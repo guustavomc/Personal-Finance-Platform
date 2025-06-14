@@ -59,6 +59,21 @@ public class ExpenseService {
         return response;
     }
 
+    public void deleteExpense(Long id){
+        if(!expenseRepository.existsById(id)){
+            throw new RuntimeException("Expense with ID " + id + " not found");
+        }
+        else{
+            try{
+                expenseRepository.deleteById(id);
+            }
+            catch(Exception e){
+                throw new RuntimeException("Failed to delete Expense with ID " + id);
+            }
+
+        }
+    }
+
 
 
     
