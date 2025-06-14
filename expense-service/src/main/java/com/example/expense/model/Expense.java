@@ -2,8 +2,15 @@ package com.example.expense.model;
 
 import java.math.BigDecimal;
 
+import org.springframework.data.annotation.Id;
+import jakarta.persistence.*;
+
+
+@Entity
 public class Expense {
 
+    @Id 
+    @GeneratedValue
     private long id;
 
     private String Description;
