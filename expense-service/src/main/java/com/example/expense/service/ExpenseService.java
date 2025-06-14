@@ -21,6 +21,10 @@ public class ExpenseService {
         return expenseRepository.findAll();
     }
 
+    public Expense saveExpense(Expense expense){
+        return expenseRepository.save(expense);
+    }
+
 
 
     
