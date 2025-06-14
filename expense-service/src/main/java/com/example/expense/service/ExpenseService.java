@@ -12,7 +12,6 @@ public class ExpenseService {
 
     private ExpenseRepository expenseRepository;
 
-
     public ExpenseService(ExpenseRepository expenseRepository){
         this.expenseRepository=expenseRepository;
     }

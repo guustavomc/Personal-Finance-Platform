@@ -1,25 +1,25 @@
 package com.example.expense.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.expense.model.Expense;
 import com.example.expense.service.ExpenseService;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.*;
-
-
 @RestController
 @RequestMapping("/api/expense")
+@Validated
 public class ExpenseController {
 
+    @Autowired
     private ExpenseService expenseService;
-
-    public ExpenseController(ExpenseService expenseService){
-        this.expenseService=expenseService;
-    }
 
     @GetMapping
     public List<Expense> getAllExpenses(){

@@ -13,11 +13,19 @@ public class Expense {
     @GeneratedValue
     private long id;
 
-    private String Description;
+    private String description;
 
     private String category;
 
     private BigDecimal value;
+
+    public Expense(){}
+
+    public Expense(String description, String category, BigDecimal value){
+        this.description=description;
+        this.category=category;
+        this.value=value;
+    }
 
 
     public long getId() {
@@ -25,7 +33,7 @@ public class Expense {
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
     public String getCategory() {
@@ -41,7 +49,7 @@ public class Expense {
     }
 
     public void setDescription(String description) {
-        Description = description;
+        description = description;
     }
 
     public void setCategory(String category) {
