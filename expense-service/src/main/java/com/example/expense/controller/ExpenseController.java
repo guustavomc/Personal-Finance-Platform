@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.expense.dto.CreateExpenseRequest;
+import com.example.expense.dto.ExpenseResponse;
 import com.example.expense.model.Expense;
 import com.example.expense.service.ExpenseService;
 
@@ -23,7 +24,7 @@ public class ExpenseController {
     private ExpenseService expenseService;
 
     @GetMapping
-    public List<Expense> getAllExpenses(){
+    public List<ExpenseResponse> getAllExpenses(){
         return expenseService.getAllExpenses();
     }
     

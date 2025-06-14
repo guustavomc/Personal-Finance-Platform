@@ -18,16 +18,16 @@ public class Expense {
 
     private String category;
 
-    private BigDecimal value;
+    private BigDecimal valueSpent;
 
     private LocalDate date;
 
     public Expense(){}
 
-    public Expense(String description, String category, BigDecimal value, LocalDate date){
+    public Expense(String description, String category, BigDecimal valueSpent, LocalDate date){
         this.description=description;
         this.category=category;
-        this.value=value;
+        this.valueSpent=valueSpent;
         this.date=date;
     }
 
@@ -44,8 +44,8 @@ public class Expense {
         return category;
     }
 
-    public BigDecimal getValue() {
-        return value;
+    public BigDecimal getValueSpent() {
+        return valueSpent;
     }
 
     public LocalDate getDate() {
@@ -64,8 +64,8 @@ public class Expense {
         this.category = category;
     }
 
-    public void setValue(BigDecimal value) {
-        this.value = value;
+    public void setValueSpent(BigDecimal valueSpent) {
+        this.valueSpent = valueSpent;
     }
 
     public void setDate(LocalDate date) {
