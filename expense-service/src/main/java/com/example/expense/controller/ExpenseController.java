@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.expense.dto.CreateExpenseRequest;
 import com.example.expense.model.Expense;
 import com.example.expense.service.ExpenseService;
 
@@ -27,7 +28,7 @@ public class ExpenseController {
     }
     
     @PostMapping
-    public Expense creatExpense(@RequestBody Expense expense){
+    public Expense creatExpense(@RequestBody CreateExpenseRequest expense){
         return expenseService.saveExpense(expense);
     }
 }

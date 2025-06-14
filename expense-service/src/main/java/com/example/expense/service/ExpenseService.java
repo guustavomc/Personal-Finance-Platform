@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.expense.dto.CreateExpenseRequest;
 import com.example.expense.model.Expense;
 import com.example.expense.repository.ExpenseRepository;
 
@@ -20,7 +21,13 @@ public class ExpenseService {
         return expenseRepository.findAll();
     }
 
-    public Expense saveExpense(Expense expense){
+    public Expense saveExpense(CreateExpenseRequest expenseRequest){
+        Expense expense = new Expense();
+        expense.setCategory(expenseRequest.getCategory());
+        expense.setDate(expenseRequest.getDate());
+        expense.setDescription(expenseRequest.getDescription());
+        expense.setValue(expenseRequest.getValue());
+
         return expenseRepository.save(expense);
     }
 

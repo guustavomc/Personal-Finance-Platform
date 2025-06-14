@@ -1,18 +1,11 @@
-package com.example.expense.model;
+package com.example.expense.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import jakarta.persistence.Id;
-import jakarta.persistence.*;
+public class ExpenseResponse {
 
-
-@Entity
-public class Expense {
-
-    @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     private String description;
 
@@ -22,17 +15,7 @@ public class Expense {
 
     private LocalDate date;
 
-    public Expense(){}
-
-    public Expense(String description, String category, BigDecimal value, LocalDate date){
-        this.description=description;
-        this.category=category;
-        this.value=value;
-        this.date=date;
-    }
-
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -52,12 +35,12 @@ public class Expense {
         return date;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     public void setDescription(String description) {
-        this.description=description;
+        this.description = description;
     }
 
     public void setCategory(String category) {
@@ -72,6 +55,5 @@ public class Expense {
         this.date = date;
     }
 
-
-
+    
 }
