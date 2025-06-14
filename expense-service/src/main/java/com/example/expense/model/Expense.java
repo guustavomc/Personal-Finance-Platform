@@ -49,7 +49,7 @@ public class Expense {
     }
 
     public void setDescription(String description) {
-        description = description;
+        this.description=description;
     }
 
     public void setCategory(String category) {
