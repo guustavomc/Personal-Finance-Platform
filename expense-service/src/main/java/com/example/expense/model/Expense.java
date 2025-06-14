@@ -10,7 +10,6 @@ public class Expense {
 
     private String category;
 
-
     private BigDecimal value;
 
 
