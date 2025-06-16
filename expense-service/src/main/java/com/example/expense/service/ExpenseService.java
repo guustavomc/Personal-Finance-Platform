@@ -50,13 +50,7 @@ public class ExpenseService {
         Expense expense= expenseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task with ID " + id + " not found"));
 
-        response.setId(expense.getId());
-        response.setCategory(expense.getCategory());
-        response.setDate(expense.getDate());
-        response.setDescription(expense.getDescription());
-        response.setValueSpent(expense.getValueSpent());
-
-        return response;
+        return mapToExpenseResponse(expense);
     }
 
     public void deleteExpense(Long id){
@@ -72,6 +66,22 @@ public class ExpenseService {
             }
 
         }
+    }
+
+    public ExpenseResponse updateExpenseById(long id, CreateExpenseRequest expense){
+        if(!expenseRepository.existsById(id)){
+            throw new RuntimeException("Expense with ID " + id + " not found");
+        }
+
+        Expense expenseWithId= expenseRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task with ID " + id + " not found"));
+
+        expenseWithId.setCategory(expenseWithId.getCategory());
+        expenseWithId.setDate(expenseWithId.getDate());
+        expenseWithId.setDescription(expenseWithId.getDescription());
+        expenseWithId.setValueSpent(expenseWithId.getValueSpent());
+
+        return mapToExpenseResponse(expenseWithId);
     }
 
 
