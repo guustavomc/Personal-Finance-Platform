@@ -33,11 +33,11 @@ public class ExpenseController {
         return expenseService.findExpenseById(id);
     }
 
-    @GetMapping("/tag")
-    public ResponseEntity<List<ExpenseResponse>> getExpensesWithTag(@RequestParam String requestedTag){
+    @GetMapping("/category")
+    public ResponseEntity<List<ExpenseResponse>> getExpensesWithCategory(@RequestParam String category){
         List<ExpenseResponse> expenseWithRequestedTag = new ArrayList<>();
         try {
-            expenseWithRequestedTag = expenseService.findExpensesByTag(requestedTag);
+            expenseWithRequestedTag = expenseService.findExpensesByCategory(category);
             return ResponseEntity.status(HttpStatus.OK).body(expenseWithRequestedTag);
         }
         catch (Exception e){

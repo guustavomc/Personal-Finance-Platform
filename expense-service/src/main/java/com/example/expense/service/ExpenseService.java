@@ -54,12 +54,12 @@ public class ExpenseService {
         return mapExpenseToExpenseResponse(expense);
     }
 
-    public List<ExpenseResponse> findExpensesByTag(String requestedTag){
+    public List<ExpenseResponse> findExpensesByCategory(String requestedCategory){
         try {
-            return expenseRepository.findByTag(requestedTag).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
+            return expenseRepository.findByCategory(requestedCategory).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
         }
         catch (Exception e){
-            throw new RuntimeException(String.format("Failed to find expenses with tag %s", requestedTag), e);
+            throw new RuntimeException(String.format("Failed to find expenses with tag %s", requestedCategory), e);
         }
     }
 
