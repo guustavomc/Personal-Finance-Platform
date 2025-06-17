@@ -23,14 +23,19 @@ public class ExpenseService {
         return expenseRepository.findAll().stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
     }
 
-    public Expense saveExpense(CreateExpenseRequest expenseRequest){
+    public ExpenseResponse saveExpense(CreateExpenseRequest expenseRequest){
         Expense expense = new Expense();
-        expense.setCategory(expenseRequest.getCategory());
-        expense.setDate(expenseRequest.getDate());
-        expense.setDescription(expenseRequest.getDescription());
-        expense.setValueSpent(expenseRequest.getValueSpent());
+        try {
+            expense.setCategory(expenseRequest.getCategory());
+            expense.setDate(expenseRequest.getDate());
+            expense.setDescription(expenseRequest.getDescription());
+            expense.setValueSpent(expenseRequest.getValueSpent());
 
-        return expenseRepository.save(expense);
+            return mapExpenseToExpenseResponse(expenseRepository.save(expense));
+        }
+        catch (Exception e){
+            throw new RuntimeException("Failed to Save Expense");
+        }
     }
 
     public ExpenseResponse mapExpenseToExpenseResponse(Expense expense){

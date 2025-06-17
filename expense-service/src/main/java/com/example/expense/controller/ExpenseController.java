@@ -24,13 +24,28 @@ public class ExpenseController {
     private ExpenseService expenseService;
 
     @GetMapping
-    public List<ExpenseResponse> getAllExpenses(){
-        return expenseService.findAllExpenses();
+    public ResponseEntity<List<ExpenseResponse>> getAllExpenses(){
+        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
+        try {
+            expenseResponseList = expenseService.findAllExpenses();
+            return ResponseEntity.status(HttpStatus.OK).body(expenseResponseList);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenseResponseList);
+        }
     }
 
     @GetMapping("/{id}")
-    public ExpenseResponse getExpenseByID(@PathVariable("id") long id){
-        return expenseService.findExpenseById(id);
+    public ResponseEntity<ExpenseResponse> getExpenseByID(@PathVariable("id") long id){
+        ExpenseResponse expenseResponseWithId = new ExpenseResponse();
+        try {
+            expenseResponseWithId= expenseService.findExpenseById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(expenseResponseWithId);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenseResponseWithId);
+        }
+
     }
 
     @GetMapping("/category")
@@ -58,8 +73,15 @@ public class ExpenseController {
     }
     
     @PostMapping
-    public Expense creatExpense(@RequestBody CreateExpenseRequest expense){
-        return expenseService.saveExpense(expense);
+    public ResponseEntity<ExpenseResponse> creatExpense(@RequestBody CreateExpenseRequest expense){
+        ExpenseResponse response = new ExpenseResponse();
+        try {
+            response = expenseService.saveExpense(expense);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 
     @DeleteMapping("/{id}")
