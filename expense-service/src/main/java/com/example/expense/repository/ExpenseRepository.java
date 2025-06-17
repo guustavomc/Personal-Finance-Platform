@@ -11,4 +11,5 @@ import com.example.expense.model.Expense;
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByDateBetween(LocalDate start, LocalDate end);
+
 }

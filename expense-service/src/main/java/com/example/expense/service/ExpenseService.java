@@ -1,5 +1,6 @@
 package com.example.expense.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -51,6 +52,19 @@ public class ExpenseService {
                 .orElseThrow(() -> new RuntimeException("Task with ID " + id + " not found"));
 
         return mapToExpenseResponse(expense);
+    }
+
+    public List<ExpenseResponse> getExpenseByMonth(int year, int month){
+        LocalDate startDate = LocalDate.of(year, month,1);
+        LocalDate endDate = LocalDate.of(year, month, startDate.lengthOfMonth());
+        try {
+            return expenseRepository.findByDateBetween(startDate, endDate).stream().map(expense -> mapToExpenseResponse(expense)).toList();
+        }
+        catch (Exception e){
+            throw new RuntimeException(String.format("Failed to find expenses from Year %d, Month %d", year, month), e);
+
+        }
+
     }
 
     public void deleteExpense(Long id){

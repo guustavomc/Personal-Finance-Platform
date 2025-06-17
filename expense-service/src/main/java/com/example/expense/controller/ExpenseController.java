@@ -1,5 +1,6 @@
 package com.example.expense.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,18 @@ public class ExpenseController {
     @GetMapping("/{id}")
     public ExpenseResponse getExpenseByID(@PathVariable("id") long id){
         return expenseService.getExpenseById(id);
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<ExpenseResponse>> getMonthlyExpense(@RequestParam int year,@RequestParam int month){
+        List<ExpenseResponse> expensesFromRequestedMonth = new ArrayList<>();
+        try{
+            expensesFromRequestedMonth = expenseService.getExpenseByMonth(year, month);
+            return  ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedMonth);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(expensesFromRequestedMonth);
+        }
     }
     
     @PostMapping
