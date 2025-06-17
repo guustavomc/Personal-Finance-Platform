@@ -25,20 +25,32 @@ public class ExpenseController {
 
     @GetMapping
     public List<ExpenseResponse> getAllExpenses(){
-        return expenseService.getAllExpenses();
+        return expenseService.findAllExpenses();
     }
 
     @GetMapping("/{id}")
     public ExpenseResponse getExpenseByID(@PathVariable("id") long id){
-        return expenseService.getExpenseById(id);
+        return expenseService.findExpenseById(id);
+    }
+
+    @GetMapping("/tag")
+    public ResponseEntity<List<ExpenseResponse>> getExpensesWithTag(@RequestParam String requestedTag){
+        List<ExpenseResponse> expenseWithRequestedTag = new ArrayList<>();
+        try {
+            expenseWithRequestedTag = expenseService.findExpensesByTag(requestedTag);
+            return ResponseEntity.status(HttpStatus.OK).body(expenseWithRequestedTag);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenseWithRequestedTag);
+        }
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<List<ExpenseResponse>> getMonthlyExpense(@RequestParam int year,@RequestParam int month){
+    public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(@RequestParam int year,@RequestParam int month){
         List<ExpenseResponse> expensesFromRequestedMonth = new ArrayList<>();
         try{
-            expensesFromRequestedMonth = expenseService.getExpenseByMonth(year, month);
-            return  ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedMonth);
+            expensesFromRequestedMonth = expenseService.findExpensesByMonth(year, month);
+            return ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedMonth);
         }
         catch (Exception e){
             return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(expensesFromRequestedMonth);
@@ -53,7 +65,7 @@ public class ExpenseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteExpense(@PathVariable("id") long id){
         try{
-            expenseService.deleteExpense(id);
+            expenseService.removeExpense(id);
             return ResponseEntity.noContent().build();
         }
         catch(Exception e){
@@ -65,7 +77,7 @@ public class ExpenseController {
     public ResponseEntity<ExpenseResponse> updateExpense(@PathVariable("id") long id, @RequestBody CreateExpenseRequest expense){
         ExpenseResponse response= new ExpenseResponse();
         try{
-            response = expenseService.updateExpenseById(id, expense);
+            response = expenseService.editExpenseById(id, expense);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         catch (Exception e){

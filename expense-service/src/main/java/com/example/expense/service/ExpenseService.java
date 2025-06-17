@@ -19,8 +19,8 @@ public class ExpenseService {
         this.expenseRepository=expenseRepository;
     }
 
-    public List<ExpenseResponse> getAllExpenses(){
-        return expenseRepository.findAll().stream().map(expense -> mapToExpenseResponse(expense)).toList();
+    public List<ExpenseResponse> findAllExpenses(){
+        return expenseRepository.findAll().stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
     }
 
     public Expense saveExpense(CreateExpenseRequest expenseRequest){
@@ -33,7 +33,7 @@ public class ExpenseService {
         return expenseRepository.save(expense);
     }
 
-    public ExpenseResponse mapToExpenseResponse(Expense expense){
+    public ExpenseResponse mapExpenseToExpenseResponse(Expense expense){
         ExpenseResponse response = new ExpenseResponse();
 
         response.setCategory(expense.getCategory());
@@ -45,29 +45,37 @@ public class ExpenseService {
         return response;
     }
 
-    public ExpenseResponse getExpenseById(Long id){
+    public ExpenseResponse findExpenseById(Long id){
         ExpenseResponse response = new ExpenseResponse();
 
         Expense expense= expenseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task with ID " + id + " not found"));
 
-        return mapToExpenseResponse(expense);
+        return mapExpenseToExpenseResponse(expense);
     }
 
-    public List<ExpenseResponse> getExpenseByMonth(int year, int month){
+    public List<ExpenseResponse> findExpensesByTag(String requestedTag){
+        try {
+            return expenseRepository.findByTag(requestedTag).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
+        }
+        catch (Exception e){
+            throw new RuntimeException(String.format("Failed to find expenses with tag %s", requestedTag), e);
+        }
+    }
+
+    public List<ExpenseResponse> findExpensesByMonth(int year, int month){
         LocalDate startDate = LocalDate.of(year, month,1);
         LocalDate endDate = LocalDate.of(year, month, startDate.lengthOfMonth());
         try {
-            return expenseRepository.findByDateBetween(startDate, endDate).stream().map(expense -> mapToExpenseResponse(expense)).toList();
+            return expenseRepository.findByDateBetween(startDate, endDate).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
         }
         catch (Exception e){
             throw new RuntimeException(String.format("Failed to find expenses from Year %d, Month %d", year, month), e);
 
         }
-
     }
 
-    public void deleteExpense(Long id){
+    public void removeExpense(Long id){
         if(!expenseRepository.existsById(id)){
             throw new RuntimeException("Expense with ID " + id + " not found");
         }
@@ -82,7 +90,7 @@ public class ExpenseService {
         }
     }
 
-    public ExpenseResponse updateExpenseById(long id, CreateExpenseRequest expense){
+    public ExpenseResponse editExpenseById(long id, CreateExpenseRequest expense){
         if(!expenseRepository.existsById(id)){
             throw new RuntimeException("Expense with ID " + id + " not found");
         }
@@ -95,7 +103,7 @@ public class ExpenseService {
         expenseWithId.setDescription(expenseWithId.getDescription());
         expenseWithId.setValueSpent(expenseWithId.getValueSpent());
 
-        return mapToExpenseResponse(expenseWithId);
+        return mapExpenseToExpenseResponse(expenseWithId);
     }
 
 
