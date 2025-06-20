@@ -54,7 +54,7 @@ public class ExpenseService {
         ExpenseResponse response = new ExpenseResponse();
 
         Expense expense= expenseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task with ID " + id + " not found"));
+                .orElseThrow(() -> new RuntimeException("Expense with ID " + id + " not found"));
 
         return mapExpenseToExpenseResponse(expense);
     }
@@ -64,7 +64,7 @@ public class ExpenseService {
             return expenseRepository.findByCategory(requestedCategory).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
         }
         catch (Exception e){
-            throw new RuntimeException(String.format("Failed to find expenses with tag %s", requestedCategory), e);
+            throw new RuntimeException(String.format("Failed to find expenses with category %s", requestedCategory), e);
         }
     }
 
@@ -96,12 +96,9 @@ public class ExpenseService {
     }
 
     public ExpenseResponse editExpenseById(long id, CreateExpenseRequest expense){
-        if(!expenseRepository.existsById(id)){
-            throw new RuntimeException("Expense with ID " + id + " not found");
-        }
 
         Expense expenseWithId= expenseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task with ID " + id + " not found"));
+                .orElseThrow(() -> new RuntimeException("Expense with ID " + id + " not found"));
 
         expenseWithId.setCategory(expenseWithId.getCategory());
         expenseWithId.setDate(expenseWithId.getDate());
