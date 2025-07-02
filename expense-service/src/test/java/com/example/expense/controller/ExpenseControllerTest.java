@@ -1,5 +1,6 @@
 package com.example.expense.controller;
 
+import com.example.expense.dto.CreateExpenseRequest;
 import com.example.expense.dto.ExpenseResponse;
 import com.example.expense.repository.ExpenseRepository;
 import com.example.expense.service.ExpenseService;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ExpenseControllerTest {
@@ -132,6 +133,83 @@ public class ExpenseControllerTest {
 
         ResponseEntity<List<ExpenseResponse>> response = expenseController.getMonthlyExpenses(year, month);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void createExpense_ReturnExpenseResponse(){
+        CreateExpenseRequest expense = new CreateExpenseRequest();
+        ExpenseResponse expenseResponse = new ExpenseResponse();
+
+        when(expenseService.saveExpense(expense)).thenReturn(expenseResponse);
+
+        ResponseEntity<ExpenseResponse> response = expenseController.createExpense(expense);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(expenseResponse, response.getBody());
+    }
+
+    @Test
+    void createExpense_ReturnNotFound(){
+        CreateExpenseRequest expense = new CreateExpenseRequest();
+        ExpenseResponse expenseResponse = new ExpenseResponse();
+
+        when(expenseService.saveExpense(expense)).thenThrow(new RuntimeException());
+
+        ResponseEntity<ExpenseResponse> response = expenseController.createExpense(expense);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void deleteExpense_DeleteExpenseWithID(){
+        long id = 1L;
+        ExpenseResponse expenseResponse = new ExpenseResponse();
+
+        doNothing().when(expenseService).removeExpense(id);
+
+        ResponseEntity<String> response = expenseController.deleteExpense(id);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void deleteExpense_ReturnNotFound(){
+        long id = 1L;
+        ExpenseResponse expenseResponse = new ExpenseResponse();
+
+
+        doThrow(new RuntimeException()).when(expenseService).removeExpense(id);
+
+        ResponseEntity<String> response = expenseController.deleteExpense(id);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void updateExpense_Success_ReturnsOk() {
+        long id = 1L;
+        CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
+        ExpenseResponse expenseResponse = new ExpenseResponse();
+        when(expenseService.editExpenseById(id, createExpenseRequest)).thenReturn(expenseResponse);
+
+        ResponseEntity<ExpenseResponse> response = expenseController.updateExpense(id, createExpenseRequest);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expenseResponse, response.getBody());
+    }
+
+    @Test
+    void updateExpense_Failure_ReturnsNotFound() {
+        long id = 1L;
+        CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
+        ExpenseResponse expenseResponse = new ExpenseResponse();
+
+        when(expenseService.editExpenseById(id, createExpenseRequest)).thenThrow(new RuntimeException());
+
+        ResponseEntity<ExpenseResponse> response = expenseController.updateExpense(id, createExpenseRequest);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
     }
 }
 
