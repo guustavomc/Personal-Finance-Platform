@@ -73,7 +73,7 @@ public class ExpenseController {
     }
     
     @PostMapping
-    public ResponseEntity<ExpenseResponse> creatExpense(@RequestBody CreateExpenseRequest expense){
+    public ResponseEntity<ExpenseResponse> createExpense(@RequestBody CreateExpenseRequest expense){
         ExpenseResponse response = new ExpenseResponse();
         try {
             response = expenseService.saveExpense(expense);
@@ -88,7 +88,7 @@ public class ExpenseController {
     public ResponseEntity<String> deleteExpense(@PathVariable("id") long id){
         try{
             expenseService.removeExpense(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.OK).build();
         }
         catch(Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -108,6 +108,9 @@ public class ExpenseController {
 
 
     }
+
+
+
 
 
 
