@@ -3,6 +3,7 @@ package com.example.expense.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -73,7 +74,7 @@ public class ExpenseController {
     }
     
     @PostMapping
-    public ResponseEntity<ExpenseResponse> createExpense(@RequestBody CreateExpenseRequest expense){
+    public ResponseEntity<ExpenseResponse> createExpense(@Valid @RequestBody CreateExpenseRequest expense){
         ExpenseResponse response = new ExpenseResponse();
         try {
             response = expenseService.saveExpense(expense);
