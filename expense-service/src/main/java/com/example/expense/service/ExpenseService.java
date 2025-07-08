@@ -3,6 +3,7 @@ package com.example.expense.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.example.expense.exception.ExpenseNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.expense.dto.CreateExpenseRequest;
@@ -54,7 +55,7 @@ public class ExpenseService {
         ExpenseResponse response = new ExpenseResponse();
 
         Expense expense= expenseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Expense with ID " + id + " not found"));
+                .orElseThrow(() -> new ExpenseNotFoundException("Expense with ID " + id + " not found"));
 
         return mapExpenseToExpenseResponse(expense);
     }
@@ -64,7 +65,7 @@ public class ExpenseService {
             return expenseRepository.findByCategory(requestedCategory).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
         }
         catch (Exception e){
-            throw new RuntimeException(String.format("Failed to find expenses with category %s", requestedCategory), e);
+            throw new ExpenseNotFoundException(String.format("Failed to find expenses with category %s", requestedCategory));
         }
     }
 
@@ -75,14 +76,14 @@ public class ExpenseService {
             return expenseRepository.findByDateBetween(startDate, endDate).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
         }
         catch (Exception e){
-            throw new RuntimeException(String.format("Failed to find expenses from Year %d, Month %d", year, month), e);
+            throw new ExpenseNotFoundException(String.format("Failed to find expenses from Year %d, Month %d", year, month));
 
         }
     }
 
     public void removeExpense(Long id){
         if(!expenseRepository.existsById(id)){
-            throw new RuntimeException("Expense with ID " + id + " not found");
+            throw new ExpenseNotFoundException("Expense with ID " + id + " not found");
         }
         else{
             try{
@@ -98,7 +99,7 @@ public class ExpenseService {
     public ExpenseResponse editExpenseById(long id, CreateExpenseRequest expense){
 
         Expense expenseWithId= expenseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Expense with ID " + id + " not found"));
+                .orElseThrow(() -> new ExpenseNotFoundException("Expense with ID " + id + " not found"));
 
         expenseWithId.setCategory(expenseWithId.getCategory());
         expenseWithId.setDate(expenseWithId.getDate());

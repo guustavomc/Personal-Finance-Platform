@@ -2,6 +2,7 @@ package com.example.expense.service;
 
 import com.example.expense.dto.CreateExpenseRequest;
 import com.example.expense.dto.ExpenseResponse;
+import com.example.expense.exception.ExpenseNotFoundException;
 import com.example.expense.model.Expense;
 import com.example.expense.repository.ExpenseRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -129,7 +130,7 @@ public class ExpenseServiceTest {
     }
 
     @Test
-    void findExpenseById_ThrowRuntimeException_WhenIDNotFound(){
+    void findExpenseById_ThrowExpenseNotFoundException_WhenIDNotFound(){
         Expense expenseTest1 = new Expense();
         expenseTest1.setId(1L);
         expenseTest1.setCategory("Food");
@@ -143,7 +144,7 @@ public class ExpenseServiceTest {
 
         when(expenseRepository.findById(1L)).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(RuntimeException.class,() -> expenseService.findExpenseById(1L));
+        RuntimeException exception = assertThrows(ExpenseNotFoundException.class,() -> expenseService.findExpenseById(1L));
         assertEquals("Expense with ID 1 not found", exception.getMessage());
     }
 
@@ -176,7 +177,7 @@ public class ExpenseServiceTest {
     }
 
     @Test
-    void findExpensesByCategory_ThrowRuntimeException_WhenFailedToFindCategory(){
+    void findExpensesByCategory_ThrowExpenseNotFoundException_WhenFailedToFindCategory(){
         Expense expenseTest1 = new Expense();
         expenseTest1.setId(1L);
         expenseTest1.setCategory("Food");
@@ -196,8 +197,8 @@ public class ExpenseServiceTest {
         expenses.add(expenseTest1);
         expenses.add(expenseTest2);
 
-        when(expenseRepository.findByCategory("Food")).thenThrow(new RuntimeException());
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> expenseService.findExpensesByCategory("Food"));
+        when(expenseRepository.findByCategory("Food")).thenThrow(new ExpenseNotFoundException("Failed to find expenses with category Food"));
+        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseService.findExpensesByCategory("Food"));
         assertEquals("Failed to find expenses with category Food",exception.getMessage());
     }
 
@@ -233,7 +234,7 @@ public class ExpenseServiceTest {
     }
 
     @Test
-    void findExpensesByMonth_ThrowRuntimeException_WhenFailedToFindFromSpecificMonth(){
+    void findExpensesByMonth_ThrowExpenseNotFoundException_WhenFailedToFindFromSpecificMonth(){
         Expense expenseTest1 = new Expense();
         expenseTest1.setId(1L);
         expenseTest1.setCategory("Food");
@@ -255,9 +256,9 @@ public class ExpenseServiceTest {
         LocalDate initialDate = LocalDate.of(2025,6,1);
         LocalDate endDate = LocalDate.of(2025,6,30);
 
-        when(expenseRepository.findByDateBetween(initialDate,endDate)).thenThrow(new RuntimeException());
+        when(expenseRepository.findByDateBetween(initialDate,endDate)).thenThrow(new ExpenseNotFoundException("Failed to find expenses from Year 2025, Month 6"));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> expenseService.findExpensesByMonth(2025,6));
+        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseService.findExpensesByMonth(2025,6));
         assertEquals("Failed to find expenses from Year 2025, Month 6",exception.getMessage());
     }
 
@@ -278,7 +279,7 @@ public class ExpenseServiceTest {
         verify(expenseRepository).deleteById(1L);
     }
     @Test
-    void removeExpense_ThrowRuntimeException_WhenFailedToFindSpecificID(){
+    void removeExpense_ThrowExpenseNotFoundException_WhenFailedToFindSpecificID(){
         Expense expenseTest1 = new Expense();
         expenseTest1.setId(1L);
         expenseTest1.setCategory("Food");
@@ -287,7 +288,7 @@ public class ExpenseServiceTest {
         expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
 
         when(expenseRepository.existsById(1L)).thenReturn(false);
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> expenseService.removeExpense(1L));
+        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseService.removeExpense(1L));
         assertEquals("Expense with ID 1 not found", exception.getMessage());
     }
 
@@ -330,7 +331,7 @@ public class ExpenseServiceTest {
     }
 
     @Test
-    void editExpenseById_ThrowRuntimeException_WhenFailedToFindSpecificID(){
+    void editExpenseById_ThrowExpenseNotFoundException_WhenFailedToFindSpecificID(){
         Expense expenseTest1 = new Expense();
         expenseTest1.setId(1L);
         expenseTest1.setCategory("Food");
@@ -345,7 +346,7 @@ public class ExpenseServiceTest {
         createExpenseRequest.setValueSpent(BigDecimal.valueOf(25.50));
 
         when(expenseRepository.findById(1L)).thenReturn(Optional.empty());
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> expenseService.editExpenseById(1L, createExpenseRequest));
+        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseService.editExpenseById(1L, createExpenseRequest));
         assertEquals("Expense with ID 1 not found", exception.getMessage());
     }
 }
