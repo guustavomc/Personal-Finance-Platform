@@ -160,24 +160,46 @@ spring.jpa.properties.hibernate.format_sql=true
   kubectl get svc
   ```
 
-4. Build and Push Your Docker Image:
+4. Build the application:
    ```bash
    mvn clean package
-   docker build -t expense-api .
-   docker tag expense-api <your-dockerhub-username>/expense-api:latest
-   docker push <your-dockerhub-username>/expense-api:latest
    ```
    - Replace <your-dockerhub-username> with your Docker Hub username.
    - Make sure the image: field in expense-deployment.yaml matches.
 
 
-5. Deploy the Spring Boot app:
+5. Load the Docker Image:
+
+- Option 1 Push the Image to Docker Hub
+
+   ```bash
+   docker build -t expense-api .
+   docker tag expense-api <your-dockerhub-username>/expense-api:latest
+   docker push <your-dockerhub-username>/expense-api:latest
+   ```
+
+- Optiion 2 Load the Docker Image into Kind
+
+   If you prefer not to use Docker Hub, you can load the local expense-api image into Kind:
+
+   ```bash
+   docker build -t expense-api .
+   kind load docker-image expense-api:latest --name expense
+   ```
+
+   - Replace <your-dockerhub-username> with your Docker Hub username.
+   - Make sure the image: field in expense-deployment.yaml matches.
+
+   **Important**: Replace <your-dockerhub-username>/expense-api:latest with your Docker Hub username in the image field. If you used the local image with kind load docker-image, use image: expense-api:latest instead.
+
+
+6. Deploy the Spring Boot app:
    ```bash
    kubectl apply -f k8s/expense-deployment.yaml
    kubectl apply -f k8s/expense-service.yaml
    ```
 
-6. Expose via NodePort (or Ingress):
+7. Expose via NodePort (or Ingress):
    Your expense-service.yaml exposes the app on port 30080:
 
    ```bash
@@ -187,14 +209,14 @@ spring.jpa.properties.hibernate.format_sql=true
    - You can now access the app at:http://<node-ip>:30080
 
 
-7. For Kind or other local clusters, check the node’s IP:
+8. For Kind or other local clusters, check the node’s IP:
    ```bash
    kubectl get nodes -o wide
    ```
 
    - Use the INTERNAL-IP of a node.
 
-8. Access the API at:
+9. Access the API at:
    ```bash
    http://<node-ip>:30080/api/expense
    ```

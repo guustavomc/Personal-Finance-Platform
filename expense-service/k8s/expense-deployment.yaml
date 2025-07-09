@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: expense-api
-          image: guustavomccb/expense-api:latest
+          image: expense-api:latest
           ports:
             - containerPort: 8080
           envFrom:
