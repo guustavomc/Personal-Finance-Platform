@@ -178,17 +178,19 @@ spring.jpa.properties.hibernate.format_sql=true
    docker push <your-dockerhub-username>/expense-api:latest
    ```
 
-- Optiion 2 Load the Docker Image into Kind
+  - Replace <your-dockerhub-username> with your Docker Hub username.
+  - Make sure the image: field in expense-deployment.yaml matches.
+  
+- Option 2 Load the Docker Image into Kind
 
    If you prefer not to use Docker Hub, you can load the local expense-api image into Kind:
 
    ```bash
    docker build -t expense-api .
-   kind load docker-image expense-api:latest --name expense
+   kind load docker-image expense-api:latest --name <cluster-name>
    ```
 
-   - Replace <your-dockerhub-username> with your Docker Hub username.
-   - Make sure the image: field in expense-deployment.yaml matches.
+  
 
    **Important**: Replace <your-dockerhub-username>/expense-api:latest with your Docker Hub username in the image field. If you used the local image with kind load docker-image, use image: expense-api:latest instead.
 
