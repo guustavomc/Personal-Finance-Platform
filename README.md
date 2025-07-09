@@ -116,43 +116,6 @@ Response:
 - IDE (e.g., IntelliJ IDEA, Eclipse)
 - Database (configurable via `application.properties`; uses PostgreSQL)
 
-#### Local Test
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/personal-finance-platform.git
-   cd personal-finance-platform
-   ```
-
-   - Use tools like Postman or cURL to test the API endpoints. Unit and integration tests can be added using JUnit and Spring Boot Test.
-
-   - For local testing of Expense-Service functionality, we can run PostgreSQL with docker-compose, and app as a container
-
-
-2. For local tests, we can start PostgreSQL DB locally, using container:
-   ```bash
-   docker-compose -f db-docker-compose.yaml up -d
-   ```
-3. Build the JAR and Docker image
-   ```bash
-   ./mvnw clean package -DskipTests
-   docker build -t expense-api:latest .
-   ```
-
-4. Test the Docker Container:
-   ```bash
-    docker run -p 8080:8080 \
-   -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/expense_db \
-   -e DB_USER=postgres \
-   -e DB_PASSWORD=postgres \
-   expense-api
-   ```
-
-   - Maps port 8080 on the host to 8080 in the container.
-
-
-5. Access the API at `http://localhost:8080/api/expense`.
-
 ### Configuration
 
 Edit `src/main/resources/application.properties` to configure the database or other settings. Configuration made for Postgres:
@@ -175,13 +138,17 @@ spring.jpa.properties.hibernate.format_sql=true
 
 ### Kubernetes cluster deployment
 
-1. Create Kubernetes Secret for DB credentials:
+1. Create or start Kind Cluster
    ```bash
    kind create cluster --name <cluster-name>
+   ```
+
+2. Create Kubernetes Secret for DB credentials:
+   ```bash
    kubectl apply -f k8s/db-secrets.yaml
    ```
 
-2. Deploy PostgreSQL to the cluster:
+3. Deploy PostgreSQL to the cluster:
    ```bash
     kubectl apply -f k8s/postgres-deployment.yaml
     kubectl apply -f k8s/postgres-service.yaml
@@ -193,23 +160,24 @@ spring.jpa.properties.hibernate.format_sql=true
   kubectl get svc
   ```
 
-3. Build and Push Your Docker Image:
+4. Build and Push Your Docker Image:
    ```bash
-   ./mvnw clean package -DskipTests
-   docker build -t <your-dockerhub-username>/expense-api:latest .
+   mvn clean package
+   docker build -t expense-api .
+   docker tag expense-api <your-dockerhub-username>/expense-api:latest
    docker push <your-dockerhub-username>/expense-api:latest
    ```
-
+   - Replace <your-dockerhub-username> with your Docker Hub username.
    - Make sure the image: field in expense-deployment.yaml matches.
 
 
-4. Deploy the Spring Boot app:
+5. Deploy the Spring Boot app:
    ```bash
    kubectl apply -f k8s/expense-deployment.yaml
    kubectl apply -f k8s/expense-service.yaml
    ```
 
-5. Expose via NodePort (or Ingress):
+6. Expose via NodePort (or Ingress):
    Your expense-service.yaml exposes the app on port 30080:
 
    ```bash
@@ -219,6 +187,17 @@ spring.jpa.properties.hibernate.format_sql=true
    - You can now access the app at:http://<node-ip>:30080
 
 
+7. For Kind or other local clusters, check the node’s IP:
+   ```bash
+   kubectl get nodes -o wide
+   ```
+
+   - Use the INTERNAL-IP of a node.
+
+8. Access the API at:
+   ```bash
+   http://<node-ip>:30080/api/expense
+   ```
 ### Future Enhancements
 - Add Global Exception Handling
 - Use Lombok for Boilerplate
