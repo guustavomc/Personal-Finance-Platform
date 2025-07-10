@@ -18,6 +18,7 @@ spec:
       containers:
         - name: expense-api
           image: expense-api:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8080
           envFrom:
