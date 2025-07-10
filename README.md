@@ -169,47 +169,37 @@ spring.jpa.properties.hibernate.format_sql=true
 
 
 5. Load the Docker Image:
+   - For this project we load the local expense-api image into Kind:
 
-- Option 1 Push the Image to Docker Hub
+    ```bash
+    docker build -t expense-api .
+    kind load docker-image expense-api:latest --name <cluster-name>
+    ```
 
-   ```bash
-   docker build -t expense-api .
-   docker tag expense-api <your-dockerhub-username>/expense-api:latest
-   docker push <your-dockerhub-username>/expense-api:latest
-   ```
+    **Important**: If you were getting dockerhub image, replace <your-dockerhub-username>/expense-api:latest with your Docker Hub username in the image field. 
+   If you used the local image with kind load docker-image, use image: expense-api:latest instead.
 
-  - Replace <your-dockerhub-username> with your Docker Hub username.
-  - Make sure the image: field in expense-deployment.yaml matches.
-  
-- Option 2 Load the Docker Image into Kind
-
-   If you prefer not to use Docker Hub, you can load the local expense-api image into Kind:
-
-   ```bash
-   docker build -t expense-api .
-   kind load docker-image expense-api:latest --name <cluster-name>
-   ```
-
-  
-
-   **Important**: Replace <your-dockerhub-username>/expense-api:latest with your Docker Hub username in the image field. If you used the local image with kind load docker-image, use image: expense-api:latest instead.
-
-
-6. Deploy the Spring Boot app:
+6. Apply the Manifests:
    ```bash
    kubectl apply -f k8s/expense-deployment.yaml
    kubectl apply -f k8s/expense-service.yaml
    ```
 
 7. Expose via NodePort (or Ingress):
-   Your expense-service.yaml exposes the app on port 30080:
+   - Your expense-service.yaml exposes the app on port 30080:
 
    ```bash
    kubectl get svc expense-api-service
    ```
-
    - You can now access the app at:http://<node-ip>:30080
+   
 
+8. Verify the Deployment:
+   ```bash
+    kubectl get deployments
+    kubectl get pods
+    kubectl get services
+   ```
 
 8. For Kind or other local clusters, check the node’s IP:
    ```bash
@@ -218,10 +208,14 @@ spring.jpa.properties.hibernate.format_sql=true
 
    - Use the INTERNAL-IP of a node.
 
-9. Access the API at:
+9. Port Forwarding:
    ```bash
-   http://<node-ip>:30080/api/expense
+   kubectl port-forward service/expense-api-service 8080:80
    ```
+
+   - Access the API at http://localhost:8080/api/expense.
+
+
 ### Future Enhancements
 - Add Global Exception Handling
 - Use Lombok for Boilerplate
