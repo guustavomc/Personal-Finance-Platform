@@ -323,6 +323,7 @@ public class ExpenseServiceTest {
         createExpenseRequest.setValueSpent(BigDecimal.valueOf(25.50));
 
         when(expenseRepository.findById(1L)).thenReturn(Optional.of(expenseTest1));
+        when(expenseRepository.save(any(Expense.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         ExpenseResponse result = expenseService.editExpenseById(1L, createExpenseRequest);
 

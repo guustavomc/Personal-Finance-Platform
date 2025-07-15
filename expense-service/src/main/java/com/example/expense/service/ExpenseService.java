@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.example.expense.exception.ExpenseNotFoundException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import com.example.expense.dto.CreateExpenseRequest;
@@ -25,39 +26,46 @@ public class ExpenseService {
     }
 
     public ExpenseResponse saveExpense(CreateExpenseRequest expenseRequest){
-        Expense expense = new Expense();
         try {
-            expense.setCategory(expenseRequest.getCategory());
-            expense.setDate(expenseRequest.getDate());
-            expense.setDescription(expenseRequest.getDescription());
-            expense.setValueSpent(expenseRequest.getValueSpent());
-
-            return mapExpenseToExpenseResponse(expenseRepository.save(expense));
+            return mapExpenseToExpenseResponse(saveVerifiedExpense(expenseRequest));
         }
         catch (Exception e){
             throw new RuntimeException("Failed to Save Expense");
         }
     }
 
+    public Expense saveVerifiedExpense(CreateExpenseRequest expenseRequest){
+        return expenseRepository.save(mapExpenseRequestToExpense(expenseRequest));
+    }
+
+    private Expense mapExpenseRequestToExpense(CreateExpenseRequest expenseRequest) {
+        Expense expense = new Expense();
+        expense.setCategory(expenseRequest.getCategory());
+        expense.setDate(expenseRequest.getDate());
+        expense.setDescription(expenseRequest.getDescription());
+        expense.setValueSpent(expenseRequest.getValueSpent());
+
+        return expense;
+    }
+
     public ExpenseResponse mapExpenseToExpenseResponse(Expense expense){
         ExpenseResponse response = new ExpenseResponse();
-
         response.setCategory(expense.getCategory());
         response.setDate(expense.getDate());
         response.setDescription(expense.getDescription());
         response.setId(expense.getId());
         response.setValueSpent(expense.getValueSpent());
-
         return response;
     }
 
     public ExpenseResponse findExpenseById(Long id){
-        ExpenseResponse response = new ExpenseResponse();
-
-        Expense expense= expenseRepository.findById(id)
-                .orElseThrow(() -> new ExpenseNotFoundException("Expense with ID " + id + " not found"));
-
+        Expense expense = findVerifiedExpense(id);
         return mapExpenseToExpenseResponse(expense);
+    }
+
+    public Expense findVerifiedExpense(Long id) {
+        return expenseRepository.findById(id)
+                .orElseThrow(() -> new ExpenseNotFoundException("Expense with ID " + id + " not found"));
     }
 
     public List<ExpenseResponse> findExpensesByCategory(String requestedCategory){
@@ -97,19 +105,18 @@ public class ExpenseService {
     }
 
     public ExpenseResponse editExpenseById(long id, CreateExpenseRequest expense){
-
-        Expense expenseWithId= expenseRepository.findById(id)
-                .orElseThrow(() -> new ExpenseNotFoundException("Expense with ID " + id + " not found"));
-
-        expenseWithId.setCategory(expenseWithId.getCategory());
-        expenseWithId.setDate(expenseWithId.getDate());
-        expenseWithId.setDescription(expenseWithId.getDescription());
-        expenseWithId.setValueSpent(expenseWithId.getValueSpent());
-
+        Expense expenseWithId = updateVerifiedExpenseById(id, expense);
         return mapExpenseToExpenseResponse(expenseWithId);
     }
 
+    private Expense updateVerifiedExpenseById(long id, CreateExpenseRequest request) {
+        Expense expense = findVerifiedExpense(id);
+        expense.setCategory(request.getCategory());
+        expense.setDate(request.getDate());
+        expense.setDescription(request.getDescription());
+        expense.setValueSpent(request.getValueSpent());
+        return expenseRepository.save(expense);
+    }
 
 
-    
 }
