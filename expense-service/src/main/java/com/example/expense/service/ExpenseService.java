@@ -81,7 +81,7 @@ public class ExpenseService {
         LocalDate startDate = LocalDate.of(year, month,1);
         LocalDate endDate = LocalDate.of(year, month, startDate.lengthOfMonth());
         try {
-            return expenseRepository.findByDateBetween(startDate, endDate).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
+            return findVerifiedExpensesBetweenDates(startDate, endDate);
         }
         catch (Exception e){
             throw new ExpenseNotFoundException(String.format("Failed to find expenses from Year %d, Month %d", year, month));
@@ -89,18 +89,38 @@ public class ExpenseService {
         }
     }
 
+    public List<ExpenseResponse> findExpensesByYear(int year){
+        LocalDate startDate = LocalDate.of(year, 01,1);
+        LocalDate endDate = LocalDate.of(year, 12, startDate.lengthOfMonth());
+        try {
+            return findVerifiedExpensesBetweenDates(startDate, endDate);
+        }
+        catch (Exception e){
+            throw new ExpenseNotFoundException(String.format("Failed to find expenses from Year %d", year));
+
+        }
+    }
+
+    private List<ExpenseResponse> findVerifiedExpensesBetweenDates(LocalDate startDate, LocalDate endDate) {
+        return expenseRepository.findByDateBetween(startDate, endDate).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
+    }
+
     public void removeExpense(Long id){
         if(!expenseRepository.existsById(id)){
             throw new ExpenseNotFoundException("Expense with ID " + id + " not found");
         }
         else{
-            try{
-                expenseRepository.deleteById(id);
-            }
-            catch(Exception e){
-                throw new RuntimeException("Failed to delete Expense with ID " + id);
-            }
+            removeVerifiedExpense(id);
 
+        }
+    }
+
+    private void removeVerifiedExpense(Long id) {
+        try{
+            expenseRepository.deleteById(id);
+        }
+        catch(Exception e){
+            throw new RuntimeException("Failed to delete Expense with ID " + id);
         }
     }
 

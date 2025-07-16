@@ -61,7 +61,7 @@ public class ExpenseController {
         }
     }
 
-    @GetMapping("/summary")
+    /*@GetMapping("/summary")
     public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(@RequestParam int year,@RequestParam int month){
         List<ExpenseResponse> expensesFromRequestedMonth = new ArrayList<>();
         try{
@@ -70,6 +70,30 @@ public class ExpenseController {
         }
         catch (Exception e){
             return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(expensesFromRequestedMonth);
+        }
+    }*/
+
+    @GetMapping("/summary/monthly")
+    public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(@RequestParam int year,@RequestParam int month){
+        List<ExpenseResponse> expensesFromRequestedMonth = new ArrayList<>();
+        try{
+            expensesFromRequestedMonth = expenseService.findExpensesByMonth(year, month);
+            return ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedMonth);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(expensesFromRequestedMonth);
+        }
+    }
+
+    @GetMapping("/summary/annual")
+    public ResponseEntity<List<ExpenseResponse>> getAnnualExpenses(@RequestParam int year){
+        List<ExpenseResponse> expensesFromRequestedYear = new ArrayList<>();
+        try{
+            expensesFromRequestedYear = expenseService.findExpensesByYear(year);
+            return ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedYear);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(expensesFromRequestedYear);
         }
     }
     
