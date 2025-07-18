@@ -136,6 +136,33 @@ public class ExpenseControllerTest {
     }
 
     @Test
+    void getAnnualExpenses_ReturnExpenseResponseList_WithYearlyExpenses(){
+        ExpenseResponse expenseResponse = new ExpenseResponse();
+        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
+        expenseResponseList.add(expenseResponse);
+        int year = 2025;
+
+        when(expenseService.findExpensesByYear(year)).thenReturn(expenseResponseList);
+
+        ResponseEntity<List<ExpenseResponse>> response = expenseController.getAnnualExpenses(year);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().size());
+    }
+
+    @Test
+    void getAnnualExpenses_ReturnNotFound(){
+        ExpenseResponse expenseResponse = new ExpenseResponse();
+        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
+        expenseResponseList.add(expenseResponse);
+        int year = 2025;
+
+        when(expenseService.findExpensesByYear(year)).thenThrow(new RuntimeException());
+
+        ResponseEntity<List<ExpenseResponse>> response = expenseController.getAnnualExpenses(year);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void createExpense_ReturnExpenseResponse(){
         CreateExpenseRequest expense = new CreateExpenseRequest();
         ExpenseResponse expenseResponse = new ExpenseResponse();

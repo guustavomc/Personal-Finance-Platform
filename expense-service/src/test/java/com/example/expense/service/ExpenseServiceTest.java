@@ -263,6 +263,66 @@ public class ExpenseServiceTest {
     }
 
     @Test
+    void findExpensesByYear_ReturnExpenseResponseList_FromSpecificYear(){
+        Expense expenseTest1 = new Expense();
+        expenseTest1.setId(1L);
+        expenseTest1.setCategory("Food");
+        expenseTest1.setDate(LocalDate.of(2025, 6, 18));
+        expenseTest1.setDescription("Lunch");
+        expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
+
+        Expense expenseTest2 = new Expense();
+        expenseTest2.setId(2L);
+        expenseTest2.setCategory("Food");
+        expenseTest2.setDate(LocalDate.of(2025, 6, 8));
+        expenseTest2.setDescription("Dinner with the gf");
+        expenseTest2.setValueSpent(BigDecimal.valueOf(200));
+
+        List<Expense> expenses = new ArrayList<>();
+        expenses.add(expenseTest1);
+        expenses.add(expenseTest2);
+
+        LocalDate startDate = LocalDate.of(2025, 01,1);
+        LocalDate endDate = LocalDate.of(2025, 12, startDate.lengthOfMonth());
+
+        when(expenseRepository.findByDateBetween(startDate,endDate)).thenReturn(expenses);
+        List<ExpenseResponse> expenseResponsesList = expenseService.findExpensesByYear(2025);
+
+        assertEquals(2, expenseResponsesList.size());
+        assertEquals(LocalDate.of(2025, 6, 18), expenseResponsesList.get(0).getDate());
+        assertEquals(LocalDate.of(2025, 6, 8), expenseResponsesList.get(1).getDate());
+    }
+
+    @Test
+    void findExpensesByYear_ThrowExpenseNotFoundException_WhenFailedToFindFromSpecificMonth(){
+        Expense expenseTest1 = new Expense();
+        expenseTest1.setId(1L);
+        expenseTest1.setCategory("Food");
+        expenseTest1.setDate(LocalDate.of(2025, 6, 18));
+        expenseTest1.setDescription("Lunch");
+        expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
+
+        Expense expenseTest2 = new Expense();
+        expenseTest2.setId(2L);
+        expenseTest2.setCategory("Food");
+        expenseTest2.setDate(LocalDate.of(2025, 6, 8));
+        expenseTest2.setDescription("Dinner with the gf");
+        expenseTest2.setValueSpent(BigDecimal.valueOf(200));
+
+        List<Expense> expenses = new ArrayList<>();
+        expenses.add(expenseTest1);
+        expenses.add(expenseTest2);
+
+        LocalDate startDate = LocalDate.of(2025, 01,1);
+        LocalDate endDate = LocalDate.of(2025, 12, startDate.lengthOfMonth());
+
+        when(expenseRepository.findByDateBetween(startDate,endDate)).thenThrow(new ExpenseNotFoundException("Failed to find expenses from Year 2025"));
+
+        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseService.findExpensesByYear(2025));
+        assertEquals("Failed to find expenses from Year 2025",exception.getMessage());
+    }
+
+    @Test
     void removeExpense_DeleteExpense_WithTheID(){
         Expense expenseTest1 = new Expense();
         expenseTest1.setId(1L);
