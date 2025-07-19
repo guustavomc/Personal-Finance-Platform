@@ -39,13 +39,9 @@ public class ExpenseController {
     @GetMapping("/{id}")
     public ResponseEntity<ExpenseResponse> getExpenseByID(@PathVariable("id") long id){
         ExpenseResponse expenseResponseWithId = new ExpenseResponse();
-        try {
-            expenseResponseWithId= expenseService.findExpenseById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(expenseResponseWithId);
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenseResponseWithId);
-        }
+
+        expenseResponseWithId= expenseService.findExpenseById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(expenseResponseWithId);
 
     }
 
