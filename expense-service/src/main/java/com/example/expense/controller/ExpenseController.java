@@ -47,14 +47,11 @@ public class ExpenseController {
 
     @GetMapping("/category")
     public ResponseEntity<List<ExpenseResponse>> getExpensesWithCategory(@RequestParam String category){
-        List<ExpenseResponse> expenseWithRequestedTag = new ArrayList<>();
-        try {
-            expenseWithRequestedTag = expenseService.findExpensesByCategory(category);
-            return ResponseEntity.status(HttpStatus.OK).body(expenseWithRequestedTag);
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenseWithRequestedTag);
-        }
+        List<ExpenseResponse> expenseWithRequestedCategory = new ArrayList<>();
+
+        expenseWithRequestedCategory = expenseService.findExpensesByCategory(category);
+        return ResponseEntity.status(HttpStatus.OK).body(expenseWithRequestedCategory);
+
     }
 
     /*@GetMapping("/summary")
@@ -72,25 +69,17 @@ public class ExpenseController {
     @GetMapping("/summary/monthly")
     public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(@RequestParam int year,@RequestParam int month){
         List<ExpenseResponse> expensesFromRequestedMonth = new ArrayList<>();
-        try{
-            expensesFromRequestedMonth = expenseService.findExpensesByMonth(year, month);
-            return ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedMonth);
-        }
-        catch (Exception e){
-            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(expensesFromRequestedMonth);
-        }
+
+        expensesFromRequestedMonth = expenseService.findExpensesByMonth(year, month);
+        return ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedMonth);
+
     }
 
     @GetMapping("/summary/annual")
     public ResponseEntity<List<ExpenseResponse>> getAnnualExpenses(@RequestParam int year){
         List<ExpenseResponse> expensesFromRequestedYear = new ArrayList<>();
-        try{
             expensesFromRequestedYear = expenseService.findExpensesByYear(year);
             return ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedYear);
-        }
-        catch (Exception e){
-            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(expensesFromRequestedYear);
-        }
     }
     
     @PostMapping
@@ -107,13 +96,8 @@ public class ExpenseController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteExpense(@PathVariable("id") long id){
-        try{
-            expenseService.removeExpense(id);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        expenseService.removeExpense(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PutMapping("/{id}")
