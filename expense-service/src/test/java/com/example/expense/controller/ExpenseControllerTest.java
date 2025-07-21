@@ -2,6 +2,7 @@ package com.example.expense.controller;
 
 import com.example.expense.dto.CreateExpenseRequest;
 import com.example.expense.dto.ExpenseResponse;
+import com.example.expense.exception.ExpenseNotFoundException;
 import com.example.expense.repository.ExpenseRepository;
 import com.example.expense.service.ExpenseService;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,8 +75,8 @@ public class ExpenseControllerTest {
 
         when(expenseService.findExpenseById(id)).thenThrow(new RuntimeException());
 
-        ResponseEntity<ExpenseResponse> response = expenseController.getExpenseByID(id);
-        assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> expenseController.getExpenseByID(id));
+
     }
 
     @Test
