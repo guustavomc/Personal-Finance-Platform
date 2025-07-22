@@ -1,8 +1,10 @@
 package com.example.expense.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -75,6 +77,18 @@ public class ExpenseService {
         catch (Exception e){
             throw new ExpenseNotFoundException(String.format("Failed to find expenses with category %s", requestedCategory));
         }
+    }
+
+
+    public ExpenseSummaryResponse findExpenseSummaryByMonth(int year, int month){
+        ExpenseSummaryResponse responseSummary = new ExpenseSummaryResponse();
+        List<ExpenseResponse> expensesFromGivenMonth = findExpensesByMonth(year,month);
+        BigDecimal totalExpensesFromMonth = expensesFromGivenMonth
+                .stream()
+                .map(expenseResponse -> expenseResponse.getValueSpent())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return responseSummary;
+
     }
 
     public List<ExpenseResponse> findExpensesByMonth(int year, int month){
