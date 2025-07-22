@@ -225,7 +225,7 @@ public class ExpenseControllerTest {
     }
 
     @Test
-    void updateExpense_Failure_ReturnsNotFound() {
+    void updateExpense_Failure_ReturnsNotFoundException() {
         long id = 1L;
         CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
         ExpenseResponse expenseResponse = new ExpenseResponse();
