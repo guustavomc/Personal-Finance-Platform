@@ -207,8 +207,8 @@ public class ExpenseControllerTest {
         ExpenseResponse expenseResponse = new ExpenseResponse();
 
         doThrow(new ExpenseNotFoundException("Expense with ID " + id + " not found")).when(expenseService).removeExpense(id);
-        ResponseEntity<String> response = expenseController.deleteExpense(id);
-        assertEquals("Expense with ID 1 not found", response.getStatusCode());
+
+        assertThrows(RuntimeException.class, () -> expenseController.deleteExpense(id));
     }
 
     @Test
@@ -230,11 +230,11 @@ public class ExpenseControllerTest {
         CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
         ExpenseResponse expenseResponse = new ExpenseResponse();
 
-        when(expenseService.editExpenseById(id, createExpenseRequest)).thenThrow(new RuntimeException());
+        when(expenseService.editExpenseById(id, createExpenseRequest)).thenThrow(new ExpenseNotFoundException("Expense with ID " + id + " not found"));
 
-        ResponseEntity<ExpenseResponse> response = expenseController.updateExpense(id, createExpenseRequest);
+        ExpenseNotFoundException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseController.updateExpense(id, createExpenseRequest));
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Expense with ID 1 not found", exception.getMessage());
 
     }
 }
