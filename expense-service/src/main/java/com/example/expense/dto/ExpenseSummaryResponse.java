@@ -11,8 +11,13 @@ public class ExpenseSummaryResponse {
 
     List<ExpenseResponse> detailedExpenses;
 
-    public ExpenseSummaryResponse(){
+    public ExpenseSummaryResponse(){}
 
+    public ExpenseSummaryResponse(BigDecimal totalExpenses, BigDecimal averageDailyExpense, String highestSpentCategory, List<ExpenseResponse> detailedExpenses){
+        this.totalExpenses=totalExpenses;
+        this.averageDailyExpense=averageDailyExpense;
+        this.highestSpentCategory=highestSpentCategory;
+        this.detailedExpenses=detailedExpenses;
     }
 
     public BigDecimal getTotalExpenses() {
