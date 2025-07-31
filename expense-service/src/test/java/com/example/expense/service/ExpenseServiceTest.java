@@ -2,6 +2,7 @@ package com.example.expense.service;
 
 import com.example.expense.dto.CreateExpenseRequest;
 import com.example.expense.dto.ExpenseResponse;
+import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
 import com.example.expense.model.Expense;
 import com.example.expense.repository.ExpenseRepository;
@@ -200,6 +201,34 @@ public class ExpenseServiceTest {
         when(expenseRepository.findByCategory("Food")).thenThrow(new ExpenseNotFoundException("Failed to find expenses with category Food"));
         RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseService.findExpensesByCategory("Food"));
         assertEquals("Failed to find expenses with category Food",exception.getMessage());
+    }
+
+    @Test
+    void findExpenseSummaryByMonth_ReturnExpenseSummaryResponse_FromSpecificMonth(){
+        Expense expenseTest1 = new Expense();
+        expenseTest1.setId(1L);
+        expenseTest1.setCategory("Food");
+        expenseTest1.setDate(LocalDate.of(2025, 6, 18));
+        expenseTest1.setDescription("Lunch");
+        expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
+
+        Expense expenseTest2 = new Expense();
+        expenseTest2.setId(2L);
+        expenseTest2.setCategory("Food");
+        expenseTest2.setDate(LocalDate.of(2025, 6, 18));
+        expenseTest2.setDescription("Dinner with the gf");
+        expenseTest2.setValueSpent(BigDecimal.valueOf(200));
+
+        List<Expense> expenses = new ArrayList<>();
+        expenses.add(expenseTest1);
+        expenses.add(expenseTest2);
+
+        LocalDate initialDate = LocalDate.of(2025,6,1);
+        LocalDate endDate = LocalDate.of(2025,6,30);
+
+        when(expenseRepository.findByDateBetween(initialDate,endDate)).thenReturn(expenses);
+        ExpenseSummaryResponse expenseSummaryResponse = expenseService.findExpenseSummaryByMonth(2025,6);
+        assertEquals(expenseSummaryResponse.getTotalExpenses(),225.5);
     }
 
     @Test

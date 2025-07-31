@@ -2,6 +2,7 @@ package com.example.expense.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 import com.example.expense.dto.ExpenseSummaryResponse;
@@ -83,10 +84,15 @@ public class ExpenseService {
     public ExpenseSummaryResponse findExpenseSummaryByMonth(int year, int month){
         ExpenseSummaryResponse responseSummary = new ExpenseSummaryResponse();
         List<ExpenseResponse> expensesFromGivenMonth = findExpensesByMonth(year,month);
+
         BigDecimal totalExpensesFromMonth = expensesFromGivenMonth
                 .stream()
                 .map(expenseResponse -> expenseResponse.getValueSpent())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal averageDailyExpenses = totalExpensesFromMonth.divide(BigDecimal.valueOf(YearMonth.of(year,month).lengthOfMonth()));
+
+
         return responseSummary;
 
     }
