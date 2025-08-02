@@ -2,6 +2,7 @@ package com.example.expense.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public class ExpenseSummaryResponse {
 
@@ -9,14 +10,16 @@ public class ExpenseSummaryResponse {
     private BigDecimal averageDailyExpense;
     private String highestSpentCategory;
 
-    List<ExpenseResponse> detailedExpenses;
+    private Map<String, BigDecimal> totalPerCategory;
+    private List<ExpenseResponse> detailedExpenses;
 
     public ExpenseSummaryResponse(){}
 
-    public ExpenseSummaryResponse(BigDecimal totalExpenses, BigDecimal averageDailyExpense, String highestSpentCategory, List<ExpenseResponse> detailedExpenses){
+    public ExpenseSummaryResponse(BigDecimal totalExpenses, BigDecimal averageDailyExpense, String highestSpentCategory,Map<String, BigDecimal> totalPerCategory ,List<ExpenseResponse> detailedExpenses){
         this.totalExpenses=totalExpenses;
         this.averageDailyExpense=averageDailyExpense;
         this.highestSpentCategory=highestSpentCategory;
+        this.totalPerCategory=totalPerCategory;
         this.detailedExpenses=detailedExpenses;
     }
 
@@ -30,6 +33,10 @@ public class ExpenseSummaryResponse {
 
     public String getHighestSpentCategory() {
         return highestSpentCategory;
+    }
+
+    public Map<String, BigDecimal> getTotalPerCategory() {
+        return totalPerCategory;
     }
 
     public List<ExpenseResponse> getDetailedExpenses() {
@@ -48,6 +55,9 @@ public class ExpenseSummaryResponse {
         this.highestSpentCategory = highestSpentCategory;
     }
 
+    public void setTotalPerCategory(Map<String, BigDecimal> totalPerCategory) {
+        this.totalPerCategory = totalPerCategory;
+    }
     public void setDetailedExpenses(List<ExpenseResponse> detailedExpenses) {
         this.detailedExpenses = detailedExpenses;
     }
