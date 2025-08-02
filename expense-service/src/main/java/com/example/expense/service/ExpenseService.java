@@ -1,9 +1,12 @@
 package com.example.expense.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
@@ -90,16 +93,32 @@ public class ExpenseService {
                 .map(expenseResponse -> expenseResponse.getValueSpent())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal averageDailyExpenses = totalExpensesFromMonth.divide(BigDecimal.valueOf(YearMonth.of(year,month).lengthOfMonth()));
+        BigDecimal averageDailyExpenses = totalExpensesFromMonth.divide(BigDecimal.valueOf(getDaysInMonth(year, month)), 2, RoundingMode.HALF_UP);
 
+        Map<String, BigDecimal> totalPerCategory = expensesFromGivenMonth.stream()
+                .collect(Collectors.groupingBy(
+                        ExpenseResponse::getCategory,
+                        Collectors.mapping(ExpenseResponse::getValueSpent,
+                                Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                ));
+
+        String highestSpentCategory = totalPerCategory.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("N/A");
+
+        responseSummary.setTotalExpenses(totalExpensesFromMonth);
+        responseSummary.setAverageDailyExpense(averageDailyExpenses);
+        responseSummary.setDetailedExpenses(findExpensesByMonth(year, month));
 
         return responseSummary;
 
     }
 
+
     public List<ExpenseResponse> findExpensesByMonth(int year, int month){
         LocalDate startDate = LocalDate.of(year, month,1);
-        LocalDate endDate = LocalDate.of(year, month, startDate.lengthOfMonth());
+        LocalDate endDate = LocalDate.of(year, month, getDaysInMonth(year, month));
         try {
             return findVerifiedExpensesBetweenDates(startDate, endDate);
         }
@@ -111,7 +130,7 @@ public class ExpenseService {
 
     public List<ExpenseResponse> findExpensesByYear(int year){
         LocalDate startDate = LocalDate.of(year, 01,1);
-        LocalDate endDate = LocalDate.of(year, 12, startDate.lengthOfMonth());
+        LocalDate endDate = LocalDate.of(year, 12, getDaysInMonth(year, 01));
         try {
             return findVerifiedExpensesBetweenDates(startDate, endDate);
         }
@@ -123,6 +142,10 @@ public class ExpenseService {
 
     private List<ExpenseResponse> findVerifiedExpensesBetweenDates(LocalDate startDate, LocalDate endDate) {
         return expenseRepository.findByDateBetween(startDate, endDate).stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
+    }
+
+    public int getDaysInMonth(int year, int month) {
+        return YearMonth.of(year, month).lengthOfMonth();
     }
 
     public void removeExpense(Long id){

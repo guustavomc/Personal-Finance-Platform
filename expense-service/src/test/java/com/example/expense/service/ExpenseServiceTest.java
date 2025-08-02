@@ -228,7 +228,7 @@ public class ExpenseServiceTest {
 
         when(expenseRepository.findByDateBetween(initialDate,endDate)).thenReturn(expenses);
         ExpenseSummaryResponse expenseSummaryResponse = expenseService.findExpenseSummaryByMonth(2025,6);
-        assertEquals(expenseSummaryResponse.getTotalExpenses(),225.5);
+        assertEquals(expenseSummaryResponse.getTotalExpenses(),BigDecimal.valueOf(225.5));
     }
 
     @Test
