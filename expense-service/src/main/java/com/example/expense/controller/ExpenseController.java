@@ -3,6 +3,7 @@ package com.example.expense.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.expense.dto.ExpenseSummaryResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,17 +55,15 @@ public class ExpenseController {
 
     }
 
-    /*@GetMapping("/summary")
-    public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(@RequestParam int year,@RequestParam int month){
-        List<ExpenseResponse> expensesFromRequestedMonth = new ArrayList<>();
-        try{
-            expensesFromRequestedMonth = expenseService.findExpensesByMonth(year, month);
-            return ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedMonth);
-        }
-        catch (Exception e){
-            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(expensesFromRequestedMonth);
-        }
-    }*/
+    @GetMapping("/summary/monthly")
+    public ResponseEntity<ExpenseSummaryResponse> getMonthlyExpenseSummaryResponse(@RequestParam int year,@RequestParam int month){
+        ExpenseSummaryResponse expenseSummaryResponse = new ExpenseSummaryResponse();
+
+        expenseSummaryResponse = expenseService.findExpenseSummaryByMonth(year, month);
+
+        return ResponseEntity.status(HttpStatus.OK).body(expenseSummaryResponse);
+    }
+
 
     @GetMapping("/detailed/monthly")
     public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(@RequestParam int year,@RequestParam int month){

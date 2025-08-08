@@ -2,6 +2,7 @@ package com.example.expense.controller;
 
 import com.example.expense.dto.CreateExpenseRequest;
 import com.example.expense.dto.ExpenseResponse;
+import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
 import com.example.expense.repository.ExpenseRepository;
 import com.example.expense.service.ExpenseService;
@@ -13,8 +14,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -105,6 +109,38 @@ public class ExpenseControllerTest {
 
         RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseController.getExpensesWithCategory(category));
         assertEquals("Failed to find expenses with category Health", exception.getMessage());
+
+    }
+
+    @Test
+    void getMonthlyExpenseSummaryResponse_ReturnMonthlySummaryResponse_WithMonthlyDetails(){
+        ExpenseSummaryResponse summaryResponse = new ExpenseSummaryResponse();
+
+        summaryResponse.setTotalExpenses(BigDecimal.valueOf(3000));
+
+        summaryResponse.setAverageDailyExpense(BigDecimal.valueOf(100));
+
+        summaryResponse.setHighestSpentCategory("Market");
+
+        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
+        summaryResponse.setDetailedExpenses(expenseResponseList);
+
+        Map<String, BigDecimal> totalPerCategory = new HashMap<>();
+        summaryResponse.setTotalPerCategory(totalPerCategory);
+
+        int year = 2025;
+        int month = 9;
+
+        when(expenseService.findExpenseSummaryByMonth(year, month)).thenReturn(summaryResponse);
+
+        ResponseEntity<ExpenseSummaryResponse> response = expenseController.getMonthlyExpenseSummaryResponse(year, month);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(BigDecimal.valueOf(3000), response.getBody().getTotalExpenses());
+        assertEquals(BigDecimal.valueOf(100), response.getBody().getAverageDailyExpense());
+        assertEquals("Market", response.getBody().getHighestSpentCategory());
+        assertEquals(0, response.getBody().getDetailedExpenses().size());
+        assertEquals(0, response.getBody().getTotalPerCategory().size());
+
 
     }
 
