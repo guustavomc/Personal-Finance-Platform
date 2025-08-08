@@ -83,7 +83,6 @@ public class ExpenseService {
         }
     }
 
-
     public ExpenseSummaryResponse findExpenseSummaryByMonth(int year, int month){
         List<ExpenseResponse> expensesFromGivenMonth = findExpensesByMonth(year,month);
 
@@ -103,8 +102,6 @@ public class ExpenseService {
                 expensesFromGivenMonth);
 
         return summaryResponse;
-
-
     }
 
     private BigDecimal findTotalExpensesFromMonth(List<ExpenseResponse> expensesFromGivenMonth) {
