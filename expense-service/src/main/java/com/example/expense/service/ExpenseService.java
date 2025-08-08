@@ -85,16 +85,44 @@ public class ExpenseService {
 
 
     public ExpenseSummaryResponse findExpenseSummaryByMonth(int year, int month){
-        ExpenseSummaryResponse responseSummary = new ExpenseSummaryResponse();
         List<ExpenseResponse> expensesFromGivenMonth = findExpensesByMonth(year,month);
 
-        BigDecimal totalExpensesFromMonth = expensesFromGivenMonth
+        BigDecimal totalExpensesFromMonth = findTotalExpensesFromMonth(expensesFromGivenMonth);
+
+        BigDecimal averageDailyExpenses = findAverageDailyExpenses(year, month, totalExpensesFromMonth);
+
+        Map<String, BigDecimal> totalPerCategory = findTotalPerCategory(expensesFromGivenMonth);
+
+        String highestSpentCategory= findHighestSpentCategory(totalPerCategory);
+
+        ExpenseSummaryResponse summaryResponse = new ExpenseSummaryResponse(
+                totalExpensesFromMonth,
+                averageDailyExpenses,
+                highestSpentCategory,
+                totalPerCategory,
+                expensesFromGivenMonth);
+
+        return summaryResponse;
+
+
+    }
+
+    private BigDecimal findTotalExpensesFromMonth(List<ExpenseResponse> expensesFromGivenMonth) {
+        BigDecimal totalExpensesFromMonth= expensesFromGivenMonth
                 .stream()
                 .map(expenseResponse -> expenseResponse.getValueSpent())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal averageDailyExpenses = totalExpensesFromMonth.divide(BigDecimal.valueOf(getDaysInMonth(year, month)), 2, RoundingMode.HALF_UP);
+        return totalExpensesFromMonth;
+    }
 
+    private BigDecimal findAverageDailyExpenses(int year, int month, BigDecimal totalExpensesFromMonth) {
+        BigDecimal averageDailyExpense= totalExpensesFromMonth.divide(BigDecimal.valueOf(getDaysInMonth(year, month)), 2, RoundingMode.HALF_UP);
+
+        return  averageDailyExpense;
+    }
+
+    private Map<String, BigDecimal> findTotalPerCategory(List<ExpenseResponse> expensesFromGivenMonth) {
         Map<String, BigDecimal> totalPerCategory = expensesFromGivenMonth.stream()
                 .collect(Collectors.groupingBy(
                         ExpenseResponse::getCategory,
@@ -102,17 +130,16 @@ public class ExpenseService {
                                 Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
                 ));
 
+        return totalPerCategory;
+    }
+
+    private String findHighestSpentCategory(Map<String, BigDecimal> totalPerCategory) {
         String highestSpentCategory = totalPerCategory.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse("N/A");
 
-        responseSummary.setTotalExpenses(totalExpensesFromMonth);
-        responseSummary.setAverageDailyExpense(averageDailyExpenses);
-        responseSummary.setDetailedExpenses(findExpensesByMonth(year, month));
-
-        return responseSummary;
-
+        return highestSpentCategory;
     }
 
 
