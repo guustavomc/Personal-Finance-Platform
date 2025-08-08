@@ -220,6 +220,7 @@ public class ExpenseServiceTest {
         expenseTest2.setValueSpent(BigDecimal.valueOf(200));
 
         List<Expense> expenses = new ArrayList<>();
+
         expenses.add(expenseTest1);
         expenses.add(expenseTest2);
 
