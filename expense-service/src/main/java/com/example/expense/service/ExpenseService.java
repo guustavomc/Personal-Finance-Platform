@@ -3,6 +3,7 @@ package com.example.expense.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
@@ -86,16 +87,16 @@ public class ExpenseService {
     public ExpenseSummaryResponse findExpenseSummaryByMonth(int year, int month){
         List<ExpenseResponse> expensesFromGivenMonth = findExpensesByMonth(year,month);
 
-        BigDecimal totalExpensesFromMonth = findTotalExpensesFromMonth(expensesFromGivenMonth);
+        BigDecimal totalSpentInMonth = findTotalSpentFromGivenPeriod(expensesFromGivenMonth);
 
-        BigDecimal averageDailyExpenses = findAverageDailyExpenses(year, month, totalExpensesFromMonth);
+        BigDecimal averageDailyExpenses = findAverageDailyExpensesFromMonth(year, month, totalSpentInMonth);
 
         Map<String, BigDecimal> totalPerCategory = findTotalPerCategory(expensesFromGivenMonth);
 
         String highestSpentCategory= findHighestSpentCategory(totalPerCategory);
 
         ExpenseSummaryResponse summaryResponse = new ExpenseSummaryResponse(
-                totalExpensesFromMonth,
+                totalSpentInMonth,
                 averageDailyExpenses,
                 highestSpentCategory,
                 totalPerCategory,
@@ -104,7 +105,28 @@ public class ExpenseService {
         return summaryResponse;
     }
 
-    private BigDecimal findTotalExpensesFromMonth(List<ExpenseResponse> expensesFromGivenMonth) {
+    public ExpenseSummaryResponse findExpenseSummaryByYear(int year){
+        List<ExpenseResponse> expensesFromGivenYear = findExpensesByYear(year);
+
+        BigDecimal totalSpentInYear = findTotalSpentFromGivenPeriod(expensesFromGivenYear);
+
+        BigDecimal averageDailyExpenses = findAverageDailyExpensesFromYear(year, totalSpentInYear);
+
+        Map<String, BigDecimal> totalPerCategory = findTotalPerCategory(expensesFromGivenYear);
+
+        String highestSpentCategory= findHighestSpentCategory(totalPerCategory);
+
+        ExpenseSummaryResponse summaryResponse = new ExpenseSummaryResponse(
+                totalSpentInYear,
+                averageDailyExpenses,
+                highestSpentCategory,
+                totalPerCategory,
+                expensesFromGivenYear);
+
+        return summaryResponse;
+    }
+
+    private BigDecimal findTotalSpentFromGivenPeriod(List<ExpenseResponse> expensesFromGivenMonth) {
         BigDecimal totalExpensesFromMonth= expensesFromGivenMonth
                 .stream()
                 .map(expenseResponse -> expenseResponse.getValueSpent())
@@ -113,8 +135,14 @@ public class ExpenseService {
         return totalExpensesFromMonth;
     }
 
-    private BigDecimal findAverageDailyExpenses(int year, int month, BigDecimal totalExpensesFromMonth) {
+    private BigDecimal findAverageDailyExpensesFromMonth(int year, int month, BigDecimal totalExpensesFromMonth) {
         BigDecimal averageDailyExpense= totalExpensesFromMonth.divide(BigDecimal.valueOf(getDaysInMonth(year, month)), 2, RoundingMode.HALF_UP);
+
+        return  averageDailyExpense;
+    }
+
+    private BigDecimal findAverageDailyExpensesFromYear(int year, BigDecimal totalExpensesFromMonth) {
+        BigDecimal averageDailyExpense= totalExpensesFromMonth.divide(BigDecimal.valueOf(getDaysInYear(year)), 2, RoundingMode.HALF_UP);
 
         return  averageDailyExpense;
     }
@@ -171,6 +199,10 @@ public class ExpenseService {
     public int getDaysInMonth(int year, int month) {
         return YearMonth.of(year, month).lengthOfMonth();
     }
+
+    public int getDaysInYear(int year) {
+    return Year.of(year).length();
+}
 
     public void removeExpense(Long id){
         if(!expenseRepository.existsById(id)){
