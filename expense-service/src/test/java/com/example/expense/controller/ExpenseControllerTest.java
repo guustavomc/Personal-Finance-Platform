@@ -145,6 +145,37 @@ public class ExpenseControllerTest {
     }
 
     @Test
+    void getAnnualExpenseSummaryResponse_ReturnAnnualSummaryResponse_WithAnnualDetails(){
+        ExpenseSummaryResponse summaryResponse = new ExpenseSummaryResponse();
+
+        summaryResponse.setTotalExpenses(BigDecimal.valueOf(3000));
+
+        summaryResponse.setAverageDailyExpense(BigDecimal.valueOf(100));
+
+        summaryResponse.setHighestSpentCategory("Market");
+
+        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
+        summaryResponse.setDetailedExpenses(expenseResponseList);
+
+        Map<String, BigDecimal> totalPerCategory = new HashMap<>();
+        summaryResponse.setTotalPerCategory(totalPerCategory);
+
+        int year = 2025;
+
+        when(expenseService.findExpenseSummaryByYear(year)).thenReturn(summaryResponse);
+
+        ResponseEntity<ExpenseSummaryResponse> response = expenseController.getAnnualExpenseSummaryResponse(year);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(BigDecimal.valueOf(3000), response.getBody().getTotalExpenses());
+        assertEquals(BigDecimal.valueOf(100), response.getBody().getAverageDailyExpense());
+        assertEquals("Market", response.getBody().getHighestSpentCategory());
+        assertEquals(0, response.getBody().getDetailedExpenses().size());
+        assertEquals(0, response.getBody().getTotalPerCategory().size());
+
+
+    }
+
+    @Test
     void getMonthlyExpenses_ReturnExpenseResponseList_WithMonthlyExpenses(){
         ExpenseResponse expenseResponse = new ExpenseResponse();
         List<ExpenseResponse> expenseResponseList = new ArrayList<>();

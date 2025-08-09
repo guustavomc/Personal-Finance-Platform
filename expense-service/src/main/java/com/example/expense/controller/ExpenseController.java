@@ -64,6 +64,15 @@ public class ExpenseController {
         return ResponseEntity.status(HttpStatus.OK).body(expenseSummaryResponse);
     }
 
+    @GetMapping("/summary/annual")
+    public ResponseEntity<ExpenseSummaryResponse> getAnnualExpenseSummaryResponse(@RequestParam int year){
+        ExpenseSummaryResponse expenseSummaryResponse = new ExpenseSummaryResponse();
+
+        expenseSummaryResponse = expenseService.findExpenseSummaryByYear(year);
+
+        return ResponseEntity.status(HttpStatus.OK).body(expenseSummaryResponse);
+    }
+
 
     @GetMapping("/detailed/monthly")
     public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(@RequestParam int year,@RequestParam int month){
