@@ -182,7 +182,7 @@ public class ExpenseService {
 
     public List<ExpenseResponse> findExpensesByYear(int year){
         LocalDate startDate = LocalDate.of(year, 01,1);
-        LocalDate endDate = LocalDate.of(year, 12, getDaysInMonth(year, 01));
+        LocalDate endDate = LocalDate.of(year, 12, getDaysInMonth(year, 12));
         try {
             return findVerifiedExpensesBetweenDates(startDate, endDate);
         }

@@ -233,6 +233,35 @@ public class ExpenseServiceTest {
     }
 
     @Test
+    void findExpenseSummaryByYear_ReturnExpenseSummaryResponse_FromSpecificYear(){
+        Expense expenseTest1 = new Expense();
+        expenseTest1.setId(1L);
+        expenseTest1.setCategory("Food");
+        expenseTest1.setDate(LocalDate.of(2025, 6, 18));
+        expenseTest1.setDescription("Lunch");
+        expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
+
+        Expense expenseTest2 = new Expense();
+        expenseTest2.setId(2L);
+        expenseTest2.setCategory("Food");
+        expenseTest2.setDate(LocalDate.of(2025, 1, 18));
+        expenseTest2.setDescription("Dinner with the gf");
+        expenseTest2.setValueSpent(BigDecimal.valueOf(200));
+
+        List<Expense> expenses = new ArrayList<>();
+
+        expenses.add(expenseTest1);
+        expenses.add(expenseTest2);
+
+        LocalDate initialDate = LocalDate.of(2025, 1, 1);
+    LocalDate endDate = LocalDate.of(2025, 12, 31);
+
+        when(expenseRepository.findByDateBetween(initialDate,endDate)).thenReturn(expenses);
+        ExpenseSummaryResponse expenseSummaryResponse = expenseService.findExpenseSummaryByYear(2025);
+        assertEquals(expenseSummaryResponse.getTotalExpenses(),BigDecimal.valueOf(225.5));
+    }
+
+    @Test
     void findExpensesByMonth_ReturnExpenseResponseList_FromSpecificMonth(){
         Expense expenseTest1 = new Expense();
         expenseTest1.setId(1L);
