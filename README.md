@@ -172,9 +172,6 @@ spring.jpa.properties.hibernate.format_sql=true
    ```bash
    mvn clean package
    ```
-   - Replace <your-dockerhub-username> with your Docker Hub username.
-   - Make sure the image: field in expense-deployment.yaml matches.
-
 
 5. Load the Docker Image:
    - For this project we load the local expense-api image into Kind:
@@ -183,8 +180,11 @@ spring.jpa.properties.hibernate.format_sql=true
     docker build -t expense-api .
     kind load docker-image expense-api:latest --name <cluster-name>
     ```
+   - Replace <your-dockerhub-username> with your Docker Hub username.
+   - Make sure the image: field in expense-deployment.yaml matches.
+   
 
-    **Important**: If you were getting dockerhub image, replace <your-dockerhub-username>/expense-api:latest with your Docker Hub username in the image field. 
+   - **Important**: If you were getting dockerhub image, replace <your-dockerhub-username>/expense-api:latest with your Docker Hub username in the image field. 
    If you used the local image with kind load docker-image, use image: expense-api:latest instead.
 
 6. Apply the Manifests:
