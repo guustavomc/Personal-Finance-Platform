@@ -43,11 +43,16 @@ src/
  └── main/
  │   ├── java/com/example/expense
  │   │   ├── ExpenseServiceApplication.java      # Main application entry point
+ │   │   │
  │   │   ├── controller/
  │   │   │   └── ExpenseController.java         # REST controller for expense endpoints
  │   │   ├── dto/
  │   │   │   ├── CreateExpenseRequest.java      # DTO for creating/updating expenses
  │   │   │   └── ExpenseResponse.java           # DTO for expense response data
+ │   │   │   └── ExpenseSummaryResponse.java    # DTO for expense summary response data
+ │   │   ├── exception/
+ │   │   │   ├── ExpenseNotFoundException.java  # Custom Exception
+ │   │   │   └── GlobalExceptionHandler.java    # Handle responses for exception
  │   │   ├── model/
  │   │   │   └── Expense.java                   # Entity model for expenses
  │   │   ├── repository/
@@ -71,15 +76,18 @@ k8s/
 
 ### API Endpoints
 
-| Method | Endpoint                     | Description                              | Request Body                     | Response Body                     |
-|--------|------------------------------|------------------------------------------|----------------------------------|-----------------------------------|
-| GET    | `/api/expense`              | Retrieve all expenses                   | None                             | List of `ExpenseResponse`         |
-| GET    | `/api/expense/{id}`         | Retrieve expense by ID                  | None                             | `ExpenseResponse`                 |
-| GET    | `/api/expense/category`     | Retrieve expenses by category           | Query param: `category`          | List of `ExpenseResponse`         |
-| GET    | `/api/expense/summary`      | Retrieve expenses for a specific month  | Query params: `year`, `month`    | List of `ExpenseResponse`         |
-| POST   | `/api/expense`              | Create a new expense                    | `CreateExpenseRequest`           | `ExpenseResponse`                 |
-| PUT    | `/api/expense/{id}`         | Update an existing expense              | `CreateExpenseRequest`           | `ExpenseResponse`                 |
-| DELETE | `/api/expense/{id}`         | Delete an expense by ID                 | None                             | None (204 No Content)             |
+| Method | Endpoint                       | Description                                      | Request Body                  | Response Body                   |
+|--------|--------------------------------|--------------------------------------------------|-------------------------------|---------------------------------|
+| GET    | `/api/expense`                 | Retrieve all expenses                            | None                          | List of `ExpenseResponse`       |
+| GET    | `/api/expense/{id}`            | Retrieve expense by ID                           | None                          | `ExpenseResponse`               |
+| GET    | `/api/expense/category`        | Retrieve expenses by category                    | Query param: `category`       | List of `ExpenseResponse`       |
+| GET    | `/api/expense/summary/monthly` | Retrieve  Summarized expenses for a specific month | Query params: `year`, `month` | `ExpenseSummaryResponse`        |
+| GET    | `/api/expense/summary/annual`  | Retrieve  Summarized expenses for a specific year | Query params: `year`          | `ExpenseSummaryResponse`        |
+| GET    | `/api/expense/detailed/monthly`  | Retrieve  List of expenses for a specific month  | Query params: `year`, `month` | List of `ExpenseResponse`       |
+| GET    | `/api/expense/detailed/annual`  | Retrieve  List of expenses for a specific year  | Query params: `year`          | List of `ExpenseResponse`       |
+| POST   | `/api/expense`                 | Create a new expense                             | `CreateExpenseRequest`        | `ExpenseResponse`               |
+| PUT    | `/api/expense/{id}`            | Update an existing expense                       | `CreateExpenseRequest`        | `ExpenseResponse`               |
+| DELETE | `/api/expense/{id}`            | Delete an expense by ID                          | None                          | None (204 No Content)           |
 
 ### Example Request/Response
 
