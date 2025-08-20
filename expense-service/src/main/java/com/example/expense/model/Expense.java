@@ -22,6 +22,15 @@ public class Expense {
 
     private LocalDate date;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
+    private BigDecimal totalPurchaseValue;
+
+    private int numberOfInstallments = 1;
+    private int currentInstallment = 1;
+
+
     public Expense(){}
 
     public Expense(String description, String category, BigDecimal valueSpent, LocalDate date){
@@ -52,6 +61,22 @@ public class Expense {
         return date;
     }
 
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public BigDecimal getTotalPurchaseValue() {
+        return totalPurchaseValue;
+    }
+
+    public int getNumberOfInstallments() {
+        return numberOfInstallments;
+    }
+
+    public int getCurrentInstallment() {
+        return currentInstallment;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -72,6 +97,19 @@ public class Expense {
         this.date = date;
     }
 
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
 
+    public void setTotalPurchaseValue(BigDecimal totalPurchaseValue) {
+        this.totalPurchaseValue = totalPurchaseValue;
+    }
 
+    public void setNumberOfInstallments(int numberOfInstallments) {
+        this.numberOfInstallments = numberOfInstallments;
+    }
+
+    public void setCurrentInstallment(int currentInstallment) {
+        this.currentInstallment = currentInstallment;
+    }
 }
