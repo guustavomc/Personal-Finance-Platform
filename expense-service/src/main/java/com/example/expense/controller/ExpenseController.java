@@ -91,8 +91,8 @@ public class ExpenseController {
     }
     
     @PostMapping
-    public ResponseEntity<ExpenseResponse> createExpense(@Valid @RequestBody CreateExpenseRequest expense){
-        ExpenseResponse response = new ExpenseResponse();
+    public ResponseEntity<List<ExpenseResponse>> createExpense(@Valid @RequestBody CreateExpenseRequest expense){
+        List<ExpenseResponse> response = new ArrayList<>();
         try {
             response = expenseService.saveExpense(expense);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -108,6 +108,7 @@ public class ExpenseController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    /*
     @PutMapping("/{id}")
     public ResponseEntity<ExpenseResponse> updateExpense(@PathVariable("id") long id, @RequestBody CreateExpenseRequest expense){
         ExpenseResponse response= new ExpenseResponse();
@@ -115,7 +116,7 @@ public class ExpenseController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
-
+*/
 
 
 
