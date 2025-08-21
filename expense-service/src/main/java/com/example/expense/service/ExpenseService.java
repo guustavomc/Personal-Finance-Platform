@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
@@ -85,11 +86,16 @@ public class ExpenseService {
 
     public ExpenseResponse mapExpenseToExpenseResponse(Expense expense){
         ExpenseResponse response = new ExpenseResponse();
-        response.setCategory(expense.getCategory());
-        response.setDate(expense.getDate());
-        response.setDescription(expense.getDescription());
+
         response.setId(expense.getId());
+        response.setDescription(expense.getDescription());
+        response.setCategory(expense.getCategory());
         response.setValueSpent(expense.getValueSpent());
+        response.setDate(expense.getDate());
+        response.setPaymentMethod(expense.getPaymentMethod());
+        response.setTotalPurchaseValue(expense.getTotalPurchaseValue());
+        response.setNumberOfInstallments(expense.getNumberOfInstallments());
+        response.setCurrentInstallment(expense.getCurrentInstallment());
         return response;
     }
 
@@ -252,20 +258,30 @@ public class ExpenseService {
     }
 
 
-    /*
-    public ExpenseResponse editExpenseById(long id, CreateExpenseRequest expense){
-        Expense expenseWithId = updateVerifiedExpenseById(id, expense);
-        return mapExpenseToExpenseResponse(expenseWithId);
+
+    public List<ExpenseResponse> editExpenseById(long id, CreateExpenseRequest createExpenseRequest){
+        try {
+            List<Expense> savedExpenses= updateVerifiedExpenseById(id,createExpenseRequest);
+            return  savedExpenses.stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
+        }
+        catch (Exception e){
+            throw new RuntimeException("Failed to Edit Expense");
+        }
+
     }
 
-    private Expense updateVerifiedExpenseById(long id, CreateExpenseRequest request) {
-        Expense expense = findVerifiedExpense(id);
-        expense.setCategory(request.getCategory());
-        expense.setPurchaseDate(request.getDate());
-        expense.setDescription(request.getDescription());
-        expense.setValueSpent(request.getValueSpent());
-        return expenseRepository.save(expense);
+    private List<Expense> updateVerifiedExpenseById(long id, CreateExpenseRequest createExpenseRequest) {
+        List<Expense> expensesWithPurchaseID = expenseRepository.findByPurchaseID(findVerifiedExpense(id).getPurchaseId());
+
+        if(expensesWithPurchaseID.isEmpty()){
+            throw new EntityNotFoundException("Expenses not found");
+        }
+
+        expenseRepository.deleteAll(expensesWithPurchaseID);
+
+        return saveVerifiedExpense(createExpenseRequest);
+
     }
-*/
+
 
 }

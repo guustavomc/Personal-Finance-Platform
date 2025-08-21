@@ -1,5 +1,7 @@
 package com.example.expense.dto;
 
+import com.example.expense.model.PaymentMethod;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -14,6 +16,13 @@ public class ExpenseResponse {
     private BigDecimal valueSpent;
 
     private LocalDate date;
+
+    private PaymentMethod paymentMethod;
+
+    private BigDecimal totalPurchaseValue;
+
+    private int numberOfInstallments = 1;
+    private int currentInstallment = 1;
 
     public Long getId() {
         return id;
@@ -33,6 +42,22 @@ public class ExpenseResponse {
 
     public LocalDate getDate() {
         return date;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public BigDecimal getTotalPurchaseValue() {
+        return totalPurchaseValue;
+    }
+
+    public int getNumberOfInstallments() {
+        return numberOfInstallments;
+    }
+
+    public int getCurrentInstallment() {
+        return currentInstallment;
     }
 
     public void setId(Long id) {
@@ -55,5 +80,19 @@ public class ExpenseResponse {
         this.date = date;
     }
 
-    
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public void setTotalPurchaseValue(BigDecimal totalPurchaseValue) {
+        this.totalPurchaseValue = totalPurchaseValue;
+    }
+
+    public void setNumberOfInstallments(int numberOfInstallments) {
+        this.numberOfInstallments = numberOfInstallments;
+    }
+
+    public void setCurrentInstallment(int currentInstallment) {
+        this.currentInstallment = currentInstallment;
+    }
 }
