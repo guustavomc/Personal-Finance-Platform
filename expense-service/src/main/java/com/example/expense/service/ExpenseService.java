@@ -271,7 +271,7 @@ public class ExpenseService {
     }
 
     private List<Expense> updateVerifiedExpenseById(long id, CreateExpenseRequest createExpenseRequest) {
-        List<Expense> expensesWithPurchaseID = expenseRepository.findByPurchaseID(findVerifiedExpense(id).getPurchaseId());
+        List<Expense> expensesWithPurchaseID = expenseRepository.findByPurchaseId(findVerifiedExpense(id).getPurchaseId());
 
         if(expensesWithPurchaseID.isEmpty()){
             throw new EntityNotFoundException("Expenses not found");

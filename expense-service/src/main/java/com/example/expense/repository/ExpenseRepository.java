@@ -14,5 +14,5 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     List<Expense> findByCategory(String category);
 
-    List<Expense> findByPurchaseID(String purchaseId);
+    List<Expense> findByPurchaseId(String purchaseId);
 }

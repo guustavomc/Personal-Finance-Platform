@@ -427,31 +427,65 @@ public class ExpenseServiceTest {
     }
 
     @Test
-    void editExpenseById_EditExpense_WithTheID(){
-        Expense expenseTest1 = new Expense();
-        expenseTest1.setId(1L);
-        expenseTest1.setCategory("Food");
-        expenseTest1.setDate(LocalDate.of(2025, 6, 18));
-        expenseTest1.setDescription("Lunch");
-        expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
-        expenseTest1.setPurchaseId("test");
+    void editExpenseById_EditExpense_WithTheID() {
+        // Arrange
+        Expense existingExpense = new Expense();
+        existingExpense.setId(1L);
+        existingExpense.setCategory("Food");
+        existingExpense.setDate(LocalDate.of(2025, 6, 18));
+        existingExpense.setDescription("Lunch");
+        existingExpense.setValueSpent(BigDecimal.valueOf(25.50));
+        existingExpense.setTotalPurchaseValue(BigDecimal.valueOf(25.50));
+        existingExpense.setNumberOfInstallments(1);
+        existingExpense.setCurrentInstallment(1);
+        existingExpense.setPurchaseId("test");
 
         CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
         createExpenseRequest.setCategory("Food");
         createExpenseRequest.setDate(LocalDate.of(2025, 6, 18));
-        createExpenseRequest.setDescription("Lunch");
-        createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(25.50));
+        createExpenseRequest.setDescription("Dinner"); // Changed description to test update
+        createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(30.00));
+        createExpenseRequest.setNumberOfInstallments(1);
 
-        List<Expense> expenses = new ArrayList<Expense>();
-        expenses.add(expenseTest1);
+        Expense updatedExpense = new Expense();
+        updatedExpense.setId(1L);
+        updatedExpense.setCategory("Food");
+        updatedExpense.setDate(LocalDate.of(2025, 6, 18));
+        updatedExpense.setDescription("Dinner");
+        updatedExpense.setValueSpent(BigDecimal.valueOf(30.00));
+        updatedExpense.setTotalPurchaseValue(BigDecimal.valueOf(30.00));
+        updatedExpense.setNumberOfInstallments(1);
+        updatedExpense.setCurrentInstallment(1);
+        updatedExpense.setPurchaseId("test");
 
-        when(expenseRepository.findByPurchaseID("test").thenReturn(expenses);
-        when(expenseRepository.save(any(Expense.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        List<Expense> expenses = new ArrayList<>();
+        expenses.add(existingExpense);
 
+        // Mock repository methods
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(existingExpense));
+        when(expenseRepository.findByPurchaseId("test")).thenReturn(expenses);
+        when(expenseRepository.save(any(Expense.class))).thenReturn(updatedExpense);
+
+        // Act
         List<ExpenseResponse> result = expenseService.editExpenseById(1L, createExpenseRequest);
 
+        // Assert
         assertNotNull(result);
-        //assertEquals("Food", result.get(0).getCategory());
+        assertEquals(1, result.size());
+        ExpenseResponse response = result.get(0);
+        assertEquals("Dinner", response.getDescription());
+        assertEquals("Food", response.getCategory());
+        assertEquals(BigDecimal.valueOf(30.00), response.getValueSpent());
+        assertEquals(LocalDate.of(2025, 6, 18), response.getDate());
+        assertEquals(BigDecimal.valueOf(30.00), response.getTotalPurchaseValue());
+        assertEquals(1, response.getNumberOfInstallments());
+        assertEquals(1, response.getCurrentInstallment());
+
+        // Verify repository interactions
+        verify(expenseRepository, times(1)).findById(1L);
+        verify(expenseRepository, times(1)).findByPurchaseId("test");
+        verify(expenseRepository, times(1)).deleteAll(expenses);
+        verify(expenseRepository, times(1)).save(any(Expense.class));
     }
 
     @Test
