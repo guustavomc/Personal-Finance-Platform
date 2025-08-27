@@ -5,6 +5,7 @@ import com.example.expense.dto.ExpenseResponse;
 import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
 import com.example.expense.model.Expense;
+import com.example.expense.model.PaymentMethod;
 import com.example.expense.repository.ExpenseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,6 +85,70 @@ public class ExpenseServiceTest {
         assertEquals(LocalDate.of(2025, 6, 18), result.get(0).getDate());
         assertEquals("Lunch", result.get(0).getDescription());
         assertEquals(BigDecimal.valueOf(25.50), result.get(0).getValueSpent());
+
+    }
+
+    @Test
+    void saveExpense_WithMultipleInstallments_ReturnExpenseResponseCreated(){
+        CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
+        createExpenseRequest.setCategory("Food");
+        createExpenseRequest.setDate(LocalDate.of(2025, 6, 18));
+        createExpenseRequest.setDescription("Lunch");
+        createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(50));
+        createExpenseRequest.setNumberOfInstallments(2);
+        createExpenseRequest.setPaymentMethod(PaymentMethod.CREDIT);
+
+        Expense firstInstallment = new Expense();
+        firstInstallment.setId(1L);
+        firstInstallment.setDescription("Lunch");
+        firstInstallment.setCategory("Food");
+        firstInstallment.setValueSpent(BigDecimal.valueOf(25));
+        firstInstallment.setDate(LocalDate.of(2025, 6, 18));
+        firstInstallment.setPaymentMethod(PaymentMethod.CREDIT);
+        firstInstallment.setTotalPurchaseValue(BigDecimal.valueOf(50));
+        firstInstallment.setNumberOfInstallments(2);
+        firstInstallment.setCurrentInstallment(1);
+        firstInstallment.setPurchaseId("test-purchase-id");
+
+        Expense secondInstallment = new Expense();
+        secondInstallment.setId(2L);
+        secondInstallment.setDescription("Lunch");
+        secondInstallment.setCategory("Food");
+        secondInstallment.setValueSpent(BigDecimal.valueOf(25));
+        secondInstallment.setDate(LocalDate.of(2025, 7, 18)); // Next month
+        secondInstallment.setPaymentMethod(PaymentMethod.CREDIT);
+        secondInstallment.setTotalPurchaseValue(BigDecimal.valueOf(50));
+        secondInstallment.setNumberOfInstallments(2);
+        secondInstallment.setCurrentInstallment(2);
+        secondInstallment.setPurchaseId("test-purchase-id");
+
+        when(expenseRepository.save(any(Expense.class)))
+                .thenReturn(firstInstallment)
+                .thenReturn(secondInstallment);
+        List<ExpenseResponse> result = expenseService.saveExpense(createExpenseRequest);
+
+        assertNotNull(result);
+        assertEquals(2,result.size());
+
+        ExpenseResponse firstResponse = result.get(0);
+        assertEquals("Food", firstResponse.getCategory());
+        assertEquals(LocalDate.of(2025, 6, 18), firstResponse.getDate());
+        assertEquals("Lunch", firstResponse.getDescription());
+        assertEquals(BigDecimal.valueOf(25), firstResponse.getValueSpent());
+        assertEquals(PaymentMethod.CREDIT, firstResponse.getPaymentMethod());
+        assertEquals(BigDecimal.valueOf(50), firstResponse.getTotalPurchaseValue());
+        assertEquals(2, firstResponse.getNumberOfInstallments());
+        assertEquals(1, firstResponse.getCurrentInstallment());
+
+        ExpenseResponse secondResponse = result.get(1);
+        assertEquals("Food", secondResponse.getCategory());
+        assertEquals(LocalDate.of(2025, 7, 18), secondResponse.getDate());
+        assertEquals("Lunch", secondResponse.getDescription());
+        assertEquals(BigDecimal.valueOf(25), secondResponse.getValueSpent());
+        assertEquals(PaymentMethod.CREDIT, secondResponse.getPaymentMethod());
+        assertEquals(BigDecimal.valueOf(50), secondResponse.getTotalPurchaseValue());
+        assertEquals(2, secondResponse.getNumberOfInstallments());
+        assertEquals(2, secondResponse.getCurrentInstallment());
 
     }
 
