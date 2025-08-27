@@ -108,15 +108,15 @@ public class ExpenseController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    /*
+
     @PutMapping("/{id}")
-    public ResponseEntity<ExpenseResponse> updateExpense(@PathVariable("id") long id, @RequestBody CreateExpenseRequest expense){
-        ExpenseResponse response= new ExpenseResponse();
+    public ResponseEntity<List<ExpenseResponse>> updateExpense(@PathVariable("id") long id, @RequestBody CreateExpenseRequest expense){
+        List<ExpenseResponse> response= new ArrayList<>();
         response = expenseService.editExpenseById(id, expense);
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
-*/
+
 
 
 
