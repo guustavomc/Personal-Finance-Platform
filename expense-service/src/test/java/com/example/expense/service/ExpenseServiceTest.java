@@ -5,6 +5,7 @@ import com.example.expense.dto.ExpenseResponse;
 import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
 import com.example.expense.model.Expense;
+import com.example.expense.model.PaymentMethod;
 import com.example.expense.repository.ExpenseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,16 +75,80 @@ public class ExpenseServiceTest {
         createExpenseRequest.setCategory("Food");
         createExpenseRequest.setDate(LocalDate.of(2025, 6, 18));
         createExpenseRequest.setDescription("Lunch");
-        createExpenseRequest.setValueSpent(BigDecimal.valueOf(25.50));
+        createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(25.50));
 
         when(expenseRepository.save(any(Expense.class))).thenReturn(expense);
-        ExpenseResponse result = expenseService.saveExpense(createExpenseRequest);
+        List<ExpenseResponse> result = expenseService.saveExpense(createExpenseRequest);
 
         assertNotNull(result);
-        assertEquals("Food", result.getCategory());
-        assertEquals(LocalDate.of(2025, 6, 18), result.getDate());
-        assertEquals("Lunch", result.getDescription());
-        assertEquals(BigDecimal.valueOf(25.50), result.getValueSpent());
+        assertEquals("Food", result.get(0).getCategory());
+        assertEquals(LocalDate.of(2025, 6, 18), result.get(0).getDate());
+        assertEquals("Lunch", result.get(0).getDescription());
+        assertEquals(BigDecimal.valueOf(25.50), result.get(0).getValueSpent());
+
+    }
+
+    @Test
+    void saveExpense_WithMultipleInstallments_ReturnExpenseResponseCreated(){
+        CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
+        createExpenseRequest.setCategory("Food");
+        createExpenseRequest.setDate(LocalDate.of(2025, 6, 18));
+        createExpenseRequest.setDescription("Lunch");
+        createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(50));
+        createExpenseRequest.setNumberOfInstallments(2);
+        createExpenseRequest.setPaymentMethod(PaymentMethod.CREDIT);
+
+        Expense firstInstallment = new Expense();
+        firstInstallment.setId(1L);
+        firstInstallment.setDescription("Lunch");
+        firstInstallment.setCategory("Food");
+        firstInstallment.setValueSpent(BigDecimal.valueOf(25));
+        firstInstallment.setDate(LocalDate.of(2025, 6, 18));
+        firstInstallment.setPaymentMethod(PaymentMethod.CREDIT);
+        firstInstallment.setTotalPurchaseValue(BigDecimal.valueOf(50));
+        firstInstallment.setNumberOfInstallments(2);
+        firstInstallment.setCurrentInstallment(1);
+        firstInstallment.setPurchaseId("test-purchase-id");
+
+        Expense secondInstallment = new Expense();
+        secondInstallment.setId(2L);
+        secondInstallment.setDescription("Lunch");
+        secondInstallment.setCategory("Food");
+        secondInstallment.setValueSpent(BigDecimal.valueOf(25));
+        secondInstallment.setDate(LocalDate.of(2025, 7, 18)); // Next month
+        secondInstallment.setPaymentMethod(PaymentMethod.CREDIT);
+        secondInstallment.setTotalPurchaseValue(BigDecimal.valueOf(50));
+        secondInstallment.setNumberOfInstallments(2);
+        secondInstallment.setCurrentInstallment(2);
+        secondInstallment.setPurchaseId("test-purchase-id");
+
+        when(expenseRepository.save(any(Expense.class)))
+                .thenReturn(firstInstallment)
+                .thenReturn(secondInstallment);
+        List<ExpenseResponse> result = expenseService.saveExpense(createExpenseRequest);
+
+        assertNotNull(result);
+        assertEquals(2,result.size());
+
+        ExpenseResponse firstResponse = result.get(0);
+        assertEquals("Food", firstResponse.getCategory());
+        assertEquals(LocalDate.of(2025, 6, 18), firstResponse.getDate());
+        assertEquals("Lunch", firstResponse.getDescription());
+        assertEquals(BigDecimal.valueOf(25), firstResponse.getValueSpent());
+        assertEquals(PaymentMethod.CREDIT, firstResponse.getPaymentMethod());
+        assertEquals(BigDecimal.valueOf(50), firstResponse.getTotalPurchaseValue());
+        assertEquals(2, firstResponse.getNumberOfInstallments());
+        assertEquals(1, firstResponse.getCurrentInstallment());
+
+        ExpenseResponse secondResponse = result.get(1);
+        assertEquals("Food", secondResponse.getCategory());
+        assertEquals(LocalDate.of(2025, 7, 18), secondResponse.getDate());
+        assertEquals("Lunch", secondResponse.getDescription());
+        assertEquals(BigDecimal.valueOf(25), secondResponse.getValueSpent());
+        assertEquals(PaymentMethod.CREDIT, secondResponse.getPaymentMethod());
+        assertEquals(BigDecimal.valueOf(50), secondResponse.getTotalPurchaseValue());
+        assertEquals(2, secondResponse.getNumberOfInstallments());
+        assertEquals(2, secondResponse.getCurrentInstallment());
 
     }
 
@@ -100,7 +165,7 @@ public class ExpenseServiceTest {
         createExpenseRequest.setCategory("Food");
         createExpenseRequest.setDate(LocalDate.of(2025, 6, 18));
         createExpenseRequest.setDescription("Lunch");
-        createExpenseRequest.setValueSpent(BigDecimal.valueOf(25.50));
+        createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(25.50));
 
         when(expenseRepository.save(any(Expense.class))).thenThrow(new RuntimeException());
 
@@ -427,27 +492,65 @@ public class ExpenseServiceTest {
     }
 
     @Test
-    void editExpenseById_EditExpense_WithTheID(){
-        Expense expenseTest1 = new Expense();
-        expenseTest1.setId(1L);
-        expenseTest1.setCategory("Food");
-        expenseTest1.setDate(LocalDate.of(2025, 6, 18));
-        expenseTest1.setDescription("Lunch");
-        expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
+    void editExpenseById_EditExpense_WithTheID() {
+        // Arrange
+        Expense existingExpense = new Expense();
+        existingExpense.setId(1L);
+        existingExpense.setCategory("Food");
+        existingExpense.setDate(LocalDate.of(2025, 6, 18));
+        existingExpense.setDescription("Lunch");
+        existingExpense.setValueSpent(BigDecimal.valueOf(25.50));
+        existingExpense.setTotalPurchaseValue(BigDecimal.valueOf(25.50));
+        existingExpense.setNumberOfInstallments(1);
+        existingExpense.setCurrentInstallment(1);
+        existingExpense.setPurchaseId("test");
 
         CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
         createExpenseRequest.setCategory("Food");
         createExpenseRequest.setDate(LocalDate.of(2025, 6, 18));
-        createExpenseRequest.setDescription("Lunch");
-        createExpenseRequest.setValueSpent(BigDecimal.valueOf(25.50));
+        createExpenseRequest.setDescription("Dinner"); // Changed description to test update
+        createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(30.00));
+        createExpenseRequest.setNumberOfInstallments(1);
 
-        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expenseTest1));
-        when(expenseRepository.save(any(Expense.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Expense updatedExpense = new Expense();
+        updatedExpense.setId(1L);
+        updatedExpense.setCategory("Food");
+        updatedExpense.setDate(LocalDate.of(2025, 6, 18));
+        updatedExpense.setDescription("Dinner");
+        updatedExpense.setValueSpent(BigDecimal.valueOf(30.00));
+        updatedExpense.setTotalPurchaseValue(BigDecimal.valueOf(30.00));
+        updatedExpense.setNumberOfInstallments(1);
+        updatedExpense.setCurrentInstallment(1);
+        updatedExpense.setPurchaseId("test");
 
-        ExpenseResponse result = expenseService.editExpenseById(1L, createExpenseRequest);
+        List<Expense> expenses = new ArrayList<>();
+        expenses.add(existingExpense);
 
+        // Mock repository methods
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(existingExpense));
+        when(expenseRepository.findByPurchaseId("test")).thenReturn(expenses);
+        when(expenseRepository.save(any(Expense.class))).thenReturn(updatedExpense);
+
+        // Act
+        List<ExpenseResponse> result = expenseService.editExpenseById(1L, createExpenseRequest);
+
+        // Assert
         assertNotNull(result);
-        assertEquals("Food", result.getCategory());
+        assertEquals(1, result.size());
+        ExpenseResponse response = result.get(0);
+        assertEquals("Dinner", response.getDescription());
+        assertEquals("Food", response.getCategory());
+        assertEquals(BigDecimal.valueOf(30.00), response.getValueSpent());
+        assertEquals(LocalDate.of(2025, 6, 18), response.getDate());
+        assertEquals(BigDecimal.valueOf(30.00), response.getTotalPurchaseValue());
+        assertEquals(1, response.getNumberOfInstallments());
+        assertEquals(1, response.getCurrentInstallment());
+
+        // Verify repository interactions
+        verify(expenseRepository, times(1)).findById(1L);
+        verify(expenseRepository, times(1)).findByPurchaseId("test");
+        verify(expenseRepository, times(1)).deleteAll(expenses);
+        verify(expenseRepository, times(1)).save(any(Expense.class));
     }
 
     @Test
@@ -463,10 +566,12 @@ public class ExpenseServiceTest {
         createExpenseRequest.setCategory("Food");
         createExpenseRequest.setDate(LocalDate.of(2025, 6, 18));
         createExpenseRequest.setDescription("Lunch");
-        createExpenseRequest.setValueSpent(BigDecimal.valueOf(25.50));
+        createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(25.50));
 
         when(expenseRepository.findById(1L)).thenReturn(Optional.empty());
-        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseService.editExpenseById(1L, createExpenseRequest));
-        assertEquals("Expense with ID 1 not found", exception.getMessage());
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> expenseService.editExpenseById(1L, createExpenseRequest));
+        assertEquals("Failed to Edit Expense", exception.getMessage());
     }
+
+
 }

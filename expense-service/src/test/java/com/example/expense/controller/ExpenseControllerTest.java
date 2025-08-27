@@ -4,6 +4,8 @@ import com.example.expense.dto.CreateExpenseRequest;
 import com.example.expense.dto.ExpenseResponse;
 import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
+import com.example.expense.model.Expense;
+import com.example.expense.model.PaymentMethod;
 import com.example.expense.repository.ExpenseRepository;
 import com.example.expense.service.ExpenseService;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -234,11 +237,11 @@ public class ExpenseControllerTest {
     @Test
     void createExpense_ReturnExpenseResponse(){
         CreateExpenseRequest expense = new CreateExpenseRequest();
-        ExpenseResponse expenseResponse = new ExpenseResponse();
+        List<ExpenseResponse> expenseResponse = new ArrayList<>();
 
         when(expenseService.saveExpense(expense)).thenReturn(expenseResponse);
 
-        ResponseEntity<ExpenseResponse> response = expenseController.createExpense(expense);
+        ResponseEntity<List<ExpenseResponse>> response = expenseController.createExpense(expense);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(expenseResponse, response.getBody());
@@ -247,11 +250,11 @@ public class ExpenseControllerTest {
     @Test
     void createExpense_ReturnNotFound(){
         CreateExpenseRequest expense = new CreateExpenseRequest();
-        ExpenseResponse expenseResponse = new ExpenseResponse();
+        List<ExpenseResponse> expenseResponse = new ArrayList<>();
 
         when(expenseService.saveExpense(expense)).thenThrow(new RuntimeException());
 
-        ResponseEntity<ExpenseResponse> response = expenseController.createExpense(expense);
+        ResponseEntity<List<ExpenseResponse>> response = expenseController.createExpense(expense);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
@@ -278,17 +281,50 @@ public class ExpenseControllerTest {
         assertThrows(RuntimeException.class, () -> expenseController.deleteExpense(id));
     }
 
+
     @Test
     void updateExpense_Success_ReturnsOk() {
-        long id = 1L;
         CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
-        ExpenseResponse expenseResponse = new ExpenseResponse();
-        when(expenseService.editExpenseById(id, createExpenseRequest)).thenReturn(expenseResponse);
+        createExpenseRequest.setCategory("Food");
+        createExpenseRequest.setDate(LocalDate.of(2025, 6, 18));
+        createExpenseRequest.setDescription("Lunch");
+        createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(50));
+        createExpenseRequest.setNumberOfInstallments(2);
+        createExpenseRequest.setPaymentMethod(PaymentMethod.CREDIT);
 
-        ResponseEntity<ExpenseResponse> response = expenseController.updateExpense(id, createExpenseRequest);
+        ExpenseResponse firstInstallment = new ExpenseResponse();
+        firstInstallment.setId(1L);
+        firstInstallment.setDescription("Lunch");
+        firstInstallment.setCategory("Food");
+        firstInstallment.setValueSpent(BigDecimal.valueOf(25));
+        firstInstallment.setDate(LocalDate.of(2025, 6, 18));
+        firstInstallment.setPaymentMethod(PaymentMethod.CREDIT);
+        firstInstallment.setTotalPurchaseValue(BigDecimal.valueOf(50));
+        firstInstallment.setNumberOfInstallments(2);
+        firstInstallment.setCurrentInstallment(1);
+
+        ExpenseResponse secondInstallment = new ExpenseResponse();
+        secondInstallment.setId(2L);
+        secondInstallment.setDescription("Lunch");
+        secondInstallment.setCategory("Food");
+        secondInstallment.setValueSpent(BigDecimal.valueOf(25));
+        secondInstallment.setDate(LocalDate.of(2025, 7, 18)); // Next month
+        secondInstallment.setPaymentMethod(PaymentMethod.CREDIT);
+        secondInstallment.setTotalPurchaseValue(BigDecimal.valueOf(50));
+        secondInstallment.setNumberOfInstallments(2);
+        secondInstallment.setCurrentInstallment(2);
+
+        long id = 1L;
+        List<ExpenseResponse> expenseResponses= new ArrayList<>();
+        expenseResponses.add(firstInstallment);
+        expenseResponses.add(secondInstallment);
+
+        when(expenseService.editExpenseById(id, createExpenseRequest)).thenReturn(expenseResponses);
+
+        ResponseEntity<List<ExpenseResponse>> response = expenseController.updateExpense(id, createExpenseRequest);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(expenseResponse, response.getBody());
+        assertEquals(2, response.getBody().size());
     }
 
     @Test
@@ -304,5 +340,7 @@ public class ExpenseControllerTest {
         assertEquals("Expense with ID 1 not found", exception.getMessage());
 
     }
+
+
 }
 

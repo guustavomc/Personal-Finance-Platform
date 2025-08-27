@@ -30,6 +30,8 @@ public class Expense {
     private int numberOfInstallments = 1;
     private int currentInstallment = 1;
 
+    private String purchaseId;
+
 
     public Expense(){}
 
@@ -77,6 +79,10 @@ public class Expense {
         return currentInstallment;
     }
 
+    public String getPurchaseId() {
+        return purchaseId;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -112,4 +118,10 @@ public class Expense {
     public void setCurrentInstallment(int currentInstallment) {
         this.currentInstallment = currentInstallment;
     }
+
+    public void setPurchaseId(String purchaseId) {
+        this.purchaseId = purchaseId;
+    }
 }
+
+

@@ -5,13 +5,17 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import com.example.expense.dto.CreateExpenseRequest;
@@ -32,36 +36,66 @@ public class ExpenseService {
         return expenseRepository.findAll().stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
     }
 
-    public ExpenseResponse saveExpense(CreateExpenseRequest expenseRequest){
+    public List<ExpenseResponse> saveExpense(CreateExpenseRequest expenseRequest){
         try {
-            return mapExpenseToExpenseResponse(saveVerifiedExpense(expenseRequest));
+            List<Expense> savedExpenses= saveVerifiedExpense(expenseRequest);
+            return  savedExpenses.stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
         }
         catch (Exception e){
             throw new RuntimeException("Failed to Save Expense");
         }
     }
 
-    public Expense saveVerifiedExpense(CreateExpenseRequest expenseRequest){
-        return expenseRepository.save(mapExpenseRequestToExpense(expenseRequest));
+    public List<Expense> saveVerifiedExpense(CreateExpenseRequest expenseRequest){
+        List<Expense> expenses = new ArrayList<>();
+        if(expenseRequest.getNumberOfInstallments() ==1){
+            Expense expense = expenseRepository.save(mapExpenseRequestToExpense(expenseRequest, 1));
+            expenses.add(expense);
+        }
+        else {
+            String purchaseId = UUID.randomUUID().toString();
+            for(int currentInstallment=1; currentInstallment<=expenseRequest.getNumberOfInstallments(); currentInstallment++){
+
+                Expense expense = mapExpenseRequestToExpense(expenseRequest, currentInstallment);
+                expense.setPurchaseId(purchaseId);
+                expenseRepository.save(expense);
+                expenses.add(expense);
+            }
+        }
+        return expenses;
     }
 
-    private Expense mapExpenseRequestToExpense(CreateExpenseRequest expenseRequest) {
+    private Expense mapExpenseRequestToExpense(CreateExpenseRequest expenseRequest, int currentInstallment) {
         Expense expense = new Expense();
-        expense.setCategory(expenseRequest.getCategory());
-        expense.setDate(expenseRequest.getDate());
         expense.setDescription(expenseRequest.getDescription());
-        expense.setValueSpent(expenseRequest.getValueSpent());
+        expense.setCategory(expenseRequest.getCategory());
 
+
+        BigDecimal installmentValue = expenseRequest.getTotalPurchaseValue().divide(BigDecimal.valueOf(expenseRequest.getNumberOfInstallments()),RoundingMode.HALF_UP);
+        expense.setValueSpent(installmentValue);
+
+        LocalDate installmentDate = expenseRequest.getDate().plusMonths(currentInstallment-1);
+        expense.setDate(installmentDate);
+
+        expense.setPaymentMethod(expenseRequest.getPaymentMethod());
+        expense.setTotalPurchaseValue(expenseRequest.getTotalPurchaseValue());
+        expense.setNumberOfInstallments(expenseRequest.getNumberOfInstallments());
+        expense.setCurrentInstallment(currentInstallment);
         return expense;
     }
 
     public ExpenseResponse mapExpenseToExpenseResponse(Expense expense){
         ExpenseResponse response = new ExpenseResponse();
-        response.setCategory(expense.getCategory());
-        response.setDate(expense.getDate());
-        response.setDescription(expense.getDescription());
+
         response.setId(expense.getId());
+        response.setDescription(expense.getDescription());
+        response.setCategory(expense.getCategory());
         response.setValueSpent(expense.getValueSpent());
+        response.setDate(expense.getDate());
+        response.setPaymentMethod(expense.getPaymentMethod());
+        response.setTotalPurchaseValue(expense.getTotalPurchaseValue());
+        response.setNumberOfInstallments(expense.getNumberOfInstallments());
+        response.setCurrentInstallment(expense.getCurrentInstallment());
         return response;
     }
 
@@ -223,18 +257,30 @@ public class ExpenseService {
         }
     }
 
-    public ExpenseResponse editExpenseById(long id, CreateExpenseRequest expense){
-        Expense expenseWithId = updateVerifiedExpenseById(id, expense);
-        return mapExpenseToExpenseResponse(expenseWithId);
+
+
+    public List<ExpenseResponse> editExpenseById(long id, CreateExpenseRequest createExpenseRequest){
+        try {
+            List<Expense> savedExpenses= updateVerifiedExpenseById(id,createExpenseRequest);
+            return  savedExpenses.stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
+        }
+        catch (Exception e){
+            throw new RuntimeException("Failed to Edit Expense");
+        }
+
     }
 
-    private Expense updateVerifiedExpenseById(long id, CreateExpenseRequest request) {
-        Expense expense = findVerifiedExpense(id);
-        expense.setCategory(request.getCategory());
-        expense.setDate(request.getDate());
-        expense.setDescription(request.getDescription());
-        expense.setValueSpent(request.getValueSpent());
-        return expenseRepository.save(expense);
+    private List<Expense> updateVerifiedExpenseById(long id, CreateExpenseRequest createExpenseRequest) {
+        List<Expense> expensesWithPurchaseID = expenseRepository.findByPurchaseId(findVerifiedExpense(id).getPurchaseId());
+
+        if(expensesWithPurchaseID.isEmpty()){
+            throw new EntityNotFoundException("Expenses not found");
+        }
+
+        expenseRepository.deleteAll(expensesWithPurchaseID);
+
+        return saveVerifiedExpense(createExpenseRequest);
+
     }
 
 
