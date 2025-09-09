@@ -79,7 +79,7 @@ k8s/
 | Method | Endpoint                       | Description                                      | Request Body                  | Response Body                   |
 |--------|--------------------------------|--------------------------------------------------|-------------------------------|---------------------------------|
 | GET    | `/api/expense`                 | Retrieve all expenses                            | None                          | List of `ExpenseResponse`       |
-| GET    | `/api/expense/{id}`            | Retrieve expense by ID                           | None                          | `ExpenseResponse`               |
+| GET    | `/api/expense/{id}`            | Retrieve expense by ID                           | None                          | List of `ExpenseResponse`               |
 | GET    | `/api/expense/category`        | Retrieve expenses by category                    | Query param: `category`       | List of `ExpenseResponse`       |
 | GET    | `/api/expense/summary/monthly` | Retrieve  Summarized expenses for a specific month | Query params: `year`, `month` | `ExpenseSummaryResponse`        |
 | GET    | `/api/expense/summary/annual`  | Retrieve  Summarized expenses for a specific year | Query params: `year`          | `ExpenseSummaryResponse`        |
@@ -180,7 +180,6 @@ spring.jpa.properties.hibernate.format_sql=true
     docker build -t expense-api .
     kind load docker-image expense-api:latest --name <cluster-name>
     ```
-   - Replace <your-dockerhub-username> with your Docker Hub username.
    - Make sure the image: field in expense-deployment.yaml matches.
    
 
@@ -209,14 +208,15 @@ spring.jpa.properties.hibernate.format_sql=true
     kubectl get services
    ```
 
-8. For Kind or other local clusters, check the node’s IP:
+9. For Kind or other local clusters, check the node’s IP:
    ```bash
    kubectl get nodes -o wide
    ```
 
    - Use the INTERNAL-IP of a node.
 
-9. Port Forwarding:
+
+10. Port Forwarding:
    ```bash
    kubectl port-forward service/expense-api-service 8080:80
    ```
