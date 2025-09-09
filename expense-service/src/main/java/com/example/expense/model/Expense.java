@@ -30,6 +30,8 @@ public class Expense {
     private int numberOfInstallments = 1;
     private int currentInstallment = 1;
 
+    private String currency;
+
     private String purchaseId;
 
 
@@ -79,6 +81,10 @@ public class Expense {
         return currentInstallment;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
     public String getPurchaseId() {
         return purchaseId;
     }
@@ -117,6 +123,10 @@ public class Expense {
 
     public void setCurrentInstallment(int currentInstallment) {
         this.currentInstallment = currentInstallment;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public void setPurchaseId(String purchaseId) {
