@@ -81,6 +81,7 @@ public class ExpenseService {
         expense.setTotalPurchaseValue(expenseRequest.getTotalPurchaseValue());
         expense.setNumberOfInstallments(expenseRequest.getNumberOfInstallments());
         expense.setCurrentInstallment(currentInstallment);
+        expense.setCurrency(expenseRequest.getCurrency());
         return expense;
     }
 
@@ -96,6 +97,7 @@ public class ExpenseService {
         response.setTotalPurchaseValue(expense.getTotalPurchaseValue());
         response.setNumberOfInstallments(expense.getNumberOfInstallments());
         response.setCurrentInstallment(expense.getCurrentInstallment());
+        response.setCurrency(expense.getCurrency());
         return response;
     }
 
