@@ -70,12 +70,15 @@ public class ExpenseServiceTest {
         expense.setDate(LocalDate.of(2025, 6, 18));
         expense.setDescription("Lunch");
         expense.setValueSpent(BigDecimal.valueOf(25.50));
+        expense.setCurrency("BRL");
 
         CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
         createExpenseRequest.setCategory("Food");
         createExpenseRequest.setDate(LocalDate.of(2025, 6, 18));
         createExpenseRequest.setDescription("Lunch");
         createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(25.50));
+        createExpenseRequest.setCurrency("BRL");
+
 
         when(expenseRepository.save(any(Expense.class))).thenReturn(expense);
         List<ExpenseResponse> result = expenseService.saveExpense(createExpenseRequest);
@@ -85,6 +88,7 @@ public class ExpenseServiceTest {
         assertEquals(LocalDate.of(2025, 6, 18), result.get(0).getDate());
         assertEquals("Lunch", result.get(0).getDescription());
         assertEquals(BigDecimal.valueOf(25.50), result.get(0).getValueSpent());
+        assertEquals("BRL", result.get(0).getCurrency());
 
     }
 
@@ -181,6 +185,7 @@ public class ExpenseServiceTest {
         expenseTest1.setDate(LocalDate.of(2025, 6, 18));
         expenseTest1.setDescription("Lunch");
         expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
+        expenseTest1.setCurrency("BRL");
 
         List<Expense> expenses = new ArrayList<>();
         expenses.add(expenseTest1);
@@ -191,6 +196,7 @@ public class ExpenseServiceTest {
         assertEquals("Food",expenseResponseWithRequestedID.getCategory());
         assertEquals("Lunch",expenseResponseWithRequestedID.getDescription());
         assertEquals(1L,expenseResponseWithRequestedID.getId());
+        assertEquals("BRL", expenseResponseWithRequestedID.getCurrency());
 
 
     }
@@ -447,18 +453,23 @@ public class ExpenseServiceTest {
     }
 
     @Test
-    void removeExpense_DeleteExpense_WithTheID(){
+    void removeExpense_DeleteExpense_WithTheID() {
+        // Arrange
         Expense expenseTest1 = new Expense();
         expenseTest1.setId(1L);
         expenseTest1.setCategory("Food");
         expenseTest1.setDate(LocalDate.of(2025, 6, 18));
         expenseTest1.setDescription("Lunch");
         expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
-
+        expenseTest1.setNumberOfInstallments(1); // Set to 1 to trigger single installment deletion
 
         when(expenseRepository.existsById(1L)).thenReturn(true);
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expenseTest1)); // Mock findById
 
+        // Act
         expenseService.removeExpense(1L);
+
+        // Assert
         verify(expenseRepository).existsById(1L);
         verify(expenseRepository).deleteById(1L);
     }
@@ -477,16 +488,45 @@ public class ExpenseServiceTest {
     }
 
     @Test
-    void removeExpense_ThrowRuntimeException_WhenFailedToDeleteExpense(){
+    void removeExpense_ThrowRuntimeException_WhenFailedToDeleteExpense() {
+        // Arrange
         Expense expenseTest1 = new Expense();
         expenseTest1.setId(1L);
         expenseTest1.setCategory("Food");
         expenseTest1.setDate(LocalDate.of(2025, 6, 18));
         expenseTest1.setDescription("Lunch");
         expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
+        expenseTest1.setNumberOfInstallments(1); // Important: Set to 1 to trigger removeVerifiedExpenseWithSingleInstallment
 
         when(expenseRepository.existsById(1L)).thenReturn(true);
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expenseTest1)); // Add this mock
         doThrow(new RuntimeException()).when(expenseRepository).deleteById(1L);
+
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> expenseService.removeExpense(1L));
+        assertEquals("Failed to delete Expense with ID 1", exception.getMessage());
+    }
+
+    @Test
+    void removeExpense_ThrowRuntimeException_WhenFailedToDeleteMultipleInstallments() {
+        // Arrange
+        Expense expenseTest1 = new Expense();
+        expenseTest1.setId(1L);
+        expenseTest1.setCategory("Food");
+        expenseTest1.setDate(LocalDate.of(2025, 6, 18));
+        expenseTest1.setDescription("Lunch");
+        expenseTest1.setValueSpent(BigDecimal.valueOf(25.50));
+        expenseTest1.setNumberOfInstallments(3); // Multi-installment case
+        expenseTest1.setPurchaseId("purchase-123");
+
+        List<Expense> expenses = List.of(expenseTest1); // Mock multiple expenses with same purchaseId
+
+        when(expenseRepository.existsById(1L)).thenReturn(true);
+        when(expenseRepository.findById(1L)).thenReturn(Optional.of(expenseTest1));
+        when(expenseRepository.findByPurchaseId("purchase-123")).thenReturn(expenses);
+        doThrow(new RuntimeException()).when(expenseRepository).deleteAll(expenses);
+
+        // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () -> expenseService.removeExpense(1L));
         assertEquals("Failed to delete Expense with ID 1", exception.getMessage());
     }
