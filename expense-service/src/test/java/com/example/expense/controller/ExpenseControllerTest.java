@@ -291,6 +291,7 @@ public class ExpenseControllerTest {
         createExpenseRequest.setTotalPurchaseValue(BigDecimal.valueOf(50));
         createExpenseRequest.setNumberOfInstallments(2);
         createExpenseRequest.setPaymentMethod(PaymentMethod.CREDIT);
+        createExpenseRequest.setCurrency("BRL");
 
         ExpenseResponse firstInstallment = new ExpenseResponse();
         firstInstallment.setId(1L);
@@ -302,6 +303,7 @@ public class ExpenseControllerTest {
         firstInstallment.setTotalPurchaseValue(BigDecimal.valueOf(50));
         firstInstallment.setNumberOfInstallments(2);
         firstInstallment.setCurrentInstallment(1);
+        firstInstallment.setCurrency("BRL");
 
         ExpenseResponse secondInstallment = new ExpenseResponse();
         secondInstallment.setId(2L);
@@ -313,6 +315,8 @@ public class ExpenseControllerTest {
         secondInstallment.setTotalPurchaseValue(BigDecimal.valueOf(50));
         secondInstallment.setNumberOfInstallments(2);
         secondInstallment.setCurrentInstallment(2);
+        secondInstallment.setCurrency("BRL");
+
 
         long id = 1L;
         List<ExpenseResponse> expenseResponses= new ArrayList<>();

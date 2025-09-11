@@ -26,6 +26,8 @@ public class CreateExpenseRequest {
 
     private int numberOfInstallments = 1;
 
+    private String currency;
+
     public String getDescription() {
         return description;
     }
@@ -50,6 +52,9 @@ public class CreateExpenseRequest {
         return numberOfInstallments;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
 
     public void setDescription(String description) {
         this.description = description;
@@ -75,5 +80,7 @@ public class CreateExpenseRequest {
         this.numberOfInstallments = numberOfInstallments;
     }
 
-
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
 }

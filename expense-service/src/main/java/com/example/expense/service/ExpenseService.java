@@ -81,6 +81,7 @@ public class ExpenseService {
         expense.setTotalPurchaseValue(expenseRequest.getTotalPurchaseValue());
         expense.setNumberOfInstallments(expenseRequest.getNumberOfInstallments());
         expense.setCurrentInstallment(currentInstallment);
+        expense.setCurrency(expenseRequest.getCurrency());
         return expense;
     }
 
@@ -96,6 +97,7 @@ public class ExpenseService {
         response.setTotalPurchaseValue(expense.getTotalPurchaseValue());
         response.setNumberOfInstallments(expense.getNumberOfInstallments());
         response.setCurrentInstallment(expense.getCurrentInstallment());
+        response.setCurrency(expense.getCurrency());
         return response;
     }
 
@@ -248,9 +250,28 @@ public class ExpenseService {
         }
     }
 
-    private void removeVerifiedExpense(Long id) {
+    private void removeVerifiedExpense(Long id){
+        if(findVerifiedExpense(id).getNumberOfInstallments() ==1){
+            removeVerifiedExpenseWithSingleInstallment(id);
+        }
+        else{
+            removeVerifiedExpenseWithMultipleInstallments(id);
+        }
+    }
+
+    private void removeVerifiedExpenseWithSingleInstallment(Long id) {
         try{
             expenseRepository.deleteById(id);
+        }
+        catch(Exception e){
+            throw new RuntimeException("Failed to delete Expense with ID " + id);
+        }
+    }
+
+    private void removeVerifiedExpenseWithMultipleInstallments(Long id) {
+        try{
+            List<Expense> expensesWithPurchaseID = expenseRepository.findByPurchaseId(findVerifiedExpense(id).getPurchaseId());
+            expenseRepository.deleteAll(expensesWithPurchaseID);
         }
         catch(Exception e){
             throw new RuntimeException("Failed to delete Expense with ID " + id);

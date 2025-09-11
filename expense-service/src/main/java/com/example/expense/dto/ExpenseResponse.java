@@ -24,6 +24,9 @@ public class ExpenseResponse {
     private int numberOfInstallments = 1;
     private int currentInstallment = 1;
 
+    private String currency;
+
+
     public Long getId() {
         return id;
     }
@@ -60,6 +63,10 @@ public class ExpenseResponse {
         return currentInstallment;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -94,5 +101,9 @@ public class ExpenseResponse {
 
     public void setCurrentInstallment(int currentInstallment) {
         this.currentInstallment = currentInstallment;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 }
