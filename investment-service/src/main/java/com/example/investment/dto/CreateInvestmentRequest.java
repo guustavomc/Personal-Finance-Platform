@@ -1,11 +1,14 @@
 package com.example.investment.dto;
 
 import com.example.investment.model.InvestmentType;
+import jakarta.validation.constraints.NotBlank;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class CreateInvestmentRequest {
+
+    @NotBlank(message = "Category is a mandatory field")
 
     private InvestmentType investmentType;
 
