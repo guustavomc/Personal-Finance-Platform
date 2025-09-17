@@ -34,6 +34,7 @@ public class InvestmentService {
     public InvestmentResponse mapInvestmentToInvestmentResponse(Investment investment){
         InvestmentResponse response = new InvestmentResponse();
         response.setId(investment.getId());
+        response.setInvestmentType(investment.getInvestmentType());
         response.setAssetSymbol(investment.getAssetSymbol());
         response.setAmountInvested(investment.getAmountInvested());
         response.setQuantity(investment.getQuantity());

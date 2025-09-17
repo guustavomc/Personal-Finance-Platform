@@ -92,7 +92,7 @@ public class Investment {
     }
 
     public void setCurrency(String currency) {
-
+        this.currency=currency;
     }
 
     public void setAlternateAmount(BigDecimal alternateAmount) {
