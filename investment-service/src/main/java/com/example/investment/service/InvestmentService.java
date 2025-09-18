@@ -1,5 +1,6 @@
 package com.example.investment.service;
 
+import com.example.investment.dto.CreateInvestmentRequest;
 import com.example.investment.dto.InvestmentResponse;
 import com.example.investment.model.Investment;
 import com.example.investment.repository.InvestmentRepository;
@@ -31,6 +32,24 @@ public class InvestmentService {
 
     }
 
+    public InvestmentResponse saveInvestment(CreateInvestmentRequest createInvestmentRequest){
+        try {
+            Investment savedInvestment = saveVerifiedExpense(createInvestmentRequest);
+            return mapInvestmentToInvestmentResponse(savedInvestment);
+        }
+        catch (Exception e){
+            throw new RuntimeException("Failed to save Investments");
+        }
+    }
+
+    private Investment saveVerifiedExpense(CreateInvestmentRequest createInvestmentRequest){
+        Investment investment = investmentRepository
+                                .save(mapCreateInvestmentRequestToInvestment(createInvestmentRequest));
+
+        return investment;
+    }
+
+
     public InvestmentResponse mapInvestmentToInvestmentResponse(Investment investment){
         InvestmentResponse response = new InvestmentResponse();
         response.setId(investment.getId());
@@ -44,6 +63,20 @@ public class InvestmentService {
         response.setAlternateCurrency(investment.getAlternateCurrency());
 
         return response;
+    }
+
+    public Investment mapCreateInvestmentRequestToInvestment(CreateInvestmentRequest createInvestmentRequest){
+        Investment investment = new Investment();
+        investment.setInvestmentType(createInvestmentRequest.getInvestmentType());
+        investment.setAssetSymbol(createInvestmentRequest.getAssetSymbol());
+        investment.setAmountInvested(createInvestmentRequest.getAmountInvested());
+        investment.setQuantity(createInvestmentRequest.getQuantity());
+        investment.setInvestmentDate(createInvestmentRequest.getInvestmentDate());
+        investment.setCurrency(createInvestmentRequest.getCurrency());
+        investment.setAlternateAmount(createInvestmentRequest.getAlternateAmount());
+        investment.setAlternateCurrency(createInvestmentRequest.getAlternateCurrency());
+
+        return investment;
     }
 
 
