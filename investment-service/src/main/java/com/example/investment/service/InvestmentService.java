@@ -34,7 +34,7 @@ public class InvestmentService {
 
     public InvestmentResponse saveInvestment(CreateInvestmentRequest createInvestmentRequest){
         try {
-            Investment savedInvestment = saveVerifiedExpense(createInvestmentRequest);
+            Investment savedInvestment = saveVerifiedInvestment(createInvestmentRequest);
             return mapInvestmentToInvestmentResponse(savedInvestment);
         }
         catch (Exception e){
@@ -42,13 +42,55 @@ public class InvestmentService {
         }
     }
 
-    private Investment saveVerifiedExpense(CreateInvestmentRequest createInvestmentRequest){
+    private Investment saveVerifiedInvestment(CreateInvestmentRequest createInvestmentRequest){
         Investment investment = investmentRepository
                                 .save(mapCreateInvestmentRequestToInvestment(createInvestmentRequest));
 
         return investment;
     }
 
+    public void removeInvestment(long id){
+        if(!investmentRepository.existsById(id)){
+            throw new RuntimeException("Investment with ID " + id + " not found");
+        }
+        else{
+            removeVerifiedInvestment(id);
+        }
+    }
+
+    private void removeVerifiedInvestment(long id){
+        try {
+            investmentRepository.deleteById(id);
+        }
+        catch (Exception e){
+            throw new RuntimeException("Failed to delete Investment with ID " + id);
+        }
+    }
+
+    public InvestmentResponse editInvestmentById(long id, CreateInvestmentRequest createInvestmentRequest){
+        try{
+            Investment investment = editVerifiedInvestmentById(id, createInvestmentRequest);
+            return mapInvestmentToInvestmentResponse(investment);
+        }
+        catch (Exception e){
+            throw new RuntimeException("Failed to Edit Investment");
+        }
+    }
+
+    private Investment editVerifiedInvestmentById(long id, CreateInvestmentRequest createInvestmentRequest){
+        Investment investment = findVerifiedInvestmentTransactionWithID(id);
+
+        investment.setInvestmentType(createInvestmentRequest.getInvestmentType());
+        investment.setAssetSymbol(createInvestmentRequest.getAssetSymbol());
+        investment.setAmountInvested(createInvestmentRequest.getAmountInvested());
+        investment.setQuantity(createInvestmentRequest.getQuantity());
+        investment.setInvestmentDate(createInvestmentRequest.getInvestmentDate());
+        investment.setCurrency(createInvestmentRequest.getCurrency());
+        investment.setAlternateAmount(createInvestmentRequest.getAlternateAmount());
+        investment.setAlternateCurrency(createInvestmentRequest.getAlternateCurrency());
+
+        return investmentRepository.save(investment);
+    }
 
     public InvestmentResponse mapInvestmentToInvestmentResponse(Investment investment){
         InvestmentResponse response = new InvestmentResponse();
