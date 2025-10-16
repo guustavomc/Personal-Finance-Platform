@@ -2,6 +2,7 @@ package com.example.investment.controller;
 
 import com.example.investment.service.InvestmentService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -20,6 +21,10 @@ public class InvestmentControllerTest {
     public void setup(){
 
     }
+
+    @Test
+    void getAllInvestmentsMade_ReturnResponseEntity_WithInvestmentResponseList(){}
+
 
 
 }
