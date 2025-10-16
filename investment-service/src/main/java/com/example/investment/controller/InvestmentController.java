@@ -59,4 +59,11 @@ public class InvestmentController {
 
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<InvestmentResponse> updateInvestment(@PathVariable("id") long id, @RequestBody CreateInvestmentRequest createInvestmentRequest){
+        InvestmentResponse investmentResponse = new InvestmentResponse();
+        investmentResponse = investmentService.editInvestmentById(id, createInvestmentRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(investmentResponse);
+    }
+
 }
