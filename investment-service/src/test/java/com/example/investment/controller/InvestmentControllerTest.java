@@ -46,6 +46,35 @@ public class InvestmentControllerTest {
         assertEquals(1, response.getBody().size());
     }
 
+    @Test
+    void getAllInvestmentsMade_ReturnNotFound(){
+        InvestmentResponse investmentResponse = new InvestmentResponse();
+        List<InvestmentResponse> investmentResponseList = new ArrayList<>();
+
+        investmentResponseList.add(investmentResponse);
+
+        when(investmentService.findAllInvestmentsMade()).thenThrow(new RuntimeException());
+
+        ResponseEntity<List<InvestmentResponse>> response = investmentController.getAllInvestmentsMade();
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void getInvestmentById_ReturnResponseEntity_WithInvestmentResponse(){
+        long id=1L;
+        InvestmentResponse investmentResponse = new InvestmentResponse();
+        investmentResponse.setId(id);
+        when(investmentService.findInvestmentTransactionWithID(id)).thenReturn(investmentResponse);
+
+        ResponseEntity<InvestmentResponse> response = investmentController.getInvestmentById(id);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().getId());
+    }
+
+
+
 
 
 }
