@@ -176,7 +176,7 @@ public class InvestmentServiceTest {
     }
 
     @Test
-    void editInvestmentWithID_EditExpense_ReturnInvestmentResponse(){
+    void editInvestmentWithID_EditInvestment_ReturnInvestmentResponse(){
         Investment investment = new Investment();
         investment.setId(1L);
         investment.setInvestmentType(CRYPTO);
