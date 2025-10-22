@@ -1,5 +1,6 @@
 package com.example.investment.controller;
 
+import com.example.investment.dto.CreateInvestmentRequest;
 import com.example.investment.dto.InvestmentResponse;
 import com.example.investment.service.InvestmentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,10 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Answers.valueOf;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,8 +76,34 @@ public class InvestmentControllerTest {
         assertEquals(1, response.getBody().getId());
     }
 
+    @Test
+    void createInvestment_ReturnResponseEntity_WithInvestmentCreated(){
+        CreateInvestmentRequest createInvestmentRequest = new CreateInvestmentRequest();
+        InvestmentResponse investmentResponse = new InvestmentResponse();
+        createInvestmentRequest.setAmountInvested(BigDecimal.valueOf(1000));
+        investmentResponse.setAmountInvested(BigDecimal.valueOf(1000));
+
+        when(investmentService.saveInvestment(createInvestmentRequest)).thenReturn(investmentResponse);
+
+        ResponseEntity<InvestmentResponse> responseEntity = investmentController.createInvestment(createInvestmentRequest);
+
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        assertEquals(investmentResponse.getAmountInvested(), responseEntity.getBody().getAmountInvested());
+    }
 
 
+    @Test
+    void createInvestment_ReturnResponseEntity_WithNotFound(){
+        CreateInvestmentRequest createInvestmentRequest = new CreateInvestmentRequest();
+        InvestmentResponse investmentResponse = new InvestmentResponse();
+        createInvestmentRequest.setAmountInvested(BigDecimal.valueOf(1000));
+        investmentResponse.setAmountInvested(BigDecimal.valueOf(1000));
+
+        when(investmentService.saveInvestment(createInvestmentRequest)).thenThrow(new RuntimeException());
+        ResponseEntity<InvestmentResponse> responseEntity = investmentController.createInvestment(createInvestmentRequest);
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    }
 
 
 }
