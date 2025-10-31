@@ -6,8 +6,8 @@ public class AssetHolding {
 
     private InvestmentType investmentType;
     private String assetSymbol;
-    private BigDecimal totalAmountInvested;
-    private BigDecimal totalQuantity;
+    private BigDecimal totalAmountInvested= BigDecimal.ZERO;
+    private BigDecimal totalQuantity= BigDecimal.ZERO;
     private String primaryCurrency;
     private BigDecimal alternateTotalAmountInvested;
     private String alternateCurrency;
