@@ -56,7 +56,7 @@ public class PortfolioSummaryService {
         AssetHolding holding = new AssetHolding();
         holding.setInvestmentType(investment.getInvestmentType());
         holding.setAssetSymbol(investment.getAssetSymbol());
-        holding.setTotalAmountInvested(investment.getAlternateAmount());
+        holding.setTotalAmountInvested(investment.getAmountInvested());
         holding.setTotalQuantity(investment.getQuantity());
         holding.setPrimaryCurrency(investment.getCurrency());
         holding.setAlternateTotalAmountInvested(investment.getAlternateAmount());
