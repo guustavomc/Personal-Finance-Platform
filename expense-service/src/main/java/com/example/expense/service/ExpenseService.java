@@ -37,13 +37,8 @@ public class ExpenseService {
     }
 
     public List<ExpenseResponse> saveExpense(CreateExpenseRequest expenseRequest){
-        try {
-            List<Expense> savedExpenses= saveVerifiedExpense(expenseRequest);
-            return  savedExpenses.stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
-        }
-        catch (Exception e){
-            throw new RuntimeException("Failed to Save Expense");
-        }
+        List<Expense> savedExpenses= saveVerifiedExpense(expenseRequest);
+        return savedExpenses.stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
     }
 
     public List<Expense> saveVerifiedExpense(CreateExpenseRequest expenseRequest){
@@ -108,7 +103,7 @@ public class ExpenseService {
 
     public Expense findVerifiedExpense(Long id) {
         return expenseRepository.findById(id)
-                .orElseThrow(() -> new ExpenseNotFoundException("Expense with ID " + id + " not found"));
+                .orElseThrow(() -> new ExpenseNotFoundException(String.format("Failed to find expense with id %d", id)));
     }
 
     public List<ExpenseResponse> findExpensesByCategory(String requestedCategory){
@@ -158,7 +153,6 @@ public class ExpenseService {
                 highestSpentCategory,
                 totalPerCategory,
                 expensesFromGivenYear);
-
         return summaryResponse;
     }
 
@@ -167,19 +161,16 @@ public class ExpenseService {
                 .stream()
                 .map(expenseResponse -> expenseResponse.getValueSpent())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         return totalExpensesFromMonth;
     }
 
     private BigDecimal findAverageDailyExpensesFromMonth(int year, int month, BigDecimal totalExpensesFromMonth) {
         BigDecimal averageDailyExpense= totalExpensesFromMonth.divide(BigDecimal.valueOf(getDaysInMonth(year, month)), 2, RoundingMode.HALF_UP);
-
         return  averageDailyExpense;
     }
 
     private BigDecimal findAverageDailyExpensesFromYear(int year, BigDecimal totalExpensesFromMonth) {
         BigDecimal averageDailyExpense= totalExpensesFromMonth.divide(BigDecimal.valueOf(getDaysInYear(year)), 2, RoundingMode.HALF_UP);
-
         return  averageDailyExpense;
     }
 
@@ -190,7 +181,6 @@ public class ExpenseService {
                         Collectors.mapping(ExpenseResponse::getValueSpent,
                                 Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
                 ));
-
         return totalPerCategory;
     }
 
@@ -199,7 +189,6 @@ public class ExpenseService {
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse("N/A");
-
         return highestSpentCategory;
     }
 
@@ -212,7 +201,6 @@ public class ExpenseService {
         }
         catch (Exception e){
             throw new ExpenseNotFoundException(String.format("Failed to find expenses from Year %d, Month %d", year, month));
-
         }
     }
 
@@ -242,11 +230,10 @@ public class ExpenseService {
 
     public void removeExpense(Long id){
         if(!expenseRepository.existsById(id)){
-            throw new ExpenseNotFoundException("Expense with ID " + id + " not found");
+            throw new ExpenseNotFoundException(String.format("Failed to find expense with id %d", id));
         }
         else{
             removeVerifiedExpense(id);
-
         }
     }
 
@@ -260,49 +247,24 @@ public class ExpenseService {
     }
 
     private void removeVerifiedExpenseWithSingleInstallment(Long id) {
-        try{
-            expenseRepository.deleteById(id);
-        }
-        catch(Exception e){
-            throw new RuntimeException("Failed to delete Expense with ID " + id);
-        }
+        expenseRepository.deleteById(id);
     }
 
     private void removeVerifiedExpenseWithMultipleInstallments(Long id) {
-        try{
-            List<Expense> expensesWithPurchaseID = expenseRepository.findByPurchaseId(findVerifiedExpense(id).getPurchaseId());
-            expenseRepository.deleteAll(expensesWithPurchaseID);
-        }
-        catch(Exception e){
-            throw new RuntimeException("Failed to delete Expense with ID " + id);
-        }
+        String purchaseId = findVerifiedExpense(id).getPurchaseId();
+        List<Expense> expensesWithPurchaseID = expenseRepository.findByPurchaseId(purchaseId);
+        expenseRepository.deleteAll(expensesWithPurchaseID);
     }
 
-
-
     public List<ExpenseResponse> editExpenseById(long id, CreateExpenseRequest createExpenseRequest){
-        try {
-            List<Expense> savedExpenses= updateVerifiedExpenseById(id,createExpenseRequest);
-            return  savedExpenses.stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
-        }
-        catch (Exception e){
-            throw new RuntimeException("Failed to Edit Expense");
-        }
-
+        List<Expense> savedExpenses= updateVerifiedExpenseById(id,createExpenseRequest);
+        return  savedExpenses.stream().map(expense -> mapExpenseToExpenseResponse(expense)).toList();
     }
 
     private List<Expense> updateVerifiedExpenseById(long id, CreateExpenseRequest createExpenseRequest) {
-        List<Expense> expensesWithPurchaseID = expenseRepository.findByPurchaseId(findVerifiedExpense(id).getPurchaseId());
-
-        if(expensesWithPurchaseID.isEmpty()){
-            throw new EntityNotFoundException("Expenses not found");
-        }
-
+        String purchaseID = findVerifiedExpense(id).getPurchaseId();
+        List<Expense> expensesWithPurchaseID = expenseRepository.findByPurchaseId(purchaseID);
         expenseRepository.deleteAll(expensesWithPurchaseID);
-
         return saveVerifiedExpense(createExpenseRequest);
-
     }
-
-
 }

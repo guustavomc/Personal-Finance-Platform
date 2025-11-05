@@ -217,7 +217,7 @@ public class ExpenseServiceTest {
         when(expenseRepository.findById(1L)).thenReturn(Optional.empty());
 
         RuntimeException exception = assertThrows(ExpenseNotFoundException.class,() -> expenseService.findExpenseById(1L));
-        assertEquals("Expense with ID 1 not found", exception.getMessage());
+        assertEquals("Failed to find expense with id 1", exception.getMessage());
     }
 
     @Test
@@ -484,7 +484,7 @@ public class ExpenseServiceTest {
 
         when(expenseRepository.existsById(1L)).thenReturn(false);
         RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseService.removeExpense(1L));
-        assertEquals("Expense with ID 1 not found", exception.getMessage());
+        assertEquals("Failed to find expense with id 1", exception.getMessage());
     }
 
     @Test
