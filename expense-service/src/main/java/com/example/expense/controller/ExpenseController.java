@@ -27,14 +27,8 @@ public class ExpenseController {
 
     @GetMapping
     public ResponseEntity<List<ExpenseResponse>> getAllExpenses(){
-        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
-        try {
-            expenseResponseList = expenseService.findAllExpenses();
-            return ResponseEntity.status(HttpStatus.OK).body(expenseResponseList);
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(expenseResponseList);
-        }
+        List<ExpenseResponse> expenseResponseList = expenseService.findAllExpenses();
+        return ResponseEntity.status(HttpStatus.OK).body(expenseResponseList);
     }
 
     @GetMapping("/{id}")
@@ -92,14 +86,8 @@ public class ExpenseController {
     
     @PostMapping
     public ResponseEntity<List<ExpenseResponse>> createExpense(@Valid @RequestBody CreateExpenseRequest expense){
-        List<ExpenseResponse> response = new ArrayList<>();
-        try {
-            response = expenseService.saveExpense(expense);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+        List<ExpenseResponse> response = expenseService.saveExpense(expense);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
@@ -116,10 +104,4 @@ public class ExpenseController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
     }
-
-
-
-
-
-
 }

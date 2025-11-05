@@ -52,18 +52,6 @@ public class ExpenseControllerTest {
     }
 
     @Test
-    void getAllExpenses_ReturnNotFound(){
-        ExpenseResponse expenseResponse = new ExpenseResponse();
-        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
-        expenseResponseList.add(expenseResponse);
-        when(expenseService.findAllExpenses()).thenThrow(new RuntimeException());
-
-        ResponseEntity<List<ExpenseResponse>> response = expenseController.getAllExpenses();
-
-        assertEquals(HttpStatus.NOT_FOUND,response.getStatusCode());
-    }
-
-    @Test
     void getExpenseByID_ReturnExpenseResponse(){
         long id = 1L;
         ExpenseResponse expenseResponse = new ExpenseResponse();
@@ -245,18 +233,6 @@ public class ExpenseControllerTest {
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(expenseResponse, response.getBody());
-    }
-
-    @Test
-    void createExpense_ReturnNotFound(){
-        CreateExpenseRequest expense = new CreateExpenseRequest();
-        List<ExpenseResponse> expenseResponse = new ArrayList<>();
-
-        when(expenseService.saveExpense(expense)).thenThrow(new RuntimeException());
-
-        ResponseEntity<List<ExpenseResponse>> response = expenseController.createExpense(expense);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
