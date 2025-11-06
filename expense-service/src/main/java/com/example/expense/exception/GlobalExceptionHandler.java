@@ -20,12 +20,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String,Object>> handleRuntimeException(RuntimeException ex){
-        return buildErrorResponse("Failed to delete Expense: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return buildErrorResponse("Failed to delete Expense, Database connection failed: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String,Object>> handleDataIntegrityViolationException(DataIntegrityViolationException ex){
-        return buildErrorResponse("Failed to delete Expense, Data Integrity violated: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return buildErrorResponse("Failed to delete Expense, the register is in use: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<Map<String,Object>> buildErrorResponse(String message, HttpStatus status){
