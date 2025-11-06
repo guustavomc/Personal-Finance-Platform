@@ -2,7 +2,7 @@ package com.example.expense.controller;
 
 import com.example.expense.dto.ExpenseResponse;
 import com.example.expense.dto.ExpenseSummaryResponse;
-import com.example.expense.service.ExpenseService;
+import com.example.expense.service.ExpenseReportService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 public class ExpenseReportControllerTest {
 
     @Mock
-    private ExpenseService expenseService;
+    private ExpenseReportService expenseReportService;
 
     @InjectMocks
     private ExpenseReportController expenseReportController;
@@ -48,7 +48,7 @@ public class ExpenseReportControllerTest {
         int year = 2025;
         int month = 9;
 
-        when(expenseService.findExpenseSummaryByMonth(year, month)).thenReturn(summaryResponse);
+        when(expenseReportService.findExpenseSummaryByMonth(year, month)).thenReturn(summaryResponse);
 
         ResponseEntity<ExpenseSummaryResponse> response = expenseReportController.getMonthlyExpenseSummaryResponse(year, month);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -79,7 +79,7 @@ public class ExpenseReportControllerTest {
 
         int year = 2025;
 
-        when(expenseService.findExpenseSummaryByYear(year)).thenReturn(summaryResponse);
+        when(expenseReportService.findExpenseSummaryByYear(year)).thenReturn(summaryResponse);
 
         ResponseEntity<ExpenseSummaryResponse> response = expenseReportController.getAnnualExpenseSummaryResponse(year);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -100,7 +100,7 @@ public class ExpenseReportControllerTest {
         int year = 2023;
         int month = 6;
 
-        when(expenseService.findExpensesByMonth(year, month)).thenReturn(expenseResponseList);
+        when(expenseReportService.findExpensesByMonth(year, month)).thenReturn(expenseResponseList);
 
         ResponseEntity<List<ExpenseResponse>> response = expenseReportController.getMonthlyExpenses(year, month);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -114,7 +114,7 @@ public class ExpenseReportControllerTest {
         expenseResponseList.add(expenseResponse);
         int year = 2025;
 
-        when(expenseService.findExpensesByYear(year)).thenReturn(expenseResponseList);
+        when(expenseReportService.findExpensesByYear(year)).thenReturn(expenseResponseList);
 
         ResponseEntity<List<ExpenseResponse>> response = expenseReportController.getAnnualExpenses(year);
         assertEquals(HttpStatus.OK, response.getStatusCode());
