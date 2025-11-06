@@ -5,6 +5,7 @@ import com.example.expense.dto.ExpenseSummaryResponse;
 import com.example.expense.exception.ExpenseNotFoundException;
 import com.example.expense.model.Expense;
 import com.example.expense.repository.ExpenseRepository;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Service
 public class ExpenseReportService {
 
     private ExpenseRepository expenseRepository;
