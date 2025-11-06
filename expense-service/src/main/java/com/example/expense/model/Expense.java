@@ -37,14 +37,6 @@ public class Expense {
 
     public Expense(){}
 
-    public Expense(String description, String category, BigDecimal valueSpent, LocalDate date){
-        this.description=description;
-        this.category=category;
-        this.valueSpent=valueSpent;
-        this.date=date;
-    }
-
-
     public long getId() {
         return id;
     }

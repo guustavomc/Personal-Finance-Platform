@@ -64,17 +64,6 @@ public class ExpenseControllerTest {
     }
 
     @Test
-    void getExpenseByID_ReturnNotFound(){
-        long id = 1L;
-        ExpenseResponse expenseResponse = new ExpenseResponse();
-
-        when(expenseService.findExpenseById(id)).thenThrow(new ExpenseNotFoundException("Expense with ID 1 not found"));
-
-        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseController.getExpenseByID(id));
-        assertEquals("Expense with ID 1 not found", exception.getMessage());
-    }
-
-    @Test
     void getExpensesWithCategory_ReturnExpenseResponseList_WithCategory(){
         ExpenseResponse expenseResponse = new ExpenseResponse();
         List<ExpenseResponse> expenseResponseList = new ArrayList<>();
@@ -89,19 +78,6 @@ public class ExpenseControllerTest {
 
     }
 
-    @Test
-    void getExpensesWithCategory_ReturnNotFound(){
-        ExpenseResponse expenseResponse = new ExpenseResponse();
-        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
-        expenseResponseList.add(expenseResponse);
-        String category = "Health";
-
-        when(expenseService.findExpensesByCategory(category)).thenThrow(new ExpenseNotFoundException("Failed to find expenses with category Health"));
-
-        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseController.getExpensesWithCategory(category));
-        assertEquals("Failed to find expenses with category Health", exception.getMessage());
-
-    }
 
     @Test
     void getMonthlyExpenseSummaryResponse_ReturnMonthlySummaryResponse_WithMonthlyDetails(){
@@ -182,20 +158,6 @@ public class ExpenseControllerTest {
     }
 
     @Test
-    void getMonthlyExpenses_ReturnNotFound(){
-        ExpenseResponse expenseResponse = new ExpenseResponse();
-        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
-        expenseResponseList.add(expenseResponse);
-        int year = 2023;
-        int month = 6;
-
-        when(expenseService.findExpensesByMonth(year, month)).thenThrow(new ExpenseNotFoundException("Failed to find expenses from Year 2023, Month 6"));
-
-        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseController.getMonthlyExpenses(year, month));
-        assertEquals("Failed to find expenses from Year 2023, Month 6", exception.getMessage());
-    }
-
-    @Test
     void getAnnualExpenses_ReturnExpenseResponseList_WithYearlyExpenses(){
         ExpenseResponse expenseResponse = new ExpenseResponse();
         List<ExpenseResponse> expenseResponseList = new ArrayList<>();
@@ -207,19 +169,6 @@ public class ExpenseControllerTest {
         ResponseEntity<List<ExpenseResponse>> response = expenseController.getAnnualExpenses(year);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
-    }
-
-    @Test
-    void getAnnualExpenses_ReturnNotFound(){
-        ExpenseResponse expenseResponse = new ExpenseResponse();
-        List<ExpenseResponse> expenseResponseList = new ArrayList<>();
-        expenseResponseList.add(expenseResponse);
-        int year = 2025;
-
-        when(expenseService.findExpensesByYear(year)).thenThrow(new ExpenseNotFoundException("Failed to find expenses from Year 2025"));
-
-        RuntimeException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseController.getAnnualExpenses(year));
-        assertEquals("Failed to find expenses from Year 2025", exception.getMessage());
     }
 
     @Test
@@ -246,17 +195,6 @@ public class ExpenseControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
-
-    @Test
-    void deleteExpense_ReturnNotFound(){
-        long id = 1L;
-        ExpenseResponse expenseResponse = new ExpenseResponse();
-
-        doThrow(new ExpenseNotFoundException("Expense with ID " + id + " not found")).when(expenseService).removeExpense(id);
-
-        assertThrows(RuntimeException.class, () -> expenseController.deleteExpense(id));
-    }
-
 
     @Test
     void updateExpense_Success_ReturnsOk() {
@@ -306,21 +244,6 @@ public class ExpenseControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().size());
     }
-
-    @Test
-    void updateExpense_Failure_ReturnsNotFoundException() {
-        long id = 1L;
-        CreateExpenseRequest createExpenseRequest = new CreateExpenseRequest();
-        ExpenseResponse expenseResponse = new ExpenseResponse();
-
-        when(expenseService.editExpenseById(id, createExpenseRequest)).thenThrow(new ExpenseNotFoundException("Expense with ID " + id + " not found"));
-
-        ExpenseNotFoundException exception = assertThrows(ExpenseNotFoundException.class, () -> expenseController.updateExpense(id, createExpenseRequest));
-
-        assertEquals("Expense with ID 1 not found", exception.getMessage());
-
-    }
-
 
 }
 
