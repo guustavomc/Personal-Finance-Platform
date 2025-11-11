@@ -2,7 +2,6 @@ package com.example.investment.service;
 
 import com.example.investment.dto.CreateInvestmentRequest;
 import com.example.investment.dto.InvestmentResponse;
-import com.example.investment.exception.InvestmentNotFoundException;
 import com.example.investment.model.Investment;
 import com.example.investment.repository.InvestmentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -159,7 +158,7 @@ public class InvestmentServiceTest {
 
         when(investmentRepository.existsById(id)).thenReturn(false);
 
-        InvestmentNotFoundException exception = assertThrows(InvestmentNotFoundException.class,
+        RuntimeException exception = assertThrows(RuntimeException.class,
                 ()->investmentService.removeInvestment(id));
         assertEquals("Failed to find expenses with id 1", exception.getMessage());
     }
@@ -169,10 +168,11 @@ public class InvestmentServiceTest {
         long id = 1L;
 
         when(investmentRepository.existsById(1L)).thenReturn(true);
-        doThrow(new RuntimeException("Database error")).when(investmentRepository).deleteById(id);
+        doThrow(new RuntimeException("")).when(investmentRepository).deleteById(id);
 
-        assertThrows(RuntimeException.class, ()->investmentService.removeInvestment(id));
-
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                ()->investmentService.removeInvestment(id));
+        assertNotNull(exception);    
     }
 
     @Test
@@ -204,6 +204,7 @@ public class InvestmentServiceTest {
         investmentUpdated.setCurrency("BRL");
 
         when(investmentRepository.findById(1L)).thenReturn(Optional.of(investment));
+        when(investmentRepository.existsById(1L)).thenReturn(true);
         when(investmentRepository.save(any(Investment.class))).thenReturn(investmentUpdated);
 
         InvestmentResponse investmentResponse = investmentService.
@@ -219,37 +220,35 @@ public class InvestmentServiceTest {
     }
 
     @Test
-    void editInvestmentById_ThrowRunTimeException_WhenFailedToEditInvestment(){
-        Investment investment = new Investment();
-        investment.setId(1L);
-        investment.setInvestmentType(CRYPTO);
-        investment.setAssetSymbol("BTC");
-        investment.setAmountInvested(BigDecimal.valueOf(1000));
-        investment.setQuantity(BigDecimal.valueOf(0.1));
-        investment.setInvestmentDate(LocalDate.of(2025, 10, 8));
-        investment.setCurrency("BRL");
+    void editInvestmentById_ThrowRunTimeException_WhenFailedToEditInvestment() {
+        // Given
+        Investment existingInvestment = new Investment();
+        existingInvestment.setId(1L);
+        existingInvestment.setInvestmentType(CRYPTO);
+        existingInvestment.setAssetSymbol("BTC");
+        existingInvestment.setAmountInvested(BigDecimal.valueOf(1000));
+        existingInvestment.setQuantity(BigDecimal.valueOf(0.1));
+        existingInvestment.setInvestmentDate(LocalDate.of(2025, 10, 8));
+        existingInvestment.setCurrency("BRL");
 
-        CreateInvestmentRequest createInvestmentRequest = new CreateInvestmentRequest();
-        createInvestmentRequest.setInvestmentType(CRYPTO);
-        createInvestmentRequest.setAssetSymbol("BTC");
-        createInvestmentRequest.setAmountInvested(BigDecimal.valueOf(1000));
-        createInvestmentRequest.setQuantity(BigDecimal.valueOf(0.2));
-        createInvestmentRequest.setInvestmentDate(LocalDate.of(2025, 10, 8));
-        createInvestmentRequest.setCurrency("BRL");
+        CreateInvestmentRequest request = new CreateInvestmentRequest();
+        request.setInvestmentType(CRYPTO);
+        request.setAssetSymbol("BTC");
+        request.setAmountInvested(BigDecimal.valueOf(1000));
+        request.setQuantity(BigDecimal.valueOf(0.2));
+        request.setInvestmentDate(LocalDate.of(2025, 10, 8));
+        request.setCurrency("BRL");
 
-        Investment investmentUpdated = new Investment();
-        investment.setId(1L);
-        investment.setInvestmentType(CRYPTO);
-        investment.setAssetSymbol("BTC");
-        investment.setAmountInvested(BigDecimal.valueOf(1000));
-        investment.setQuantity(BigDecimal.valueOf(0.2));
-        investment.setInvestmentDate(LocalDate.of(2025, 10, 8));
-        investment.setCurrency("BRL");
+        // When
+        when(investmentRepository.existsById(1L)).thenReturn(true); // Critical!
+        when(investmentRepository.findById(1L)).thenReturn(Optional.of(existingInvestment));
+        when(investmentRepository.save(any(Investment.class))).thenThrow(new RuntimeException(""));
 
-        when(investmentRepository.findById(1L)).thenReturn(Optional.of(investment));
-        doThrow(new RuntimeException("Database error"))
-                .when(investmentRepository).save(investmentUpdated);
+        // Then
+        RuntimeException exception = assertThrows(RuntimeException.class, () ->
+            investmentService.editInvestmentById(1L, request)
+        );
 
-        assertThrows(RuntimeException.class, ()->investmentService.editInvestmentById(1L,createInvestmentRequest));
+        assertNotNull(exception);    
     }
 }

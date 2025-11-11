@@ -60,8 +60,14 @@ public class InvestmentService {
     }
 
     public InvestmentResponse editInvestmentById(long id, CreateInvestmentRequest createInvestmentRequest){
-        Investment investment = editVerifiedInvestmentById(id, createInvestmentRequest);
-        return mapInvestmentToInvestmentResponse(investment);
+        if(!investmentRepository.existsById(id)){
+            throw new InvestmentNotFoundException(String.format("Failed to find expenses with id %d", id));
+        }
+        else{
+           Investment investment = editVerifiedInvestmentById(id, createInvestmentRequest);
+            return mapInvestmentToInvestmentResponse(investment);
+        }
+        
     }
 
     private Investment editVerifiedInvestmentById(long id, CreateInvestmentRequest createInvestmentRequest){
