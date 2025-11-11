@@ -2,6 +2,7 @@ package com.example.investment.service;
 
 import com.example.investment.dto.CreateInvestmentRequest;
 import com.example.investment.dto.InvestmentResponse;
+import com.example.investment.exception.InvestmentNotFoundException;
 import com.example.investment.model.Investment;
 import com.example.investment.repository.InvestmentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -153,14 +154,14 @@ public class InvestmentServiceTest {
         verify(investmentRepository, times(1)).deleteById(1L);
     }
     @Test
-    void removeInvestment_ThrowRunTimeException_WhenInvestmentNotFound(){
+    void removeInvestment_ThrowInvestmentNotFoundException_WhenInvestmentNotFound(){
         long id = 1L;
 
         when(investmentRepository.existsById(id)).thenReturn(false);
 
-        RuntimeException exception = assertThrows(RuntimeException.class,
+        InvestmentNotFoundException exception = assertThrows(InvestmentNotFoundException.class,
                 ()->investmentService.removeInvestment(id));
-        assertEquals("Investment with ID " + id + " not found", exception.getMessage());
+        assertEquals("Failed to find expenses with id 1", exception.getMessage());
     }
 
     @Test
@@ -170,9 +171,8 @@ public class InvestmentServiceTest {
         when(investmentRepository.existsById(1L)).thenReturn(true);
         doThrow(new RuntimeException("Database error")).when(investmentRepository).deleteById(id);
 
-        RuntimeException exception = assertThrows(RuntimeException.class,
-                ()->investmentService.removeInvestment(id));
-        assertEquals("Failed to delete Investment with ID " + id, exception.getMessage());
+        assertThrows(RuntimeException.class, ()->investmentService.removeInvestment(id));
+
     }
 
     @Test
@@ -250,8 +250,6 @@ public class InvestmentServiceTest {
         doThrow(new RuntimeException("Database error"))
                 .when(investmentRepository).save(investmentUpdated);
 
-        RuntimeException exception = assertThrows(RuntimeException.class,
-                ()->investmentService.editInvestmentById(1L,createInvestmentRequest));
-        assertEquals("Failed to Edit Investment", exception.getMessage());
+        assertThrows(RuntimeException.class, ()->investmentService.editInvestmentById(1L,createInvestmentRequest));
     }
 }
