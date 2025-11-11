@@ -2,6 +2,7 @@ package com.example.investment.service;
 
 import com.example.investment.dto.CreateInvestmentRequest;
 import com.example.investment.dto.InvestmentResponse;
+import com.example.investment.exception.InvestmentNotFoundException;
 import com.example.investment.model.Investment;
 import com.example.investment.repository.InvestmentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -158,7 +159,7 @@ public class InvestmentServiceTest {
 
         when(investmentRepository.existsById(id)).thenReturn(false);
 
-        RuntimeException exception = assertThrows(RuntimeException.class,
+        InvestmentNotFoundException exception = assertThrows(InvestmentNotFoundException.class,
                 ()->investmentService.removeInvestment(id));
         assertEquals("Failed to find expenses with id 1", exception.getMessage());
     }
@@ -217,6 +218,41 @@ public class InvestmentServiceTest {
         assertEquals(investmentResponse.getInvestmentDate(),
                 LocalDate.of(2025, 10, 8));
         assertEquals(investmentResponse.getCurrency(),"BRL");
+    }
+
+    @Test
+    void editInvestmentById_ThrowInvestmentNotFoundException_WhenFailedToFindInvestment(){
+        Investment investment = new Investment();
+        investment.setId(1L);
+        investment.setInvestmentType(CRYPTO);
+        investment.setAssetSymbol("BTC");
+        investment.setAmountInvested(BigDecimal.valueOf(1000));
+        investment.setQuantity(BigDecimal.valueOf(0.1));
+        investment.setInvestmentDate(LocalDate.of(2025, 10, 8));
+        investment.setCurrency("BRL");
+
+        CreateInvestmentRequest createInvestmentRequest = new CreateInvestmentRequest();
+        createInvestmentRequest.setInvestmentType(CRYPTO);
+        createInvestmentRequest.setAssetSymbol("BTC");
+        createInvestmentRequest.setAmountInvested(BigDecimal.valueOf(1000));
+        createInvestmentRequest.setQuantity(BigDecimal.valueOf(0.2));
+        createInvestmentRequest.setInvestmentDate(LocalDate.of(2025, 10, 8));
+        createInvestmentRequest.setCurrency("BRL");
+
+        Investment investmentUpdated = new Investment();
+        investmentUpdated.setId(1L);
+        investmentUpdated.setInvestmentType(CRYPTO);
+        investmentUpdated.setAssetSymbol("BTC");
+        investmentUpdated.setAmountInvested(BigDecimal.valueOf(1000));
+        investmentUpdated.setQuantity(BigDecimal.valueOf(0.2));
+        investmentUpdated.setInvestmentDate(LocalDate.of(2025, 10, 8));
+        investmentUpdated.setCurrency("BRL");
+
+        when(investmentRepository.existsById(1L)).thenReturn(false);
+
+        InvestmentNotFoundException exception = assertThrows(InvestmentNotFoundException.class,
+                ()->investmentService.editInvestmentById(1L, createInvestmentRequest));
+        assertEquals("Failed to find expenses with id 1", exception.getMessage());
     }
 
     @Test
