@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: investment-api
+  namespace: default
+  labels:
+    app: investment-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: investment-api
+  template:
+    metadata:
+      labels:
+        app: investment-api
+    spec:
+      containers:
+        - name: investment-api
+          image: investment-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: db-secrets
