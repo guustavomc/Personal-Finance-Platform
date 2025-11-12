@@ -29,7 +29,7 @@ public class InvestmentService {
 
     public Investment findVerifiedInvestmentTransactionWithID(Long id){
         return investmentRepository.findById(id)
-                .orElseThrow(() ->new InvestmentNotFoundException(String.format("Failed to find expenses with id %d", id)));
+                .orElseThrow(() ->new InvestmentNotFoundException(String.format("Failed to find investment with id %d", id)));
 
     }
 
@@ -48,7 +48,7 @@ public class InvestmentService {
 
     public void removeInvestment(long id){
         if(!investmentRepository.existsById(id)){
-            throw new InvestmentNotFoundException(String.format("Failed to find expenses with id %d", id));
+            throw new InvestmentNotFoundException(String.format("Failed to find investment with id %d", id));
         }
         else{
             removeVerifiedInvestment(id);
@@ -61,7 +61,7 @@ public class InvestmentService {
 
     public InvestmentResponse editInvestmentById(long id, CreateInvestmentRequest createInvestmentRequest){
         if(!investmentRepository.existsById(id)){
-            throw new InvestmentNotFoundException(String.format("Failed to find expenses with id %d", id));
+            throw new InvestmentNotFoundException(String.format("Failed to find investment with id %d", id));
         }
         else{
            Investment investment = editVerifiedInvestmentById(id, createInvestmentRequest);

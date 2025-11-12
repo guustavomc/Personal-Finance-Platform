@@ -161,7 +161,7 @@ public class InvestmentServiceTest {
 
         InvestmentNotFoundException exception = assertThrows(InvestmentNotFoundException.class,
                 ()->investmentService.removeInvestment(id));
-        assertEquals("Failed to find expenses with id 1", exception.getMessage());
+        assertEquals("Failed to find investment with id 1", exception.getMessage());
     }
 
     @Test
@@ -252,7 +252,7 @@ public class InvestmentServiceTest {
 
         InvestmentNotFoundException exception = assertThrows(InvestmentNotFoundException.class,
                 ()->investmentService.editInvestmentById(1L, createInvestmentRequest));
-        assertEquals("Failed to find expenses with id 1", exception.getMessage());
+        assertEquals("Failed to find investment with id 1", exception.getMessage());
     }
 
     @Test
