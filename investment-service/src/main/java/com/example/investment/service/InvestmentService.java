@@ -2,6 +2,7 @@ package com.example.investment.service;
 
 import com.example.investment.dto.CreateInvestmentRequest;
 import com.example.investment.dto.InvestmentResponse;
+import com.example.investment.exception.InvestmentNotFoundException;
 import com.example.investment.model.Investment;
 import com.example.investment.repository.InvestmentRepository;
 import org.springframework.stereotype.Service;
@@ -28,18 +29,14 @@ public class InvestmentService {
 
     public Investment findVerifiedInvestmentTransactionWithID(Long id){
         return investmentRepository.findById(id)
-                .orElseThrow(() ->new RuntimeException("Investment not found"));
+                .orElseThrow(() ->new InvestmentNotFoundException(String.format("Failed to find investment with id %d", id)));
 
     }
 
     public InvestmentResponse saveInvestment(CreateInvestmentRequest createInvestmentRequest){
-        try {
-            Investment savedInvestment = saveVerifiedInvestment(createInvestmentRequest);
-            return mapInvestmentToInvestmentResponse(savedInvestment);
-        }
-        catch (Exception e){
-            throw new RuntimeException("Failed to save Investments");
-        }
+        Investment savedInvestment = saveVerifiedInvestment(createInvestmentRequest);
+        return mapInvestmentToInvestmentResponse(savedInvestment);
+
     }
 
     private Investment saveVerifiedInvestment(CreateInvestmentRequest createInvestmentRequest){
@@ -51,7 +48,7 @@ public class InvestmentService {
 
     public void removeInvestment(long id){
         if(!investmentRepository.existsById(id)){
-            throw new RuntimeException("Investment with ID " + id + " not found");
+            throw new InvestmentNotFoundException(String.format("Failed to find investment with id %d", id));
         }
         else{
             removeVerifiedInvestment(id);
@@ -59,22 +56,18 @@ public class InvestmentService {
     }
 
     private void removeVerifiedInvestment(long id){
-        try {
-            investmentRepository.deleteById(id);
-        }
-        catch (Exception e){
-            throw new RuntimeException("Failed to delete Investment with ID " + id);
-        }
+        investmentRepository.deleteById(id);
     }
 
     public InvestmentResponse editInvestmentById(long id, CreateInvestmentRequest createInvestmentRequest){
-        try{
-            Investment investment = editVerifiedInvestmentById(id, createInvestmentRequest);
+        if(!investmentRepository.existsById(id)){
+            throw new InvestmentNotFoundException(String.format("Failed to find investment with id %d", id));
+        }
+        else{
+           Investment investment = editVerifiedInvestmentById(id, createInvestmentRequest);
             return mapInvestmentToInvestmentResponse(investment);
         }
-        catch (Exception e){
-            throw new RuntimeException("Failed to Edit Investment");
-        }
+        
     }
 
     private Investment editVerifiedInvestmentById(long id, CreateInvestmentRequest createInvestmentRequest){
