@@ -15,6 +15,7 @@ public class Investment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Enumerated(EnumType.STRING)
     private InvestmentType investmentType;
 
     private String assetSymbol;
