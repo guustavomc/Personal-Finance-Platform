@@ -214,7 +214,6 @@ spring.jpa.properties.hibernate.format_sql=true
    ```bash
    kubectl get nodes -o wide
    ```
-
    - Use the INTERNAL-IP of a node.
 
 
@@ -222,8 +221,7 @@ spring.jpa.properties.hibernate.format_sql=true
    ```bash
    kubectl port-forward service/expense-api-service 8080:80
    ```
-
-   - Access the API at http://localhost:8080/api/expense.
+- Access the API at http://localhost:8080/api/expense.
 
 
 ### Future Enhancements
@@ -286,44 +284,46 @@ k8s/
 
 ### API Endpoints
 
-| Method | Endpoint                               | Description                                      | Request Body                  | Response Body                   |
-|--------|----------------------------------------|--------------------------------------------------|-------------------------------|---------------------------------|
-| GET    | `/api/investment`                      | Retrieve all expenses                            | None                          | List of `ExpenseResponse`       |
-| GET    | `/api/investment/{id}`                    | Retrieve expense by ID                           | None                          | List of `ExpenseResponse`               |
-| GET    | `/api/investment/category`                | Retrieve expenses by category                    | Query param: `category`       | List of `ExpenseResponse`       |
-| POST   | `/api/investment`                         | Create a new expense                             | `CreateExpenseRequest`        |List of `ExpenseResponse`              |
-| PUT    | `/api/investment/{id}`                    | Update an existing expense                       | `CreateExpenseRequest`        | List of `ExpenseResponse`                |
-| DELETE | `/api/investment/{id}`                    | Delete an expense by ID                          | None                          | None (204 No Content)           |
-| GET    | `/api/investment/report/summary/monthly`  | Retrieve  Summarized expenses for a specific month | Query params: `year`, `month` | `ExpenseSummaryResponse`        |
-| GET    | `/api/investment/report/summary/annual`   | Retrieve  Summarized expenses for a specific year | Query params: `year`          | `ExpenseSummaryResponse`        |
-| GET    | `/api/investment/report/detailed/monthly` | Retrieve  List of expenses for a specific month  | Query params: `year`, `month` | List of `ExpenseResponse`       |
-| GET    | `/api/investment/report/detailed/annual`  | Retrieve  List of expenses for a specific year  | Query params: `year`          | List of `ExpenseResponse`       |
+| Method | Endpoint                               | Description                      | Request Body                  | Response Body               |
+|--------|----------------------------------------|----------------------------------|-------------------------------|-----------------------------|
+| GET    | `/api/investment`                      | Retrieve all investments         | None                          | List of `InvestmentResponse` |
+| GET    | `/api/investment/{id}`                    | Retrieve investment by ID        | Query param: `id`             | `InvestmentResponse`    |
+| GET    | `/api/investment/category`                | Retrieve investments by category | Query param: `category`       | List of `InvestmentResponse`   |
+| POST   | `/api/investment`                         | Create a new investment          | `CreateInvestmentRequest `        | `InvestmentResponse`    |
+| PUT    | `/api/investment/{id}`                    | Update an existing investment    | `CreateInvestmentRequest `        | `InvestmentResponse`   |
+| DELETE | `/api/investment/{id}`                    | Delete an investment by ID       | None                          | None (204 No Content)       |
+| GET    | `api/investment/portfolio/summary`  | Retrieve  Investment Portfolio   | None | `PortfolioSummaryResponse`    |
+
 ### Example Request/Response
 
-**Create Expense (POST `/api/expense`)**
+**Create Investment (POST `/api/investment`)**
 
 Request:
 ```json
 {
-  "category": "Food",
-  "date": "2025-06-18",
-  "description": "Grocery shopping",
-  "valueSpent": 50.00
+   "investmentType": "STOCK",
+   "assetSymbol": "GOOGL",
+   "amountInvested": 1500.00,
+   "quantity": 4.0,
+   "investmentDate": "2025-08-10",
+   "currency": "USD"
 }
 ```
 
 Response:
 ```json
 {
-  "id": 1,
-  "category": "Food",
-  "date": "2025-06-18",
-  "description": "Grocery shopping",
-  "valueSpent": 50.00
+   "id": 2,
+   "investmentType": "STOCK",
+   "assetSymbol": "GOOGL",
+   "amountInvested": 1500.00,
+   "quantity": 4.0,
+   "investmentDate": "2025-08-10",
+   "currency": "USD",
+   "alternateAmount": 0.0,
+   "alternateCurrency": ""
 }
 ```
-
-
 ### Getting Started
 
 #### Prerequisites
@@ -423,9 +423,7 @@ spring.jpa.properties.hibernate.format_sql=true
    ```bash
    kubectl get nodes -o wide
    ```
-
    - Use the INTERNAL-IP of a node.
-
 
 10. Port Forwarding:
    ```bash
