@@ -42,27 +42,29 @@ The Expense Service is a fully implemented microservice responsible for managing
 src/
  └── main/
  │   ├── java/com/example/expense
- │   │   ├── ExpenseServiceApplication.java      # Main application entry point
+ │   │   ├── ExpenseServiceApplication.java        # Main application entry point
  │   │   │
  │   │   ├── controller/
- │   │   │   └── ExpenseController.java         # REST controller for expense endpoints
+ │   │   │   └── ExpenseController.java            # REST controller for expense endpoints
+ │   │   │   └── ExpenseReportController.java      # REST controller for expense report endpoints
  │   │   ├── dto/
- │   │   │   ├── CreateExpenseRequest.java      # DTO for creating/updating expenses
- │   │   │   └── ExpenseResponse.java           # DTO for expense response data
- │   │   │   └── ExpenseSummaryResponse.java    # DTO for expense summary response data
+ │   │   │   ├── CreateExpenseRequest.java         # DTO for creating/updating expenses
+ │   │   │   └── ExpenseResponse.java              # DTO for expense response data
+ │   │   │   └── ExpenseSummaryResponse.java       # DTO for expense summary response data
  │   │   ├── exception/
- │   │   │   ├── ExpenseNotFoundException.java  # Custom Exception
- │   │   │   └── GlobalExceptionHandler.java    # Handle responses for exception
+ │   │   │   ├── ExpenseNotFoundException.java     # Custom Exception
+ │   │   │   └── GlobalExceptionHandler.java       # Handle responses for exception
  │   │   ├── model/
- │   │   │   └── Expense.java                   # Entity model for expenses
+ │   │   │   └── Expense.java                      # Entity model for expenses
+ │   │   │   └── PaymentMethod.java                # Enum for payment method
  │   │   ├── repository/
- │   │   │   └── ExpenseRepository.java         # JPA repository for expense persistence
+ │   │   │   └── ExpenseRepository.java            # JPA repository for expense persistence
  │   │   ├── service/
- │   │   │   └── ExpenseService.java            # Business logic for expense operations
+ │   │   │   └── ExpenseService.java               # Business logic for expense operations
+ │   │   │   └── ExpenseReportService.java         # Business logic for expense report operations
  │   └── resources/
- │       ├── application.properties             # Configuration file
+ │       ├── application.properties                # Configuration file
  │       └── ...
- │       
 k8s/
  └───── postgres-deployment.yaml
  │  └── postgres-service.yaml
@@ -73,21 +75,20 @@ k8s/
  db-docker-compose.yaml
  Dockerfile
 ```
-
 ### API Endpoints
 
-| Method | Endpoint                       | Description                                      | Request Body                  | Response Body                   |
-|--------|--------------------------------|--------------------------------------------------|-------------------------------|---------------------------------|
-| GET    | `/api/expense`                 | Retrieve all expenses                            | None                          | List of `ExpenseResponse`       |
-| GET    | `/api/expense/{id}`            | Retrieve expense by ID                           | None                          | List of `ExpenseResponse`               |
-| GET    | `/api/expense/category`        | Retrieve expenses by category                    | Query param: `category`       | List of `ExpenseResponse`       |
-| GET    | `/api/expense/summary/monthly` | Retrieve  Summarized expenses for a specific month | Query params: `year`, `month` | `ExpenseSummaryResponse`        |
-| GET    | `/api/expense/summary/annual`  | Retrieve  Summarized expenses for a specific year | Query params: `year`          | `ExpenseSummaryResponse`        |
-| GET    | `/api/expense/detailed/monthly`  | Retrieve  List of expenses for a specific month  | Query params: `year`, `month` | List of `ExpenseResponse`       |
-| GET    | `/api/expense/detailed/annual`  | Retrieve  List of expenses for a specific year  | Query params: `year`          | List of `ExpenseResponse`       |
-| POST   | `/api/expense`                 | Create a new expense                             | `CreateExpenseRequest`        | `ExpenseResponse`               |
-| PUT    | `/api/expense/{id}`            | Update an existing expense                       | `CreateExpenseRequest`        | `ExpenseResponse`               |
-| DELETE | `/api/expense/{id}`            | Delete an expense by ID                          | None                          | None (204 No Content)           |
+| Method | Endpoint                               | Description                                      | Request Body                  | Response Body                   |
+|--------|----------------------------------------|--------------------------------------------------|-------------------------------|---------------------------------|
+| GET    | `/api/expense`                      | Retrieve all expenses                            | None                          | List of `ExpenseResponse`       |
+| GET    | `/api/expense/{id}`                    | Retrieve expense by ID                           | None                          | List of `ExpenseResponse`               |
+| GET    | `/api/expense/category`                | Retrieve expenses by category                    | Query param: `category`       | List of `ExpenseResponse`       |
+| POST   | `/api/expense`                         | Create a new expense                             | `CreateExpenseRequest`        |List of `ExpenseResponse`              |
+| PUT    | `/api/expense/{id}`                    | Update an existing expense                       | `CreateExpenseRequest`        | List of `ExpenseResponse`                |
+| DELETE | `/api/expense/{id}`                    | Delete an expense by ID                          | None                          | None (204 No Content)           |
+| GET    | `/api/expense/report/summary/monthly`  | Retrieve  Summarized expenses for a specific month | Query params: `year`, `month` | `ExpenseSummaryResponse`        |
+| GET    | `/api/expense/report/summary/annual`   | Retrieve  Summarized expenses for a specific year | Query params: `year`          | `ExpenseSummaryResponse`        |
+| GET    | `/api/expense/report/detailed/monthly` | Retrieve  List of expenses for a specific month  | Query params: `year`, `month` | List of `ExpenseResponse`       |
+| GET    | `/api/expense/report/detailed/annual`  | Retrieve  List of expenses for a specific year  | Query params: `year`          | List of `ExpenseResponse`       |
 
 ### Example Request/Response
 
@@ -184,7 +185,8 @@ spring.jpa.properties.hibernate.format_sql=true
    
 
    - **Important**: If you were getting dockerhub image, replace <your-dockerhub-username>/expense-api:latest with your Docker Hub username in the image field. 
-   If you used the local image with kind load docker-image, use image: expense-api:latest instead.
+   
+   - If you used the local image with kind load docker-image, use image: expense-api:latest instead.
 
 6. Apply the Manifests:
    ```bash
@@ -237,6 +239,197 @@ spring.jpa.properties.hibernate.format_sql=true
 
 The Budget Service will allow users to define budgets for specific months or years, integrating with the Expense and Investment Services to track spending and investment allocations.
 
-### Investment Service (Planned)
+## Investment Service
 
-The Investment Service will manage investment records, including creating, updating, and retrieving investment details, with integration into the overall budgeting process.
+The Investment Service manages investment records, including creating, updating, and retrieving investment details, with integration into the overall budgeting process.
+
+### Project Structure
+
+```
+src/
+ └── main/
+ │   ├── java/com/example/investment
+ │   │   ├── InvestmentServiceApplication.java        # Main application entry point
+ │   │   │
+ │   │   ├── controller/
+ │   │   │   └── InvestmentController.java            # REST controller for investment endpoints
+ │   │   │   └── PortfolioSummaryController.java      # REST controller for portfolio endpoints
+ │   │   ├── dto/
+ │   │   │   ├── CreateInvestmentRequest.java         # DTO for creating/updating investment
+ │   │   │   └── InvestmentResponse.java              # DTO for investment response data
+ │   │   │   └── PortfolioSummaryResponse.java        # DTO for portfolio summary response data
+ │   │   ├── exception/
+ │   │   │   ├── InvestmentNotFoundException.java     # Custom Exception
+ │   │   │   └── GlobalExceptionHandler.java          # Handle responses for exception
+ │   │   ├── model/
+ │   │   │   └── Investment.java                      # Entity model for investment
+ │   │   │   └── InvestmentType.java                  # Enum for investment type
+ │   │   │   └── AssetHolding.java                    # Entity model for current assets
+ │   │   ├── repository/
+ │   │   │   └── InvestmentRepository.java            # JPA repository for investment persistence
+ │   │   ├── service/
+ │   │   │   └── InvestmentService.java               # Business logic for investment operations
+ │   │   │   └── PortfolioSummaryService.java         # Business logic for portfolio operations
+ │   └── resources/
+ │       ├── application.properties                   # Configuration file
+ │       └── ...
+k8s/
+ └───── postgres-deployment.yaml
+ │  └── postgres-service.yaml
+ │  └── db-secrets.yaml
+ │  └── investment-deployment.yaml
+ │  └── investment-service.yaml
+ │
+ db-docker-compose.yaml
+ Dockerfile
+```
+
+### API Endpoints
+
+| Method | Endpoint                               | Description                                      | Request Body                  | Response Body                   |
+|--------|----------------------------------------|--------------------------------------------------|-------------------------------|---------------------------------|
+| GET    | `/api/investment`                      | Retrieve all expenses                            | None                          | List of `ExpenseResponse`       |
+| GET    | `/api/investment/{id}`                    | Retrieve expense by ID                           | None                          | List of `ExpenseResponse`               |
+| GET    | `/api/investment/category`                | Retrieve expenses by category                    | Query param: `category`       | List of `ExpenseResponse`       |
+| POST   | `/api/investment`                         | Create a new expense                             | `CreateExpenseRequest`        |List of `ExpenseResponse`              |
+| PUT    | `/api/investment/{id}`                    | Update an existing expense                       | `CreateExpenseRequest`        | List of `ExpenseResponse`                |
+| DELETE | `/api/investment/{id}`                    | Delete an expense by ID                          | None                          | None (204 No Content)           |
+| GET    | `/api/investment/report/summary/monthly`  | Retrieve  Summarized expenses for a specific month | Query params: `year`, `month` | `ExpenseSummaryResponse`        |
+| GET    | `/api/investment/report/summary/annual`   | Retrieve  Summarized expenses for a specific year | Query params: `year`          | `ExpenseSummaryResponse`        |
+| GET    | `/api/investment/report/detailed/monthly` | Retrieve  List of expenses for a specific month  | Query params: `year`, `month` | List of `ExpenseResponse`       |
+| GET    | `/api/investment/report/detailed/annual`  | Retrieve  List of expenses for a specific year  | Query params: `year`          | List of `ExpenseResponse`       |
+### Example Request/Response
+
+**Create Expense (POST `/api/expense`)**
+
+Request:
+```json
+{
+  "category": "Food",
+  "date": "2025-06-18",
+  "description": "Grocery shopping",
+  "valueSpent": 50.00
+}
+```
+
+Response:
+```json
+{
+  "id": 1,
+  "category": "Food",
+  "date": "2025-06-18",
+  "description": "Grocery shopping",
+  "valueSpent": 50.00
+}
+```
+
+
+### Getting Started
+
+#### Prerequisites
+
+- Java 17 or higher
+- Maven 3.8+
+- IDE (e.g., IntelliJ IDEA, Eclipse)
+- Database (configurable via `application.properties`; uses PostgreSQL)
+
+### Configuration
+
+Edit `src/main/resources/application.properties` to configure the database or other settings. Configuration made for Postgres:
+
+```properties
+# PostgreSQL DB Configuration
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# Hibernate
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+
+# Optional: Logging
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+
+### Kubernetes cluster deployment
+
+1. Create or start Kind Cluster
+   ```bash
+   kind create cluster --name <cluster-name>
+   ```
+
+2. Create Kubernetes Secret for DB credentials:
+   ```bash
+   kubectl apply -f k8s/db-secrets.yaml
+   ```
+
+3. Deploy PostgreSQL to the cluster:
+   ```bash
+    kubectl apply -f k8s/postgres-deployment.yaml
+    kubectl apply -f k8s/postgres-service.yaml
+   ```
+
+- Optional: check status
+  ```bash
+  kubectl get pods
+  kubectl get svc
+  ```
+
+4. Build the application:
+   ```bash
+   mvn clean package
+   ```
+
+5. Load the Docker Image:
+   - For this project we load the local investment-api image into Kind:
+
+    ```bash
+    docker build -t investment-api .
+    kind load docker-image investment-api:latest --name <cluster-name>
+    ```
+   - Make sure the image: field in investment-deployment.yaml matches.
+
+
+- **Important**: If you were getting dockerhub image, replace <your-dockerhub-username>/investment-api:latest with your Docker Hub username in the image field.
+  
+- If you used the local image with kind load docker-image, use image: expense-api:latest instead.
+
+6. Apply the Manifests:
+   ```bash
+   kubectl apply -f k8s/investment-deployment.yaml
+   kubectl apply -f k8s/investment-service.yaml
+   ```
+
+7. Expose via NodePort (or Ingress):
+   - Your investment-service.yaml exposes the app on port 30080:
+
+   ```bash
+   kubectl get svc investment-api-service
+   ```
+   - You can now access the app at:http://<node-ip>:30080
+
+
+8. Verify the Deployment:
+   ```bash
+    kubectl get deployments
+    kubectl get pods
+    kubectl get services
+   ```
+
+9. For Kind or other local clusters, check the node’s IP:
+   ```bash
+   kubectl get nodes -o wide
+   ```
+
+   - Use the INTERNAL-IP of a node.
+
+
+10. Port Forwarding:
+   ```bash
+   kubectl port-forward service/investment-api-service 8080:80
+   ```
+
+- Access the API at http://localhost:8080/api/investment.
