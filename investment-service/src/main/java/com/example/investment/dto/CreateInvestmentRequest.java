@@ -2,23 +2,31 @@ package com.example.investment.dto;
 
 import com.example.investment.model.InvestmentType;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class CreateInvestmentRequest {
 
-    @NotBlank(message = "Category is a mandatory field")
-
+    @NotNull(message = "Category is a mandatory field")
     private InvestmentType investmentType;
 
+    @NotBlank(message = "Asset symbol is required")
     private String assetSymbol;
 
+    @NotNull(message = "Amount invested is required")
     private BigDecimal amountInvested;
 
+    @NotNull(message = "Quantity is required")
+    @PositiveOrZero(message = "Quantity cannot be negative")
     private BigDecimal quantity;
+
+    @NotNull(message = "Investment date is required")
     private LocalDate investmentDate;
 
+    @NotBlank(message = "Currency is required")
     private String currency;
 
     private BigDecimal alternateAmount = BigDecimal.valueOf(0.0);
