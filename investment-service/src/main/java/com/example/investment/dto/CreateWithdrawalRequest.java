@@ -26,11 +26,11 @@ public class CreateWithdrawalRequest {
     @NotNull(message = "Withdrawal date is required")
     private LocalDate withdrawalDate;
 
-    private BigDecimal fee;
+    private BigDecimal fee = BigDecimal.valueOf(0.0);
 
-    private BigDecimal alternateAmount;
+    private BigDecimal alternateAmount = BigDecimal.valueOf(0.0);
 
-    private String alternateCurrency;
+    private String alternateCurrency = "";
 
     public InvestmentType getInvestmentType() {
         return investmentType;
