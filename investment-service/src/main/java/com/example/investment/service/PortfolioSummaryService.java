@@ -24,8 +24,7 @@ public class PortfolioSummaryService {
     public PortfolioSummaryResponse getPortfolioSummary(){
         PortfolioSummaryResponse response = new PortfolioSummaryResponse();
 
-        Map<String, AssetHolding> currentHoldingMap = getStringAssetHoldingMap(
-                investmentRepository.findAll());
+        Map<String, AssetHolding> currentHoldingMap = getStringAssetHoldingMap();
 
         List<AssetHolding> assetList = new ArrayList<>(currentHoldingMap.values());
         BigDecimal totalAmount = getAssetListTotalAmountInvested(assetList);
@@ -42,7 +41,8 @@ public class PortfolioSummaryService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private Map<String, AssetHolding> getStringAssetHoldingMap(List<Investment> investments) {
+    public Map<String, AssetHolding> getStringAssetHoldingMap() {
+        List<Investment> investments = investmentRepository.findAll();
         Map<String, AssetHolding> currentHoldingMap = investments.stream()
                 .collect(Collectors.groupingBy(
                         investment -> investment.getAssetSymbol() + '|' +investment.getInvestmentType(),
