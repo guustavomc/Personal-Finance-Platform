@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Entity
 public class Withdrawal {
 
     @Id
@@ -27,6 +28,10 @@ public class Withdrawal {
     private BigDecimal alternateAmount;
 
     private String alternateCurrency;
+
+    public long getId() {
+        return id;
+    }
 
     public InvestmentType getInvestmentType() {
         return investmentType;
@@ -58,6 +63,10 @@ public class Withdrawal {
 
     public String getAlternateCurrency() {
         return alternateCurrency;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public void setInvestmentType(InvestmentType investmentType) {

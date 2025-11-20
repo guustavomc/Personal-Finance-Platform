@@ -27,6 +27,10 @@ public class WithdrawalResponse {
 
     private String alternateCurrency;
 
+    public long getId() {
+        return id;
+    }
+
     public InvestmentType getInvestmentType() {
         return investmentType;
     }
@@ -57,6 +61,10 @@ public class WithdrawalResponse {
 
     public String getAlternateCurrency() {
         return alternateCurrency;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public void setInvestmentType(InvestmentType investmentType) {
