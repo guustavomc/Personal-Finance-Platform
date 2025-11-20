@@ -24,11 +24,11 @@ public class WithdrawalService {
 
     private WithdrawalRepository withdrawalRepository;
 
-    @Autowired
     private PortfolioSummaryService portfolioSummaryService;
 
-    public WithdrawalService(WithdrawalRepository withdrawalRepository){
+    public WithdrawalService(WithdrawalRepository withdrawalRepository, PortfolioSummaryService portfolioSummaryService){
         this.withdrawalRepository=withdrawalRepository;
+        this.portfolioSummaryService=portfolioSummaryService;
     }
 
     public WithdrawalResponse saveWithdrawal(CreateWithdrawalRequest createWithdrawalRequest){
@@ -41,7 +41,7 @@ public class WithdrawalService {
 
     private boolean verifyIfAmountIsAvailable(CreateWithdrawalRequest createWithdrawalRequest) {
         Map<String, AssetHolding> currentHoldingMap = portfolioSummaryService.getStringAssetHoldingMap();
-        AssetHolding asset = currentHoldingMap.get(createWithdrawalRequest.getAssetSymbol());
+        AssetHolding asset = currentHoldingMap.get(createWithdrawalRequest.getAssetSymbol()+'|'+ createWithdrawalRequest.getInvestmentType());
         if(asset.getTotalAmountInvested().intValue() >= createWithdrawalRequest.getProceeds().intValue()){
             return true;
         }
