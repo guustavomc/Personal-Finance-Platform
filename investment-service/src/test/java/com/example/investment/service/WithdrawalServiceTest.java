@@ -16,10 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.example.investment.model.InvestmentType.CRYPTO;
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,6 +38,49 @@ public class WithdrawalServiceTest {
 
     @BeforeEach
     public void setup(){
+    }
+
+    @Test
+    void findAllWithdrawalsMade_ReturnList_WithAllWithdrawals(){
+        Withdrawal firstWithdrawal = new Withdrawal();
+        firstWithdrawal.setId(1L);
+        firstWithdrawal.setInvestmentType(CRYPTO);
+        firstWithdrawal.setAssetSymbol("BTC");
+        firstWithdrawal.setProceeds(BigDecimal.valueOf(1000));
+        firstWithdrawal.setQuantity(BigDecimal.valueOf(1));
+        firstWithdrawal.setWithdrawalDate(LocalDate.of(2025, 10, 8));
+
+        Withdrawal secondWithdrawal = new Withdrawal();
+        secondWithdrawal.setId(2L);
+        secondWithdrawal.setInvestmentType(CRYPTO);
+        secondWithdrawal.setAssetSymbol("BTC");
+        secondWithdrawal.setProceeds(BigDecimal.valueOf(2000));
+        secondWithdrawal.setQuantity(BigDecimal.valueOf(2));
+        secondWithdrawal.setWithdrawalDate(LocalDate.of(2025, 11, 25));
+
+        List<Withdrawal> withdrawalList = new ArrayList<Withdrawal>();
+        withdrawalList.add(firstWithdrawal);
+        withdrawalList.add(secondWithdrawal);
+
+        when(withdrawalRepository.findAll()).thenReturn(withdrawalList);
+
+        List<WithdrawalResponse> response = withdrawalService.findAllWithdrawalsMade();
+        assertEquals(2,response.size());
+    }
+
+    @Test
+    void findWithdrawalById_ReturnWithdrawalResponse_WithWithdrawal(){
+        Withdrawal withdrawal = new Withdrawal();
+        withdrawal.setId(1L);
+        withdrawal.setInvestmentType(CRYPTO);
+        withdrawal.setAssetSymbol("BTC");
+        withdrawal.setProceeds(BigDecimal.valueOf(1000));
+        withdrawal.setQuantity(BigDecimal.valueOf(1));
+        withdrawal.setWithdrawalDate(LocalDate.of(2025, 10, 8));
+
+        when(withdrawalRepository.findById(1L)).thenReturn(Optional.of(withdrawal));
+        WithdrawalResponse withdrawalResponse = withdrawalService.findWithdrawalById(1L);
+        assertEquals(1L, withdrawalResponse.getId());
     }
 
     @Test
