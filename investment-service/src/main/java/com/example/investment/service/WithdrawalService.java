@@ -5,6 +5,7 @@ import com.example.investment.dto.CreateWithdrawalRequest;
 import com.example.investment.dto.InvestmentResponse;
 import com.example.investment.dto.WithdrawalResponse;
 import com.example.investment.exception.InsufficientHoldingException;
+import com.example.investment.exception.WithdrawalNotFoundException;
 import com.example.investment.model.AssetHolding;
 import com.example.investment.model.Investment;
 import com.example.investment.model.InvestmentType;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -31,12 +33,58 @@ public class WithdrawalService {
         this.portfolioSummaryService=portfolioSummaryService;
     }
 
+    public List<WithdrawalResponse> findAllWithdrawalsMade(){
+        return withdrawalRepository.findAll().stream().map(withdrawal -> mapWithdrawalToWithdrawalResponse(withdrawal)).toList();
+    }
+
+    public WithdrawalResponse findWithdrawalById(Long id){
+        return mapWithdrawalToWithdrawalResponse(findVerifiedWithdrawalById(id));
+
+    }
+
+    private Withdrawal findVerifiedWithdrawalById(Long id){
+        return  withdrawalRepository.findById(id).orElseThrow(() -> new WithdrawalNotFoundException(String.format("Failed to find withdrawal with id %d",id)));
+    }
+
     public WithdrawalResponse saveWithdrawal(CreateWithdrawalRequest createWithdrawalRequest){
         if(!verifyIfAmountIsAvailable(createWithdrawalRequest)){
             throw new InsufficientHoldingException("Insufficient Holding Amount to Continue with Withdraw");
         }
         Withdrawal withdrawal = withdrawalRepository.save(mapCreateWithdrawalRequestToWithdrawal(createWithdrawalRequest));
         return mapWithdrawalToWithdrawalResponse(withdrawal);
+    }
+
+    public void removeWithdrawalWithID(long id){
+        if(!withdrawalRepository.existsById(id)){
+            throw new WithdrawalNotFoundException(String.format("Failed to find withdrawal with id %d",id));
+        }
+        else {
+            removeVerifiedWithdrawalWithID(id);
+        }
+    }
+
+    public void removeVerifiedWithdrawalWithID(long id){
+        withdrawalRepository.deleteById(id);
+    }
+
+    public WithdrawalResponse editWithdrawalWithID(long id, CreateWithdrawalRequest createWithdrawalRequest){
+        if(!withdrawalRepository.existsById(id)){
+            throw new WithdrawalNotFoundException(String.format("Failed to find withdrawal with id %d",id));
+        }
+        else return mapWithdrawalToWithdrawalResponse(editVerifiedWithdrawalWithID(id, createWithdrawalRequest));
+    }
+
+    private Withdrawal editVerifiedWithdrawalWithID(long id, CreateWithdrawalRequest createWithdrawalRequest){
+        Withdrawal withdrawal = findVerifiedWithdrawalById(id);
+        withdrawal.setInvestmentType(createWithdrawalRequest.getInvestmentType());
+        withdrawal.setAssetSymbol(createWithdrawalRequest.getAssetSymbol());
+        withdrawal.setProceeds(createWithdrawalRequest.getProceeds());
+        withdrawal.setQuantity(createWithdrawalRequest.getQuantity());
+        withdrawal.setWithdrawalDate(createWithdrawalRequest.getWithdrawalDate());
+        withdrawal.setFee(createWithdrawalRequest.getFee());
+        withdrawal.setAlternateAmount(createWithdrawalRequest.getAlternateAmount());
+        withdrawal.setAlternateCurrency(createWithdrawalRequest.getAlternateCurrency());
+        return withdrawalRepository.save(withdrawal);
     }
 
     private boolean verifyIfAmountIsAvailable(CreateWithdrawalRequest createWithdrawalRequest) {
