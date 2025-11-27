@@ -1,18 +1,16 @@
-package com.example.investment.model;
+package com.example.investment.dto;
 
+import com.example.investment.model.InvestmentType;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
-public class Withdrawal {
+public class WithdrawalResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private long id;
 
-    @Enumerated(EnumType.STRING)
     private InvestmentType investmentType;
 
     private String assetSymbol;

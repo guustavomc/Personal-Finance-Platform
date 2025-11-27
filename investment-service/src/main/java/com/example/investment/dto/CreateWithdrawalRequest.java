@@ -1,37 +1,36 @@
-package com.example.investment.model;
+package com.example.investment.dto;
 
-import jakarta.persistence.*;
+import com.example.investment.model.InvestmentType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
-public class Withdrawal {
+public class CreateWithdrawalRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Category is a mandatory field")
     private InvestmentType investmentType;
 
+    @NotBlank(message = "Asset symbol is required")
     private String assetSymbol;
 
+    @NotNull(message = "Amount is required")
     private BigDecimal proceeds;
 
+    @NotNull(message = "Quantity is required")
+    @PositiveOrZero(message = "Quantity cannot be negative")
     private  BigDecimal quantity;
 
+    @NotNull(message = "Withdrawal date is required")
     private LocalDate withdrawalDate;
 
-    private BigDecimal fee;
+    private BigDecimal fee = BigDecimal.valueOf(0.0);
 
-    private BigDecimal alternateAmount;
+    private BigDecimal alternateAmount = BigDecimal.valueOf(0.0);
 
-    private String alternateCurrency;
-
-    public long getId() {
-        return id;
-    }
+    private String alternateCurrency = "";
 
     public InvestmentType getInvestmentType() {
         return investmentType;
@@ -65,10 +64,6 @@ public class Withdrawal {
         return alternateCurrency;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public void setInvestmentType(InvestmentType investmentType) {
         this.investmentType = investmentType;
     }
@@ -100,4 +95,5 @@ public class Withdrawal {
     public void setAlternateCurrency(String alternateCurrency) {
         this.alternateCurrency = alternateCurrency;
     }
+
 }
