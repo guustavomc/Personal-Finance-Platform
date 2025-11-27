@@ -1,23 +1,13 @@
 package com.example.investment.service;
 
-import com.example.investment.dto.CreateInvestmentRequest;
 import com.example.investment.dto.CreateWithdrawalRequest;
-import com.example.investment.dto.InvestmentResponse;
 import com.example.investment.dto.WithdrawalResponse;
 import com.example.investment.exception.InsufficientHoldingException;
 import com.example.investment.exception.WithdrawalNotFoundException;
 import com.example.investment.model.AssetHolding;
-import com.example.investment.model.Investment;
-import com.example.investment.model.InvestmentType;
 import com.example.investment.model.Withdrawal;
 import com.example.investment.repository.WithdrawalRepository;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
