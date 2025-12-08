@@ -13,6 +13,8 @@ public class PortfolioSummaryResponse {
 
     private int totalAssets;
 
+    private List<PortfolioEvent> portfolioEvents;
+
     public BigDecimal getTotalAmountInvested() {
         return totalAmountInvested;
     }
@@ -25,6 +27,10 @@ public class PortfolioSummaryResponse {
         return totalAssets;
     }
 
+    public List<PortfolioEvent> getPortfolioEvents() {
+        return portfolioEvents;
+    }
+
     public void setTotalAmountInvested(BigDecimal totalAmountInvested) {
         this.totalAmountInvested = totalAmountInvested;
     }
@@ -35,5 +41,9 @@ public class PortfolioSummaryResponse {
 
     public void setTotalAssets(int totalAssets) {
         this.totalAssets = totalAssets;
+    }
+
+    public void setPortfolioEvents(List<PortfolioEvent> portfolioEvents) {
+        this.portfolioEvents = portfolioEvents;
     }
 }
