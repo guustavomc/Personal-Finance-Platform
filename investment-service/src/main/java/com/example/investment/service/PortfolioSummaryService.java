@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.example.investment.dto.PortfolioEvent;
+import com.example.investment.repository.WithdrawalRepository;
 import org.springframework.stereotype.Service;
 import com.example.investment.dto.PortfolioSummaryResponse;
 import com.example.investment.model.AssetHolding;
@@ -16,9 +19,11 @@ import com.example.investment.repository.InvestmentRepository;
 public class PortfolioSummaryService {
 
     private InvestmentRepository investmentRepository;
+    private WithdrawalRepository withdrawalRepository;
 
-    public PortfolioSummaryService(InvestmentRepository investmentRepository){
+    public PortfolioSummaryService(InvestmentRepository investmentRepository, WithdrawalRepository withdrawalRepository){
         this.investmentRepository=investmentRepository;
+        this.withdrawalRepository=withdrawalRepository;
     }
 
     public PortfolioSummaryResponse getPortfolioSummary(){
@@ -29,9 +34,10 @@ public class PortfolioSummaryService {
         List<AssetHolding> assetList = new ArrayList<>(currentHoldingMap.values());
         BigDecimal totalAmount = getAssetListTotalAmountInvested(assetList);
 
+        response.setTotalAmountInvested(totalAmount);
         response.setAssetList(assetList);
         response.setTotalAssets(assetList.size());
-        response.setTotalAmountInvested(totalAmount);
+        response.setPortfolioEvents(buildPortfolioEventTimeline());
         return response;
     }
 
@@ -51,7 +57,6 @@ public class PortfolioSummaryService {
         return currentHoldingMap;
     }
 
-
     private AssetHolding mapInvestmentToHolding(Investment investment){
         AssetHolding holding = new AssetHolding();
         holding.setInvestmentType(investment.getInvestmentType());
@@ -69,5 +74,42 @@ public class PortfolioSummaryService {
         firstAsset.setTotalQuantity(firstAsset.getTotalQuantity().add(secondAsset.getTotalQuantity()));
         firstAsset.setTotalAmountInvested(firstAsset.getTotalAmountInvested().add(secondAsset.getTotalAmountInvested()));
         return firstAsset;
+    }
+
+    private List<PortfolioEvent> buildPortfolioEventTimeline(){
+        return Stream
+                .concat(mapInvestmentListToPortfolioEventList().stream(), mapWithdrawalListToPortfolioEventList()
+                        .stream())
+                .sorted((a,b) -> a.getDate().compareTo(b.getDate())).toList();
+    }
+
+    private List<PortfolioEvent> mapInvestmentListToPortfolioEventList(){
+        return investmentRepository.findAll().stream()
+                .map(inv -> new PortfolioEvent(
+                        inv.getInvestmentType(),
+                        inv.getAssetSymbol(),
+                        inv.getAmountInvested(),
+                        inv.getQuantity(),
+                        inv.getInvestmentDate(),
+                        inv.getCurrency(),
+                        inv.getFee(),
+                        "INVESTMENT",
+                        inv.getAssetTag()))
+                .toList();
+    }
+
+    private List<PortfolioEvent> mapWithdrawalListToPortfolioEventList(){
+        return withdrawalRepository.findAll().stream()
+                .map(withdrawal -> new PortfolioEvent(
+                        withdrawal.getInvestmentType(),
+                        withdrawal.getAssetSymbol(),
+                        withdrawal.getProceeds(),
+                        withdrawal.getQuantity(),
+                        withdrawal.getWithdrawalDate(),
+                        withdrawal.getCurrency(),
+                        withdrawal.getFee(),
+                        "WITHDRAWAL",
+                        withdrawal.getAssetTag()))
+                .toList();
     }
 }
