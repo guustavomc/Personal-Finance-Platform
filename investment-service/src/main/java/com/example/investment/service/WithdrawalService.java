@@ -98,7 +98,7 @@ public class WithdrawalService {
         withdrawalResponse.setFee(withdrawal.getFee());
         withdrawalResponse.setAlternateAmount(withdrawal.getAlternateAmount());
         withdrawalResponse.setAlternateCurrency(withdrawal.getAlternateCurrency());
-
+        withdrawalResponse.setAssetTag(withdrawal.getAssetTag());
         return withdrawalResponse;
     }
 

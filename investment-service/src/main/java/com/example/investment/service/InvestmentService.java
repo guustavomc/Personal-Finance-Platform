@@ -96,6 +96,7 @@ public class InvestmentService {
         response.setCurrency(investment.getCurrency());
         response.setAlternateAmount(investment.getAlternateAmount());
         response.setAlternateCurrency(investment.getAlternateCurrency());
+        response.setAssetTag(investment.getAssetTag());
 
         return response;
     }
