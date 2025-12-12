@@ -25,6 +25,8 @@ public class InvestmentResponse {
 
     private String alternateCurrency;
 
+    private String assetTag;
+
     public long getId() {
         return id;
     }
@@ -59,6 +61,10 @@ public class InvestmentResponse {
 
     public String getAlternateCurrency() {
         return alternateCurrency;
+    }
+
+    public String getAssetTag() {
+        return assetTag;
     }
 
     public void setId(long id) {
@@ -96,5 +102,9 @@ public class InvestmentResponse {
 
     public void setAlternateCurrency(String alternateCurrency) {
         this.alternateCurrency = alternateCurrency;
+    }
+
+    public void setAssetTag(String assetTag) {
+        this.assetTag = assetTag;
     }
 }

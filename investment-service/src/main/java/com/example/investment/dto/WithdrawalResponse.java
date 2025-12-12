@@ -27,6 +27,9 @@ public class WithdrawalResponse {
 
     private String alternateCurrency;
 
+    private String assetTag;
+
+
     public long getId() {
         return id;
     }
@@ -63,6 +66,10 @@ public class WithdrawalResponse {
         return alternateCurrency;
     }
 
+    public String getAssetTag() {
+        return assetTag;
+    }
+
     public void setId(long id) {
         this.id = id;
     }
@@ -97,5 +104,9 @@ public class WithdrawalResponse {
 
     public void setAlternateCurrency(String alternateCurrency) {
         this.alternateCurrency = alternateCurrency;
+    }
+
+    public void setAssetTag(String assetTag) {
+        this.assetTag = assetTag;
     }
 }
