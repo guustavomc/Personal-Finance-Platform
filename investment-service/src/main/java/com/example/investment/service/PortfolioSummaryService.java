@@ -28,6 +28,8 @@ public class PortfolioSummaryService {
 
     public PortfolioSummaryResponse getPortfolioSummary(){
         PortfolioSummaryResponse response = new PortfolioSummaryResponse();
+        response.setPortfolioEvents(buildPortfolioEventTimeline());
+
 
         Map<String, AssetHolding> currentHoldingMap = getStringAssetHoldingMap();
 
@@ -37,7 +39,6 @@ public class PortfolioSummaryService {
         response.setTotalAmount(totalAmount);
         response.setAssetList(assetList);
         response.setNumberOfAssets(assetList.size());
-        response.setPortfolioEvents(buildPortfolioEventTimeline());
         return response;
     }
 
