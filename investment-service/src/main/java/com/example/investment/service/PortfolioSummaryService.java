@@ -34,9 +34,9 @@ public class PortfolioSummaryService {
         List<AssetHolding> assetList = new ArrayList<>(currentHoldingMap.values());
         BigDecimal totalAmount = getAssetListTotalAmountInvested(assetList);
 
-        response.setTotalAmountInvested(totalAmount);
+        response.setTotalAmount(totalAmount);
         response.setAssetList(assetList);
-        response.setTotalAssets(assetList.size());
+        response.setNumberOfAssets(assetList.size());
         response.setPortfolioEvents(buildPortfolioEventTimeline());
         return response;
     }

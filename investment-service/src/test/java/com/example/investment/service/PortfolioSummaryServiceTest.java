@@ -3,6 +3,7 @@ package com.example.investment.service;
 import com.example.investment.dto.PortfolioSummaryResponse;
 import com.example.investment.model.Investment;
 import com.example.investment.repository.InvestmentRepository;
+import com.example.investment.repository.WithdrawalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,9 @@ import static org.mockito.Mockito.when;
 public class PortfolioSummaryServiceTest {
     @Mock
     private InvestmentRepository investmentRepository;
+
+    @Mock
+    private WithdrawalRepository withdrawalRepository;
 
     @InjectMocks
     private PortfolioSummaryService portfolioSummaryService;
