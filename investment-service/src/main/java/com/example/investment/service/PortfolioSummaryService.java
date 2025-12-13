@@ -30,11 +30,11 @@ public class PortfolioSummaryService {
     public PortfolioSummaryResponse getPortfolioSummary(){
         PortfolioSummaryResponse response = new PortfolioSummaryResponse();
         response.setPortfolioEvents(buildPortfolioEventTimeline());
-        response.getAssetList();
+        response.setAssetList(getAssetList());
+        response.setTotalAmount(getTotalAmount());
+        response.setNumberOfAssets(getAssetListSize());
         return response;
     }
-
-
 
     private List<PortfolioEvent> buildPortfolioEventTimeline(){
         return Stream
@@ -100,7 +100,14 @@ public class PortfolioSummaryService {
     }
 
     private BigDecimal getTotalAmount(){
+        List<AssetHolding> assets= getAssetList();
+        return assets.stream()
+                .map(AssetHolding::getTotalAmountInvested)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
+    private int getAssetListSize(){
+        return getAssetList().size();
     }
 
     private List<PortfolioEvent> mapInvestmentListToPortfolioEventList(){
