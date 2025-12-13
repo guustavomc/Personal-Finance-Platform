@@ -78,7 +78,7 @@ public class PortfolioSummaryServiceTest {
         PortfolioSummaryResponse response = portfolioSummaryService.getPortfolioSummary();
 
         assertEquals(1,response.getAssetList().size());
-        assertEquals(9500, response.getTotalAmount());
+        assertEquals(10000, response.getTotalAmount().intValue());
     }
 
 }

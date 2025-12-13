@@ -48,27 +48,30 @@ public class PortfolioSummaryService {
         Map<String, AssetHolding> holdingMap = new HashMap<String, AssetHolding>();
 
         for(PortfolioEvent event: portfolioEventList){
-            String tag = event.getAssetTag();
-            AssetHolding assetHolding = new AssetHolding();
+            String tag = event.getAssetSymbol() + "|" + event.getInvestmentType();
 
-            if(holdingMap.containsKey(tag)){
-                assetHolding = holdingMap.computeIfAbsent(tag, k-> {
-                    AssetHolding holding = new AssetHolding();
-                    holding.setInvestmentType(event.getInvestmentType());
-                    holding.setAssetSymbol(event.getAssetSymbol());
-                    holding.setTotalAmountInvested(event.getAmount());
-                    holding.setTotalQuantity(event.getQuantity());
-                    holding.setPrimaryCurrency(event.getCurrency());
-                    holding.setAlternateTotalAmountInvested(event.getAlternateAmount());
-                    holding.setAlternateCurrency(event.getAlternateCurrency());
-                    holding.setAssetTag(event.getAssetTag());
-                    return holding;
-                });
-            }
+
+            AssetHolding assetHolding = holdingMap.computeIfAbsent(tag, k-> {
+                AssetHolding holding = new AssetHolding();
+                holding.setInvestmentType(event.getInvestmentType());
+                holding.setAssetSymbol(event.getAssetSymbol());
+                holding.setTotalAmountInvested(BigDecimal.ZERO);
+                holding.setTotalQuantity(BigDecimal.ZERO);
+                holding.setPrimaryCurrency(event.getCurrency());
+                holding.setAlternateTotalAmountInvested(BigDecimal.ZERO);
+                holding.setAlternateCurrency(event.getAlternateCurrency());
+                if (event.getAssetTag() != null) {
+                    holding.setAssetTag(event.getAssetTag()); // if AssetHolding has this field
+                }
+                return holding;
+            });
+
+            BigDecimal fee = event.getFee() != null? event.getFee():BigDecimal.ZERO;
+            BigDecimal netAmount = event.getAmount().subtract(fee);
+            BigDecimal alternateAmount = event.getAlternateAmount() != null ? event.getAlternateAmount() : BigDecimal.ZERO;
 
             if(event.getEventType().equalsIgnoreCase("INVESTMENT")){
-                BigDecimal fee = event.getFee() != null? event.getFee():BigDecimal.ZERO;
-                BigDecimal netAmount = event.getAmount().subtract(fee);
+
 
                 assetHolding.setTotalAmountInvested(
                         assetHolding.getTotalAmountInvested()
@@ -80,11 +83,10 @@ public class PortfolioSummaryService {
 
                 assetHolding.setAlternateTotalAmountInvested(
                         assetHolding.getAlternateTotalAmountInvested()
-                                .add(event.getAlternateAmount()));
+                                .add(alternateAmount));
             }
             else if(event.getEventType().equalsIgnoreCase("WITHDRAWAL")){
-                BigDecimal fee = event.getFee() != null? event.getFee():BigDecimal.ZERO;
-                BigDecimal netAmount = event.getAmount().subtract(fee);
+
 
                 assetHolding.setTotalAmountInvested(
                         assetHolding.getTotalAmountInvested()
@@ -96,7 +98,7 @@ public class PortfolioSummaryService {
 
                 assetHolding.setAlternateTotalAmountInvested(
                         assetHolding.getAlternateTotalAmountInvested()
-                                .subtract(event.getAlternateAmount()));
+                                .subtract(alternateAmount));
             }
         }
         return new ArrayList<>(holdingMap.values());
