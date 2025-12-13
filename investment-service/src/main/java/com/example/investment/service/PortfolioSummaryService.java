@@ -2,6 +2,7 @@ package com.example.investment.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,59 +30,77 @@ public class PortfolioSummaryService {
     public PortfolioSummaryResponse getPortfolioSummary(){
         PortfolioSummaryResponse response = new PortfolioSummaryResponse();
         response.setPortfolioEvents(buildPortfolioEventTimeline());
-
-
-        Map<String, AssetHolding> currentHoldingMap = getStringAssetHoldingMap();
-
-        List<AssetHolding> assetList = new ArrayList<>(currentHoldingMap.values());
-        BigDecimal totalAmount = getAssetListTotalAmountInvested(assetList);
-
-        response.setTotalAmount(totalAmount);
-        response.setAssetList(assetList);
-        response.setNumberOfAssets(assetList.size());
+        response.getAssetList();
         return response;
     }
 
-    private static BigDecimal getAssetListTotalAmountInvested(List<AssetHolding> assetList) {
-        return assetList.stream()
-                .map(AssetHolding::getTotalAmountInvested)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 
-    public Map<String, AssetHolding> getStringAssetHoldingMap() {
-        List<Investment> investments = investmentRepository.findAll();
-        Map<String, AssetHolding> currentHoldingMap = investments.stream()
-                .collect(Collectors.groupingBy(
-                        investment -> investment.getAssetSymbol() + '|' +investment.getInvestmentType(),
-                        Collectors.reducing(
-                                new AssetHolding(), this::mapInvestmentToHolding,this::mergeHoldings)));
-        return currentHoldingMap;
-    }
-
-    private AssetHolding mapInvestmentToHolding(Investment investment){
-        AssetHolding holding = new AssetHolding();
-        holding.setInvestmentType(investment.getInvestmentType());
-        holding.setAssetSymbol(investment.getAssetSymbol());
-        holding.setTotalAmountInvested(investment.getAmountInvested());
-        holding.setTotalQuantity(investment.getQuantity());
-        holding.setPrimaryCurrency(investment.getCurrency());
-        holding.setAlternateTotalAmountInvested(investment.getAlternateAmount());
-        holding.setAlternateCurrency(investment.getAlternateCurrency());
-        
-        return holding;
-    }
-
-    private AssetHolding mergeHoldings(AssetHolding firstAsset, AssetHolding secondAsset) {
-        firstAsset.setTotalQuantity(firstAsset.getTotalQuantity().add(secondAsset.getTotalQuantity()));
-        firstAsset.setTotalAmountInvested(firstAsset.getTotalAmountInvested().add(secondAsset.getTotalAmountInvested()));
-        return firstAsset;
-    }
 
     private List<PortfolioEvent> buildPortfolioEventTimeline(){
         return Stream
                 .concat(mapInvestmentListToPortfolioEventList().stream(), mapWithdrawalListToPortfolioEventList()
                         .stream())
                 .sorted((a,b) -> a.getDate().compareTo(b.getDate())).toList();
+    }
+
+    private List<AssetHolding> getAssetList(){
+        List<PortfolioEvent> portfolioEventList = buildPortfolioEventTimeline();
+        Map<String, AssetHolding> holdingMap = new HashMap<String, AssetHolding>();
+
+        for(PortfolioEvent event: portfolioEventList){
+            String tag = event.getAssetTag();
+
+            AssetHolding assetHolding = holdingMap.computeIfAbsent(tag, k-> {
+                AssetHolding holding = new AssetHolding();
+                holding.setInvestmentType(event.getInvestmentType());
+                holding.setAssetSymbol(event.getAssetSymbol());
+                holding.setTotalAmountInvested(event.getAmount());
+                holding.setTotalQuantity(event.getQuantity());
+                holding.setPrimaryCurrency(event.getCurrency());
+                holding.setAlternateTotalAmountInvested(event.getAlternateAmount());
+                holding.setAlternateCurrency(event.getAlternateCurrency());
+                holding.setAssetTag(event.getAssetTag());
+                return holding;
+            });
+
+            if(event.getEventType().equalsIgnoreCase("INVESTMENT")){
+                BigDecimal fee = event.getFee() != null? event.getFee():BigDecimal.ZERO;
+                BigDecimal netAmount = event.getAmount().subtract(fee);
+
+                assetHolding.setTotalAmountInvested(
+                        assetHolding.getTotalAmountInvested()
+                                .add(netAmount));
+
+                assetHolding.setTotalQuantity(
+                        assetHolding.getTotalQuantity()
+                                .add(event.getQuantity()));
+
+                assetHolding.setAlternateTotalAmountInvested(
+                        assetHolding.getAlternateTotalAmountInvested()
+                                .add(event.getAlternateAmount()));
+            }
+            else if(event.getEventType().equalsIgnoreCase("WITHDRAWAL")){
+                BigDecimal fee = event.getFee() != null? event.getFee():BigDecimal.ZERO;
+                BigDecimal netAmount = event.getAmount().subtract(fee);
+
+                assetHolding.setTotalAmountInvested(
+                        assetHolding.getTotalAmountInvested()
+                                .subtract(netAmount));
+
+                assetHolding.setTotalQuantity(
+                        assetHolding.getTotalQuantity()
+                                .subtract(event.getQuantity()));
+
+                assetHolding.setAlternateTotalAmountInvested(
+                        assetHolding.getAlternateTotalAmountInvested()
+                                .subtract(event.getAlternateAmount()));
+            }
+        }
+        return new ArrayList<>(holdingMap.values());
+    }
+
+    private BigDecimal getTotalAmount(){
+
     }
 
     private List<PortfolioEvent> mapInvestmentListToPortfolioEventList(){
@@ -93,7 +112,9 @@ public class PortfolioSummaryService {
                         inv.getQuantity(),
                         inv.getInvestmentDate(),
                         inv.getCurrency(),
-                        inv.getFee(),
+                        inv.getAlternateAmount() != null ? inv.getAlternateAmount() : BigDecimal.ZERO,
+                        inv.getAlternateCurrency() != null ? inv.getAlternateCurrency() : "",
+                        inv.getFee() != null ? inv.getFee() : BigDecimal.ZERO,
                         "INVESTMENT",
                         inv.getAssetTag()))
                 .toList();
@@ -108,7 +129,9 @@ public class PortfolioSummaryService {
                         withdrawal.getQuantity(),
                         withdrawal.getWithdrawalDate(),
                         withdrawal.getCurrency(),
-                        withdrawal.getFee(),
+                        withdrawal.getAlternateAmount()!= null ? withdrawal.getAlternateAmount() : BigDecimal.ZERO,
+                        withdrawal.getAlternateCurrency() != null ? withdrawal.getAlternateCurrency() : "",
+                        withdrawal.getFee() != null ? withdrawal.getFee() : BigDecimal.ZERO,
                         "WITHDRAWAL",
                         withdrawal.getAssetTag()))
                 .toList();
