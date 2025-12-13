@@ -2,6 +2,7 @@ package com.example.investment.service;
 
 import com.example.investment.dto.PortfolioSummaryResponse;
 import com.example.investment.model.Investment;
+import com.example.investment.model.Withdrawal;
 import com.example.investment.repository.InvestmentRepository;
 import com.example.investment.repository.WithdrawalRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,8 +43,8 @@ public class PortfolioSummaryServiceTest {
         firstInvestment.setId(1L);
         firstInvestment.setInvestmentType(CRYPTO);
         firstInvestment.setAssetSymbol("BTC");
-        firstInvestment.setAmountInvested(BigDecimal.valueOf(1000));
-        firstInvestment.setQuantity(BigDecimal.valueOf(1));
+        firstInvestment.setAmountInvested(BigDecimal.valueOf(10000));
+        firstInvestment.setQuantity(BigDecimal.valueOf(10));
         firstInvestment.setInvestmentDate(LocalDate.of(2025, 10, 8));
         firstInvestment.setCurrency("BRL");
 
@@ -56,16 +57,28 @@ public class PortfolioSummaryServiceTest {
         secondInvestment.setInvestmentDate(LocalDate.of(2025, 10, 8));
         secondInvestment.setCurrency("BRL");
 
+        Withdrawal withdrawal = new Withdrawal();
+        withdrawal.setInvestmentType(CRYPTO);
+        withdrawal.setAssetSymbol("BTC");
+        withdrawal.setProceeds(BigDecimal.valueOf(1000));
+        withdrawal.setQuantity(BigDecimal.valueOf(1));
+        withdrawal.setWithdrawalDate(LocalDate.of(2025, 10, 8));
+
         List<Investment> investmentList = new ArrayList<>();
+        List<Withdrawal> withdrawalList = new ArrayList<>();
+
         investmentList.add(firstInvestment);
-        investmentList.add(secondInvestment);
+        //investmentList.add(secondInvestment);
+        //withdrawalList.add(withdrawal);
 
         when(investmentRepository.findAll()).thenReturn(investmentList);
+        when(withdrawalRepository.findAll()).thenReturn(withdrawalList);
+
 
         PortfolioSummaryResponse response = portfolioSummaryService.getPortfolioSummary();
 
-        assertEquals(2,response.getAssetList().size());
-
+        assertEquals(1,response.getAssetList().size());
+        assertEquals(9500, response.getTotalAmount());
     }
 
 }

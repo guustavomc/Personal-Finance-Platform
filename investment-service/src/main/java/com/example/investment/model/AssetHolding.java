@@ -9,8 +9,8 @@ public class AssetHolding {
     private BigDecimal totalAmountInvested= BigDecimal.ZERO;
     private BigDecimal totalQuantity= BigDecimal.ZERO;
     private String primaryCurrency;
-    private BigDecimal alternateTotalAmountInvested;
-    private String alternateCurrency;
+    private BigDecimal alternateTotalAmountInvested= BigDecimal.valueOf(0);;
+    private String alternateCurrency= "";
     private String assetTag;
 
     public InvestmentType getInvestmentType() {

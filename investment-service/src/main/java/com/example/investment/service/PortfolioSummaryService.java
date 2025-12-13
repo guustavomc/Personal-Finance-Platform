@@ -43,25 +43,28 @@ public class PortfolioSummaryService {
                 .sorted((a,b) -> a.getDate().compareTo(b.getDate())).toList();
     }
 
-    private List<AssetHolding> getAssetList(){
+    public List<AssetHolding> getAssetList(){
         List<PortfolioEvent> portfolioEventList = buildPortfolioEventTimeline();
         Map<String, AssetHolding> holdingMap = new HashMap<String, AssetHolding>();
 
         for(PortfolioEvent event: portfolioEventList){
             String tag = event.getAssetTag();
+            AssetHolding assetHolding = new AssetHolding();
 
-            AssetHolding assetHolding = holdingMap.computeIfAbsent(tag, k-> {
-                AssetHolding holding = new AssetHolding();
-                holding.setInvestmentType(event.getInvestmentType());
-                holding.setAssetSymbol(event.getAssetSymbol());
-                holding.setTotalAmountInvested(event.getAmount());
-                holding.setTotalQuantity(event.getQuantity());
-                holding.setPrimaryCurrency(event.getCurrency());
-                holding.setAlternateTotalAmountInvested(event.getAlternateAmount());
-                holding.setAlternateCurrency(event.getAlternateCurrency());
-                holding.setAssetTag(event.getAssetTag());
-                return holding;
-            });
+            if(holdingMap.containsKey(tag)){
+                assetHolding = holdingMap.computeIfAbsent(tag, k-> {
+                    AssetHolding holding = new AssetHolding();
+                    holding.setInvestmentType(event.getInvestmentType());
+                    holding.setAssetSymbol(event.getAssetSymbol());
+                    holding.setTotalAmountInvested(event.getAmount());
+                    holding.setTotalQuantity(event.getQuantity());
+                    holding.setPrimaryCurrency(event.getCurrency());
+                    holding.setAlternateTotalAmountInvested(event.getAlternateAmount());
+                    holding.setAlternateCurrency(event.getAlternateCurrency());
+                    holding.setAssetTag(event.getAssetTag());
+                    return holding;
+                });
+            }
 
             if(event.getEventType().equalsIgnoreCase("INVESTMENT")){
                 BigDecimal fee = event.getFee() != null? event.getFee():BigDecimal.ZERO;
