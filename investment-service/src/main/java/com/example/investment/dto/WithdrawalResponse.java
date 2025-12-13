@@ -21,6 +21,8 @@ public class WithdrawalResponse {
 
     private LocalDate withdrawalDate;
 
+    private String currency;
+
     private BigDecimal fee;
 
     private BigDecimal alternateAmount;
@@ -52,6 +54,10 @@ public class WithdrawalResponse {
 
     public LocalDate getWithdrawalDate() {
         return withdrawalDate;
+    }
+
+    public String getCurrency() {
+        return currency;
     }
 
     public BigDecimal getFee() {
@@ -92,6 +98,10 @@ public class WithdrawalResponse {
 
     public void setWithdrawalDate(LocalDate withdrawalDate) {
         this.withdrawalDate = withdrawalDate;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public void setFee(BigDecimal fee) {

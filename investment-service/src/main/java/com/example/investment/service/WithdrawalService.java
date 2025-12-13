@@ -97,6 +97,7 @@ public class WithdrawalService {
         withdrawalResponse.setProceeds(withdrawal.getProceeds());
         withdrawalResponse.setQuantity(withdrawal.getQuantity());
         withdrawalResponse.setWithdrawalDate(withdrawal.getWithdrawalDate());
+        withdrawalResponse.setCurrency(withdrawal.getCurrency());
         withdrawalResponse.setFee(withdrawal.getFee());
         withdrawalResponse.setAlternateAmount(withdrawal.getAlternateAmount());
         withdrawalResponse.setAlternateCurrency(withdrawal.getAlternateCurrency());
@@ -111,6 +112,7 @@ public class WithdrawalService {
         withdrawal.setProceeds(createWithdrawalRequest.getProceeds());
         withdrawal.setQuantity(createWithdrawalRequest.getQuantity());
         withdrawal.setWithdrawalDate(createWithdrawalRequest.getWithdrawalDate());
+        withdrawal.setCurrency(createWithdrawalRequest.getCurrency());
         withdrawal.setFee(createWithdrawalRequest.getFee());
         withdrawal.setAlternateAmount(createWithdrawalRequest.getAlternateAmount());
         withdrawal.setAlternateCurrency(createWithdrawalRequest.getAlternateCurrency());
