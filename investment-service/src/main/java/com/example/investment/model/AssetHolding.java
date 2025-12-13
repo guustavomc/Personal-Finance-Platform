@@ -11,7 +11,9 @@ public class AssetHolding {
     private String primaryCurrency;
     private BigDecimal alternateTotalAmountInvested;
     private String alternateCurrency;
-    
+    private String assetTag;
+
+
     public InvestmentType getInvestmentType() {
         return investmentType;
     }
@@ -40,6 +42,10 @@ public class AssetHolding {
         return alternateCurrency;
     }
 
+    public String getAssetTag() {
+        return assetTag;
+    }
+
     public void setInvestmentType(InvestmentType investmentType) {
         this.investmentType = investmentType;
     }
@@ -66,5 +72,9 @@ public class AssetHolding {
 
     public void setAlternateCurrency(String alternateCurrency) {
         this.alternateCurrency = alternateCurrency;
+    }
+
+    public void setAssetTag(String assetTag) {
+        this.assetTag = assetTag;
     }
 }
