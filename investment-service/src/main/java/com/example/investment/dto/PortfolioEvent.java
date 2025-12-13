@@ -19,6 +19,9 @@ public class PortfolioEvent {
 
     private String currency;
 
+    private BigDecimal alternateAmount;
+    private String alternateCurrency;
+
     private BigDecimal fee;
 
     private String eventType;
@@ -62,6 +65,14 @@ public class PortfolioEvent {
         return currency;
     }
 
+    public BigDecimal getAlternateAmount() {
+        return alternateAmount;
+    }
+
+    public String getAlternateCurrency() {
+        return alternateCurrency;
+    }
+
     public BigDecimal getFee() {
         return fee;
     }
@@ -96,6 +107,14 @@ public class PortfolioEvent {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public void setAlternateAmount(BigDecimal alternateAmount) {
+        this.alternateAmount = alternateAmount;
+    }
+
+    public void setAlternateCurrency(String alternateCurrency) {
+        this.alternateCurrency = alternateCurrency;
     }
 
     public void setFee(BigDecimal fee) {
