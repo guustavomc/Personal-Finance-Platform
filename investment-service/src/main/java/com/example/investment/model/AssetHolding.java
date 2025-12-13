@@ -13,7 +13,6 @@ public class AssetHolding {
     private String alternateCurrency;
     private String assetTag;
 
-
     public InvestmentType getInvestmentType() {
         return investmentType;
     }

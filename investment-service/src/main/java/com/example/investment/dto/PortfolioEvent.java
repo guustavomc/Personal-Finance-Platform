@@ -29,13 +29,15 @@ public class PortfolioEvent {
     private String assetTag;
 
 
-    public PortfolioEvent(InvestmentType investmentType,String assetSymbol,BigDecimal amount, BigDecimal quantity,LocalDate date, String currency, BigDecimal fee,String eventType, String assetTag){
+    public PortfolioEvent(InvestmentType investmentType,String assetSymbol,BigDecimal amount, BigDecimal quantity,LocalDate date, String currency, BigDecimal alternateAmount, String alternateCurrency, BigDecimal fee,String eventType, String assetTag){
         this.investmentType=investmentType;
         this.assetSymbol=assetSymbol;
         this.amount = amount;
         this.quantity = quantity;
         this.date = date;
         this.currency = currency;
+        this.alternateAmount = alternateAmount;
+        this.alternateCurrency = alternateCurrency;
         this.fee=fee;
         this.eventType=eventType;
         this.assetTag=assetTag;
