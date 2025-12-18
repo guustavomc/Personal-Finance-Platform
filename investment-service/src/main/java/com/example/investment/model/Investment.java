@@ -28,9 +28,13 @@ public class Investment {
 
     private String currency;
 
-    private BigDecimal alternateAmount;
+    private BigDecimal fee;
 
-    private String alternateCurrency;
+    private BigDecimal alternateAmount = BigDecimal.valueOf(0);
+
+    private String alternateCurrency = "";
+
+    private String assetTag;
 
     public long getId() {
         return id;
@@ -60,12 +64,21 @@ public class Investment {
         return currency;
     }
 
+    public BigDecimal getFee() {
+        return fee;
+    }
+
     public BigDecimal getAlternateAmount() {
         return alternateAmount;
     }
 
     public String getAlternateCurrency() {
         return alternateCurrency;
+    }
+
+    public String getAssetTag() {
+        assetTag = assetSymbol + '|' + investmentType;
+        return assetTag;
     }
 
     public void setId(long id) {
@@ -94,6 +107,10 @@ public class Investment {
 
     public void setCurrency(String currency) {
         this.currency=currency;
+    }
+
+    public void setFee(BigDecimal fee) {
+        this.fee = fee;
     }
 
     public void setAlternateAmount(BigDecimal alternateAmount) {

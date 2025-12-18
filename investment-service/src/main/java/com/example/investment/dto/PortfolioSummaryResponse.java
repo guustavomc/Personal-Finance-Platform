@@ -7,33 +7,44 @@ import com.example.investment.model.AssetHolding;
 
 public class PortfolioSummaryResponse {
 
-    private BigDecimal totalAmountInvested;
+    private List<PortfolioEvent> portfolioEvents;
 
     private List<AssetHolding> assetList;
 
-    private int totalAssets;
 
-    public BigDecimal getTotalAmountInvested() {
-        return totalAmountInvested;
+    private BigDecimal totalAmount;
+
+    private int numberOfAssets;
+
+    public List<PortfolioEvent> getPortfolioEvents() {
+        return portfolioEvents;
     }
 
     public List<AssetHolding> getAssetList() {
         return assetList;
     }
 
-    public int getTotalAssets() {
-        return totalAssets;
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setTotalAmountInvested(BigDecimal totalAmountInvested) {
-        this.totalAmountInvested = totalAmountInvested;
+    public int getNumberOfAssets() {
+        return numberOfAssets;
+    }
+
+    public void setPortfolioEvents(List<PortfolioEvent> portfolioEvents) {
+        this.portfolioEvents = portfolioEvents;
     }
 
     public void setAssetList(List<AssetHolding> assetList) {
         this.assetList = assetList;
     }
 
-    public void setTotalAssets(int totalAssets) {
-        this.totalAssets = totalAssets;
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public void setNumberOfAssets(int numberOfAssets) {
+        this.numberOfAssets = numberOfAssets;
     }
 }

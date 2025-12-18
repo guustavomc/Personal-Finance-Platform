@@ -5,30 +5,42 @@ import com.example.investment.model.InvestmentType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class InvestmentResponse {
-
-    private long id;
+public class PortfolioEvent {
 
     private InvestmentType investmentType;
 
     private String assetSymbol;
 
-    private BigDecimal amountInvested;
+    private BigDecimal amount;
 
     private  BigDecimal quantity;
 
-    private LocalDate investmentDate;
+    private LocalDate date;
 
     private String currency;
 
     private BigDecimal alternateAmount;
-
     private String alternateCurrency;
+
+    private BigDecimal fee;
+
+    private String eventType;
 
     private String assetTag;
 
-    public long getId() {
-        return id;
+
+    public PortfolioEvent(InvestmentType investmentType,String assetSymbol,BigDecimal amount, BigDecimal quantity,LocalDate date, String currency, BigDecimal alternateAmount, String alternateCurrency, BigDecimal fee,String eventType, String assetTag){
+        this.investmentType=investmentType;
+        this.assetSymbol=assetSymbol;
+        this.amount = amount;
+        this.quantity = quantity;
+        this.date = date;
+        this.currency = currency;
+        this.alternateAmount = alternateAmount;
+        this.alternateCurrency = alternateCurrency;
+        this.fee=fee;
+        this.eventType=eventType;
+        this.assetTag=assetTag;
     }
 
     public InvestmentType getInvestmentType() {
@@ -39,16 +51,16 @@ public class InvestmentResponse {
         return assetSymbol;
     }
 
-    public BigDecimal getAmountInvested() {
-        return amountInvested;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
     public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public LocalDate getInvestmentDate() {
-        return investmentDate;
+    public LocalDate getDate() {
+        return date;
     }
 
     public String getCurrency() {
@@ -63,12 +75,16 @@ public class InvestmentResponse {
         return alternateCurrency;
     }
 
-    public String getAssetTag() {
-        return assetTag;
+    public BigDecimal getFee() {
+        return fee;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public String getEventType() {
+        return eventType;
+    }
+
+    public String getAssetTag() {
+        return assetTag;
     }
 
     public void setInvestmentType(InvestmentType investmentType) {
@@ -79,21 +95,20 @@ public class InvestmentResponse {
         this.assetSymbol = assetSymbol;
     }
 
-    public void setAmountInvested(BigDecimal amountInvested) {
-        this.amountInvested = amountInvested;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
-    public void setInvestmentDate(LocalDate investmentDate) {
-        this.investmentDate = investmentDate;
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public void setCurrency(String currency) {
-        this.currency=currency;
-
+        this.currency = currency;
     }
 
     public void setAlternateAmount(BigDecimal alternateAmount) {
@@ -102,6 +117,14 @@ public class InvestmentResponse {
 
     public void setAlternateCurrency(String alternateCurrency) {
         this.alternateCurrency = alternateCurrency;
+    }
+
+    public void setFee(BigDecimal fee) {
+        this.fee = fee;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
     public void setAssetTag(String assetTag) {

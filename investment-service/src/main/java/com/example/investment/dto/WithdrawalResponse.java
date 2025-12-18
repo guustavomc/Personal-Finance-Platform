@@ -21,11 +21,16 @@ public class WithdrawalResponse {
 
     private LocalDate withdrawalDate;
 
+    private String currency;
+
     private BigDecimal fee;
 
     private BigDecimal alternateAmount;
 
     private String alternateCurrency;
+
+    private String assetTag;
+
 
     public long getId() {
         return id;
@@ -51,6 +56,10 @@ public class WithdrawalResponse {
         return withdrawalDate;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
     public BigDecimal getFee() {
         return fee;
     }
@@ -61,6 +70,10 @@ public class WithdrawalResponse {
 
     public String getAlternateCurrency() {
         return alternateCurrency;
+    }
+
+    public String getAssetTag() {
+        return assetTag;
     }
 
     public void setId(long id) {
@@ -87,6 +100,10 @@ public class WithdrawalResponse {
         this.withdrawalDate = withdrawalDate;
     }
 
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
     public void setFee(BigDecimal fee) {
         this.fee = fee;
     }
@@ -97,5 +114,9 @@ public class WithdrawalResponse {
 
     public void setAlternateCurrency(String alternateCurrency) {
         this.alternateCurrency = alternateCurrency;
+    }
+
+    public void setAssetTag(String assetTag) {
+        this.assetTag = assetTag;
     }
 }

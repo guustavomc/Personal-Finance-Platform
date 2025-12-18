@@ -29,6 +29,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse("Failed to delete investment, the register is in use: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(WithdrawalNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleWithdrawalNotFoundException(WithdrawalNotFoundException ex){
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     private ResponseEntity<Map<String,Object>> buildErrorResponse(String message, HttpStatus status){
         Map<String,Object> response = new HashMap<>();
         response.put("timestamp", LocalDate.now());

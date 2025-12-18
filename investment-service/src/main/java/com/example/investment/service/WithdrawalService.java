@@ -78,13 +78,15 @@ public class WithdrawalService {
     }
 
     private boolean verifyIfAmountIsAvailable(CreateWithdrawalRequest createWithdrawalRequest) {
-        Map<String, AssetHolding> currentHoldingMap = portfolioSummaryService.getStringAssetHoldingMap();
-        AssetHolding asset = currentHoldingMap.get(createWithdrawalRequest.getAssetSymbol()+'|'+ createWithdrawalRequest.getInvestmentType());
-        if(asset.getTotalAmountInvested().intValue() >= createWithdrawalRequest.getProceeds().intValue()){
-            return true;
-        }
-        return false;
+        List<AssetHolding> currentHoldingList = portfolioSummaryService.getAssetList();
+        String assetTag = createWithdrawalRequest.getAssetSymbol()+'|'+ createWithdrawalRequest.getInvestmentType();
 
+        return currentHoldingList
+                .stream()
+                .filter(asset -> asset.getAssetTag().equalsIgnoreCase(assetTag))
+                .findFirst()
+                .map(asset -> asset.getTotalAmountInvested().intValue() >= createWithdrawalRequest.getProceeds().intValue())
+                .orElse(false);
     }
 
     public WithdrawalResponse mapWithdrawalToWithdrawalResponse(Withdrawal withdrawal){
@@ -95,10 +97,11 @@ public class WithdrawalService {
         withdrawalResponse.setProceeds(withdrawal.getProceeds());
         withdrawalResponse.setQuantity(withdrawal.getQuantity());
         withdrawalResponse.setWithdrawalDate(withdrawal.getWithdrawalDate());
+        withdrawalResponse.setCurrency(withdrawal.getCurrency());
         withdrawalResponse.setFee(withdrawal.getFee());
         withdrawalResponse.setAlternateAmount(withdrawal.getAlternateAmount());
         withdrawalResponse.setAlternateCurrency(withdrawal.getAlternateCurrency());
-
+        withdrawalResponse.setAssetTag(withdrawal.getAssetTag());
         return withdrawalResponse;
     }
 
@@ -109,6 +112,7 @@ public class WithdrawalService {
         withdrawal.setProceeds(createWithdrawalRequest.getProceeds());
         withdrawal.setQuantity(createWithdrawalRequest.getQuantity());
         withdrawal.setWithdrawalDate(createWithdrawalRequest.getWithdrawalDate());
+        withdrawal.setCurrency(createWithdrawalRequest.getCurrency());
         withdrawal.setFee(createWithdrawalRequest.getFee());
         withdrawal.setAlternateAmount(createWithdrawalRequest.getAlternateAmount());
         withdrawal.setAlternateCurrency(createWithdrawalRequest.getAlternateCurrency());

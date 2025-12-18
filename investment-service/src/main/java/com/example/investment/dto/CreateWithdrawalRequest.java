@@ -26,6 +26,8 @@ public class CreateWithdrawalRequest {
     @NotNull(message = "Withdrawal date is required")
     private LocalDate withdrawalDate;
 
+    private String currency;
+
     private BigDecimal fee = BigDecimal.valueOf(0.0);
 
     private BigDecimal alternateAmount = BigDecimal.valueOf(0.0);
@@ -50,6 +52,10 @@ public class CreateWithdrawalRequest {
 
     public LocalDate getWithdrawalDate() {
         return withdrawalDate;
+    }
+
+    public String getCurrency() {
+        return currency;
     }
 
     public BigDecimal getFee() {
@@ -82,6 +88,10 @@ public class CreateWithdrawalRequest {
 
     public void setWithdrawalDate(LocalDate withdrawalDate) {
         this.withdrawalDate = withdrawalDate;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public void setFee(BigDecimal fee) {

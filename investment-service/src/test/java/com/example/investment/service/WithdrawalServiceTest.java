@@ -108,11 +108,13 @@ public class WithdrawalServiceTest {
         assetHolding.setTotalAmountInvested(BigDecimal.valueOf(10000));
         assetHolding.setTotalQuantity(BigDecimal.valueOf(100));
         assetHolding.setPrimaryCurrency("USD");
-        Map<String, AssetHolding> assetMap = new HashMap<>();
-        assetMap.put("BTC|CRYPTO",assetHolding);
+        assetHolding.setAssetTag("BTC|CRYPTO");
+
+        List<AssetHolding> assetList= new ArrayList<>();
+        assetList.add(assetHolding);
 
         when(withdrawalRepository.save(any(Withdrawal.class))).thenReturn(withdrawal);
-        when(portfolioSummaryService.getStringAssetHoldingMap()).thenReturn(assetMap);
+        when(portfolioSummaryService.getAssetList()).thenReturn(assetList);
         WithdrawalResponse response = withdrawalService.saveWithdrawal(createWithdrawalRequest);
 
         assertNotNull(response);
@@ -142,10 +144,12 @@ public class WithdrawalServiceTest {
         assetHolding.setTotalAmountInvested(BigDecimal.valueOf(0));
         assetHolding.setTotalQuantity(BigDecimal.valueOf(0));
         assetHolding.setPrimaryCurrency("USD");
-        Map<String, AssetHolding> assetMap = new HashMap<>();
-        assetMap.put("BTC|CRYPTO",assetHolding);
+        assetHolding.setAssetTag("BTC|CRYPTO");
 
-        when(portfolioSummaryService.getStringAssetHoldingMap()).thenReturn(assetMap);
+        List<AssetHolding> assetList= new ArrayList<>();
+        assetList.add(assetHolding);
+
+        when(portfolioSummaryService.getAssetList()).thenReturn(assetList);
 
         InsufficientHoldingException exception = assertThrows(InsufficientHoldingException.class, () -> withdrawalService.saveWithdrawal(createWithdrawalRequest));
         assertEquals("Insufficient Holding Amount to Continue with Withdraw", exception.getMessage());
