@@ -44,4 +44,17 @@ public class WithdrawalControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
     }
+
+    @Test
+    void getWithdrawalWithId_ReturnWithdrawalResponse(){
+        WithdrawalResponse withdrawalResponse = new WithdrawalResponse();
+        withdrawalResponse.setId(1L);
+        long id = 1L;
+        when(withdrawalService.findWithdrawalById(id)).thenReturn(withdrawalResponse);
+
+        ResponseEntity<WithdrawalResponse> response = withdrawalController.getWithdrawalWithId(id);
+        assertEquals(id, response.getBody().getId());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    }
 }
