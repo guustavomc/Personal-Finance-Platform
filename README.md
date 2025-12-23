@@ -284,19 +284,25 @@ k8s/
 
 ### API Endpoints
 
-| Method | Endpoint                               | Description                      | Request Body                  | Response Body               |
-|--------|----------------------------------------|----------------------------------|-------------------------------|-----------------------------|
-| GET    | `/api/investment`                      | Retrieve all investments         | None                          | List of `InvestmentResponse` |
-| GET    | `/api/investment/{id}`                    | Retrieve investment by ID        | Query param: `id`             | `InvestmentResponse`    |
-| GET    | `/api/investment/category`                | Retrieve investments by category | Query param: `category`       | List of `InvestmentResponse`   |
-| POST   | `/api/investment`                         | Create a new investment          | `CreateInvestmentRequest `        | `InvestmentResponse`    |
-| PUT    | `/api/investment/{id}`                    | Update an existing investment    | `CreateInvestmentRequest `        | `InvestmentResponse`   |
-| DELETE | `/api/investment/{id}`                    | Delete an investment by ID       | None                          | None (204 No Content)       |
-| GET    | `api/investment/portfolio/summary`  | Retrieve  Investment Portfolio   | None | `PortfolioSummaryResponse`    |
+| Method | Endpoint                           | Description                    | Request Body               | Response Body               |
+|--------|------------------------------------|--------------------------------|----------------------------|-----------------------------|
+| GET    | `/api/investment/invest`                  | Retrieve all investments       | None                       | List of `InvestmentResponse` |
+| GET    | `/api/investment/invest/{id}`             | Retrieve investment by ID      | Query param: `id`          | `InvestmentResponse`    |
+| GET    | `/api/investment/invest/type`             | Retrieve investments by type   | Query param: `investmentType`  | List of `InvestmentResponse`   |
+| POST   | `/api/investment/invest`                  | Create a new investment        | `CreateInvestmentRequest ` | `InvestmentResponse`    |
+| PUT    | `/api/investment/invest/{id}`             | Update an existing investment  | `CreateInvestmentRequest `<br/>Query param: `id`  | `InvestmentResponse`   |
+| DELETE | `/api/investment/invest/{id}`             | Delete an investment by ID     | None                       | None (204 No Content)       |
+| GET    | `/api/investment/withdrawal`       | Retrieve all withdrawals       | None                       | List of `WithdrawalResponse` |
+| GET    | `/api/investment/withdrawal/{id}`  | Retrieve withdrawals by ID     | Query param: `id`          | `WithdrawalResponse`    |
+| GET    | `/api/investment/withdrawal/type`  | Retrieve withdrawals by type   | Query param: `investmentType`  | List of `WithdrawalResponse`   |
+| POST   | `/api/investment/withdrawal`       | Create a new withdrawal        | `CreateWithdrawalRequest ` | `WithdrawalResponse`    |
+| PUT    | `/api/investment/withdrawal/{id}`  | Update an existing withdrawal  | `CreateWithdrawalRequest`<br/>Query param: `id` | `WithdrawalResponse`   |
+| DELETE | `/api/investment/withdrawal/{id}`  | Delete an withdrawal by ID     | None                       | None (204 No Content)       |
+| GET    | `api/investment/portfolio/summary` | Retrieve  Investment Portfolio | None                       | `PortfolioSummaryResponse`    |
 
 ### Example Request/Response
 
-**Create Investment (POST `/api/investment`)**
+**Create Investment (POST `/api/investment/invest`)**
 
 Request:
 ```json
