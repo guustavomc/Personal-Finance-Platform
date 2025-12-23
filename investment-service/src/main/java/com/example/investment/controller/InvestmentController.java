@@ -40,6 +40,11 @@ public class InvestmentController {
         return ResponseEntity.status(HttpStatus.OK).body(investmentResponse);
     }
 
+    @GetMapping("/type")
+    public ResponseEntity<List<InvestmentResponse>> getInvestmentByInvestmentType(@RequestParam String investmentType){
+        return ResponseEntity.status(HttpStatus.OK).body(investmentService.findInvestmentsWithInvestmentType(investmentType));
+    }
+
     @PostMapping
     public ResponseEntity<InvestmentResponse> createInvestment(@Valid @RequestBody CreateInvestmentRequest createInvestmentRequest){
         InvestmentResponse investmentResponse = new InvestmentResponse();
