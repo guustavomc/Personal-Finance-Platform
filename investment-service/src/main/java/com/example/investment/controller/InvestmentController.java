@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/investment")
+@RequestMapping("/api/investment/invest")
 @Validated
 public class InvestmentController {
 
