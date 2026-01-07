@@ -1,8 +1,10 @@
 package com.example.investment.service;
 
 import com.example.investment.dto.CreateWithdrawalRequest;
+import com.example.investment.dto.InvestmentResponse;
 import com.example.investment.dto.WithdrawalResponse;
 import com.example.investment.exception.InsufficientHoldingException;
+import com.example.investment.exception.InvestmentNotFoundException;
 import com.example.investment.exception.WithdrawalNotFoundException;
 import com.example.investment.model.AssetHolding;
 import com.example.investment.model.Investment;
@@ -83,6 +85,41 @@ public class WithdrawalServiceTest {
         when(withdrawalRepository.findById(1L)).thenReturn(Optional.of(withdrawal));
         WithdrawalResponse withdrawalResponse = withdrawalService.findWithdrawalById(1L);
         assertEquals(1L, withdrawalResponse.getId());
+    }
+
+    @Test
+    void findWithdrawalTransactionWithInvestmentType_ReturnWithdrawalResponseList(){
+        Withdrawal withdrawal = new Withdrawal();
+        withdrawal.setId(1L);
+        withdrawal.setInvestmentType(CRYPTO);
+        withdrawal.setAssetSymbol("BTC");
+        withdrawal.setProceeds(BigDecimal.valueOf(1000));
+        withdrawal.setQuantity(BigDecimal.valueOf(1));
+        withdrawal.setWithdrawalDate(LocalDate.of(2025, 10, 8));
+
+        List<Withdrawal> withdrawalList = Arrays.asList(withdrawal);
+        when(withdrawalRepository.findByInvestmentType("CRYPTO")).thenReturn(withdrawalList);
+
+        List<WithdrawalResponse> response = withdrawalService.findWithdrawalWithInvestmentType("CRYPTO");
+        assertEquals(1, response.size());
+        assertEquals("CRYPTO", response.get(0).getInvestmentType().toString());
+    }
+
+    @Test
+    void findInvestmentTransactionWithInvestmentType_ThrowInvestmentNotFoundException(){
+        Withdrawal withdrawal = new Withdrawal();
+        withdrawal.setId(1L);
+        withdrawal.setInvestmentType(CRYPTO);
+        withdrawal.setAssetSymbol("BTC");
+        withdrawal.setProceeds(BigDecimal.valueOf(1000));
+        withdrawal.setQuantity(BigDecimal.valueOf(1));
+        withdrawal.setWithdrawalDate(LocalDate.of(2025, 10, 8));
+
+        List<Withdrawal> withdrawalList = Arrays.asList(withdrawal);
+        when(withdrawalRepository.findByInvestmentType("CRYPTO")).thenThrow(WithdrawalNotFoundException.class);
+
+        assertThrows(WithdrawalNotFoundException.class, () -> withdrawalService.findWithdrawalWithInvestmentType(String.valueOf(CRYPTO)));
+
     }
 
     @Test
