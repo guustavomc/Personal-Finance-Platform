@@ -1,7 +1,9 @@
 package com.example.investment.controller;
 
 import com.example.investment.exception.InvestmentNotFoundException;
+import com.example.investment.exception.WithdrawalNotFoundException;
 import com.example.investment.service.InvestmentService;
+import com.example.investment.service.WithdrawalService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(InvestmentController.class)
-
+@WebMvcTest({InvestmentController.class, WithdrawalController.class})
 public class GlobalExceptionHandlerTest {
 
     @Autowired
@@ -27,6 +28,9 @@ public class GlobalExceptionHandlerTest {
     @MockitoBean
     private InvestmentService investmentService;
 
+    @MockitoBean
+    private WithdrawalService withdrawalService;
+
     @BeforeEach
     public void setup(){
 
@@ -34,7 +38,8 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     void investmentNotFoundException_Return404_WhenInvestmentNotFound() throws Exception{
-        when(investmentService.findInvestmentTransactionWithID(1L)).thenThrow(new InvestmentNotFoundException("Failed to find investment with id 1"));
+        when(investmentService.findInvestmentTransactionWithID(1L))
+                .thenThrow(new InvestmentNotFoundException("Failed to find investment with id 1"));
 
         mockMvc.perform(get("/api/investment/invest/1"))
                 .andExpect(status().isNotFound())
@@ -61,5 +66,16 @@ public class GlobalExceptionHandlerTest {
                 .andExpect(jsonPath("$.status").value(500))
                 .andExpect(jsonPath("$.message").value("Failed to delete Investment, Database connection failed: "));
 
+    }
+
+    @Test
+    void withdrawalNotFoundException_Return404_WhenWithdrawalNotFound() throws Exception{
+        when(withdrawalService.findWithdrawalById(1L))
+                .thenThrow(new WithdrawalNotFoundException("Failed to find withdrawal with id 1"));
+
+        mockMvc.perform(get("/api/investment/withdrawal/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Failed to find withdrawal with id 1"));
     }
 }

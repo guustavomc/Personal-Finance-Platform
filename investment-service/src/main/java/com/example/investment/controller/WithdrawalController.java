@@ -36,13 +36,9 @@ public class WithdrawalController {
     @GetMapping("/{id}")
     public ResponseEntity<WithdrawalResponse> getWithdrawalWithId(@PathVariable("id") long id){
         WithdrawalResponse withdrawal = new WithdrawalResponse();
-        try {
-            withdrawal = withdrawalService.findWithdrawalById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(withdrawal);
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(withdrawal);
-        }
+        withdrawal = withdrawalService.findWithdrawalById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(withdrawal);
+
     }
 
     @PostMapping
