@@ -36,6 +36,15 @@ public class WithdrawalService {
         return  withdrawalRepository.findById(id).orElseThrow(() -> new WithdrawalNotFoundException(String.format("Failed to find withdrawal with id %d",id)));
     }
 
+    public List<WithdrawalResponse> findWithdrawalWithInvestmentType(String investmentType){
+        return findVerifiedWithdrawalWithInvestmentType(investmentType)
+                .stream()
+                .map(withdrawal -> mapWithdrawalToWithdrawalResponse(withdrawal))
+                .toList();
+    }
+    private List<Withdrawal> findVerifiedWithdrawalWithInvestmentType(String investmentType){
+        return withdrawalRepository.findByInvestmentType(investmentType);
+    }
     public WithdrawalResponse saveWithdrawal(CreateWithdrawalRequest createWithdrawalRequest){
         if(!verifyIfAmountIsAvailable(createWithdrawalRequest)){
             throw new InsufficientHoldingException("Insufficient Holding Amount to Continue with Withdraw");
