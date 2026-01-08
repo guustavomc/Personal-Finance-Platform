@@ -60,7 +60,7 @@ public class PortfolioSummaryServiceTest {
         Withdrawal withdrawal = new Withdrawal();
         withdrawal.setInvestmentType(CRYPTO);
         withdrawal.setAssetSymbol("BTC");
-        withdrawal.setProceeds(BigDecimal.valueOf(1000));
+        withdrawal.setProceeds(BigDecimal.valueOf(500));
         withdrawal.setQuantity(BigDecimal.valueOf(1));
         withdrawal.setWithdrawalDate(LocalDate.of(2025, 10, 8));
 
@@ -68,8 +68,8 @@ public class PortfolioSummaryServiceTest {
         List<Withdrawal> withdrawalList = new ArrayList<>();
 
         investmentList.add(firstInvestment);
-        //investmentList.add(secondInvestment);
-        //withdrawalList.add(withdrawal);
+        investmentList.add(secondInvestment);
+        withdrawalList.add(withdrawal);
 
         when(investmentRepository.findAll()).thenReturn(investmentList);
         when(withdrawalRepository.findAll()).thenReturn(withdrawalList);
@@ -77,7 +77,7 @@ public class PortfolioSummaryServiceTest {
 
         PortfolioSummaryResponse response = portfolioSummaryService.getPortfolioSummary();
 
-        assertEquals(1,response.getAssetList().size());
+        assertEquals(2,response.getAssetList().size());
         assertEquals(10000, response.getTotalAmount().intValue());
     }
 
