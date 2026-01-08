@@ -1,6 +1,7 @@
 package com.example.investment.controller;
 
 import com.example.investment.dto.CreateWithdrawalRequest;
+import com.example.investment.dto.InvestmentResponse;
 import com.example.investment.dto.WithdrawalResponse;
 import com.example.investment.service.WithdrawalService;
 import jakarta.validation.Valid;
@@ -38,7 +39,11 @@ public class WithdrawalController {
         WithdrawalResponse withdrawal = new WithdrawalResponse();
         withdrawal = withdrawalService.findWithdrawalById(id);
         return ResponseEntity.status(HttpStatus.OK).body(withdrawal);
+    }
 
+    @GetMapping("/type")
+    public ResponseEntity<List<WithdrawalResponse>> getWithdrawalByInvestmentType(@RequestParam String investmentType){
+        return ResponseEntity.status(HttpStatus.OK).body(withdrawalService.findWithdrawalWithInvestmentType(investmentType));
     }
 
     @PostMapping
