@@ -82,6 +82,21 @@ public class InvestmentControllerTest {
     }
 
     @Test
+    void getInvestmentByInvestmentType_ReturnResponseEntity_WithInvestmentResponseList(){
+        InvestmentResponse investmentResponse = new InvestmentResponse();
+        investmentResponse.setInvestmentType(CRYPTO);
+        List<InvestmentResponse> responseList= new ArrayList<>();
+        responseList.add(investmentResponse);
+        when(investmentService.findInvestmentsWithInvestmentType(String.valueOf(CRYPTO)))
+                .thenReturn(responseList);
+
+        ResponseEntity<List<InvestmentResponse>> response = investmentController.getInvestmentByInvestmentType(String.valueOf(CRYPTO));
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(CRYPTO, response.getBody().get(0).getInvestmentType());
+    }
+
+    @Test
     void createInvestment_ReturnResponseEntity_WithInvestmentCreated(){
         CreateInvestmentRequest createInvestmentRequest = new CreateInvestmentRequest();
         InvestmentResponse investmentResponse = new InvestmentResponse();
