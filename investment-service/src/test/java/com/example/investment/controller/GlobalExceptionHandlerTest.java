@@ -1,7 +1,9 @@
 package com.example.investment.controller;
 
 import com.example.investment.exception.InvestmentNotFoundException;
+import com.example.investment.exception.WithdrawalNotFoundException;
 import com.example.investment.service.InvestmentService;
+import com.example.investment.service.WithdrawalService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(InvestmentController.class)
-
+@WebMvcTest({InvestmentController.class, WithdrawalController.class})
 public class GlobalExceptionHandlerTest {
 
     @Autowired
@@ -27,6 +28,9 @@ public class GlobalExceptionHandlerTest {
     @MockitoBean
     private InvestmentService investmentService;
 
+    @MockitoBean
+    private WithdrawalService withdrawalService;
+
     @BeforeEach
     public void setup(){
 
@@ -34,9 +38,10 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     void investmentNotFoundException_Return404_WhenInvestmentNotFound() throws Exception{
-        when(investmentService.findInvestmentTransactionWithID(1L)).thenThrow(new InvestmentNotFoundException("Failed to find investment with id 1"));
+        when(investmentService.findInvestmentTransactionWithID(1L))
+                .thenThrow(new InvestmentNotFoundException("Failed to find investment with id 1"));
 
-        mockMvc.perform(get("/api/investment/1"))
+        mockMvc.perform(get("/api/investment/invest/1"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.message").value("Failed to find investment with id 1"));
@@ -46,7 +51,7 @@ public class GlobalExceptionHandlerTest {
     void DataIntegrityViolationException_Return400_WhenFailedToDeleteInvestment() throws Exception{
         doThrow(new DataIntegrityViolationException("")).when(investmentService).removeInvestment(1L);
 
-        mockMvc.perform(delete("/api/investment/1"))
+        mockMvc.perform(delete("/api/investment/invest/1"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message").value("Failed to delete investment, the register is in use: "));
@@ -56,10 +61,21 @@ public class GlobalExceptionHandlerTest {
     void RuntimeException_Return500_WhenUnexpectedErrorOccurs() throws Exception{
         when(investmentService.findInvestmentTransactionWithID(1L)).thenThrow(new RuntimeException(""));
 
-        mockMvc.perform(get("/api/investment/1"))
+        mockMvc.perform(get("/api/investment/invest/1"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.status").value(500))
                 .andExpect(jsonPath("$.message").value("Failed to delete Investment, Database connection failed: "));
 
+    }
+
+    @Test
+    void withdrawalNotFoundException_Return404_WhenWithdrawalNotFound() throws Exception{
+        when(withdrawalService.findWithdrawalById(1L))
+                .thenThrow(new WithdrawalNotFoundException("Failed to find withdrawal with id 1"));
+
+        mockMvc.perform(get("/api/investment/withdrawal/1"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Failed to find withdrawal with id 1"));
     }
 }

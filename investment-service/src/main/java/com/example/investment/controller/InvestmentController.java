@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/investment")
+@RequestMapping("/api/investment/invest")
 @Validated
 public class InvestmentController {
 
@@ -38,6 +38,11 @@ public class InvestmentController {
         InvestmentResponse investmentResponse = new InvestmentResponse();
         investmentResponse = investmentService.findInvestmentTransactionWithID(id);
         return ResponseEntity.status(HttpStatus.OK).body(investmentResponse);
+    }
+
+    @GetMapping("/type")
+    public ResponseEntity<List<InvestmentResponse>> getInvestmentByInvestmentType(@RequestParam String investmentType){
+        return ResponseEntity.status(HttpStatus.OK).body(investmentService.findInvestmentsWithInvestmentType(investmentType));
     }
 
     @PostMapping

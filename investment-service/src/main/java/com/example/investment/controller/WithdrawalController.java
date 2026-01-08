@@ -1,6 +1,7 @@
 package com.example.investment.controller;
 
 import com.example.investment.dto.CreateWithdrawalRequest;
+import com.example.investment.dto.InvestmentResponse;
 import com.example.investment.dto.WithdrawalResponse;
 import com.example.investment.service.WithdrawalService;
 import jakarta.validation.Valid;
@@ -36,13 +37,13 @@ public class WithdrawalController {
     @GetMapping("/{id}")
     public ResponseEntity<WithdrawalResponse> getWithdrawalWithId(@PathVariable("id") long id){
         WithdrawalResponse withdrawal = new WithdrawalResponse();
-        try {
-            withdrawal = withdrawalService.findWithdrawalById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(withdrawal);
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(withdrawal);
-        }
+        withdrawal = withdrawalService.findWithdrawalById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(withdrawal);
+    }
+
+    @GetMapping("/type")
+    public ResponseEntity<List<WithdrawalResponse>> getWithdrawalByInvestmentType(@RequestParam String investmentType){
+        return ResponseEntity.status(HttpStatus.OK).body(withdrawalService.findWithdrawalWithInvestmentType(investmentType));
     }
 
     @PostMapping

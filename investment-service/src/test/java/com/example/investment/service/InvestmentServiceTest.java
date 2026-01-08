@@ -89,6 +89,43 @@ public class InvestmentServiceTest {
     }
 
     @Test
+    void findInvestmentTransactionWithInvestmentType_ReturnInvestmentResponseList(){
+        Investment investment = new Investment();
+        investment.setId(1L);
+        investment.setInvestmentType(CRYPTO);
+        investment.setAssetSymbol("BTC");
+        investment.setAmountInvested(BigDecimal.valueOf(1000));
+        investment.setQuantity(BigDecimal.valueOf(0.1));
+        investment.setInvestmentDate(LocalDate.of(2025, 10, 8));
+        investment.setCurrency("BRL");
+
+        List<Investment> investmentList = Arrays.asList(investment);
+        when(investmentRepository.findByInvestmentType("CRYPTO")).thenReturn(investmentList);
+
+        List<InvestmentResponse> response = investmentService.findInvestmentsWithInvestmentType("CRYPTO");
+        assertEquals(1, response.size());
+        assertEquals("CRYPTO", response.get(0).getInvestmentType().toString());
+    }
+
+    @Test
+    void findInvestmentTransactionWithInvestmentType_ThrowInvestmentNotFoundException(){
+        Investment investment = new Investment();
+        investment.setId(1L);
+        investment.setInvestmentType(CRYPTO);
+        investment.setAssetSymbol("BTC");
+        investment.setAmountInvested(BigDecimal.valueOf(1000));
+        investment.setQuantity(BigDecimal.valueOf(0.1));
+        investment.setInvestmentDate(LocalDate.of(2025, 10, 8));
+        investment.setCurrency("BRL");
+
+        List<Investment> investmentList = Arrays.asList(investment);
+        when(investmentRepository.findByInvestmentType("CRYPTO")).thenThrow(InvestmentNotFoundException.class);
+
+        assertThrows(InvestmentNotFoundException.class, () -> investmentService.findInvestmentsWithInvestmentType("CRYPTO"));
+
+    }
+
+    @Test
     void saveInvestment_ReturnInvestmentResponseCreated(){
         Investment investment = new Investment();
         investment.setId(1L);

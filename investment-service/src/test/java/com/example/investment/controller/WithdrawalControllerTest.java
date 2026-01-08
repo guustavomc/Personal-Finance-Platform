@@ -2,6 +2,7 @@ package com.example.investment.controller;
 
 import com.example.investment.dto.CreateInvestmentRequest;
 import com.example.investment.dto.CreateWithdrawalRequest;
+import com.example.investment.dto.InvestmentResponse;
 import com.example.investment.dto.WithdrawalResponse;
 import com.example.investment.service.WithdrawalService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.investment.model.InvestmentType.CRYPTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -50,6 +52,22 @@ public class WithdrawalControllerTest {
     }
 
     @Test
+    void getAllWithdrawalsMade_ReturnNotFound(){
+        WithdrawalResponse withdrawalResponse = new WithdrawalResponse();
+        List<WithdrawalResponse> responseList = new ArrayList<>();
+
+        responseList.add(withdrawalResponse);
+
+        when(withdrawalService.findAllWithdrawalsMade())
+                .thenThrow(RuntimeException.class);
+
+        ResponseEntity<List<WithdrawalResponse>> response = withdrawalController.getAllWithdrawalsMade();
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+    }
+
+    @Test
     void getWithdrawalWithId_ReturnWithdrawalResponse(){
         WithdrawalResponse withdrawalResponse = new WithdrawalResponse();
         withdrawalResponse.setId(1L);
@@ -60,6 +78,21 @@ public class WithdrawalControllerTest {
         assertEquals(id, response.getBody().getId());
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
+    }
+
+    @Test
+    void getWithdrawalByInvestmentType_ReturnResponseEntity_WithWithdrawalResponseList(){
+        WithdrawalResponse withdrawalResponse = new WithdrawalResponse();
+        withdrawalResponse.setInvestmentType(CRYPTO);
+        List<WithdrawalResponse> responseList= new ArrayList<>();
+        responseList.add(withdrawalResponse);
+        when(withdrawalService.findWithdrawalWithInvestmentType(String.valueOf(CRYPTO)))
+                .thenReturn(responseList);
+
+        ResponseEntity<List<WithdrawalResponse>> response = withdrawalController.getWithdrawalByInvestmentType(String.valueOf(CRYPTO));
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(CRYPTO, response.getBody().get(0).getInvestmentType());
     }
 
     @Test

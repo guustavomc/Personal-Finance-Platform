@@ -33,6 +33,19 @@ public class InvestmentService {
 
     }
 
+    public List<InvestmentResponse> findInvestmentsWithInvestmentType(String InvestmentType){
+        return findVerifiedInvestmentsWithInvestmentType(InvestmentType).stream().map(investment ->mapInvestmentToInvestmentResponse(investment)).toList();
+    }
+
+    private List<Investment> findVerifiedInvestmentsWithInvestmentType(String InvestmentType){
+        try {
+            return investmentRepository.findByInvestmentType(InvestmentType);
+        }
+        catch (Exception e){
+            throw new InvestmentNotFoundException(String.format("Failed to find investment with Investment Type %s", InvestmentType));
+        }
+    }
+
     public InvestmentResponse saveInvestment(CreateInvestmentRequest createInvestmentRequest){
         Investment savedInvestment = saveVerifiedInvestment(createInvestmentRequest);
         return mapInvestmentToInvestmentResponse(savedInvestment);
@@ -40,10 +53,8 @@ public class InvestmentService {
     }
 
     private Investment saveVerifiedInvestment(CreateInvestmentRequest createInvestmentRequest){
-        Investment investment = investmentRepository
-                                .save(mapCreateInvestmentRequestToInvestment(createInvestmentRequest));
+        return investmentRepository.save(mapCreateInvestmentRequestToInvestment(createInvestmentRequest));
 
-        return investment;
     }
 
     public void removeInvestment(long id){
