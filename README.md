@@ -232,11 +232,6 @@ spring.jpa.properties.hibernate.format_sql=true
 - Add Swagger/OpenAPI documentation for API endpoints.
 - Implement event-driven communication between services using Kafka or RabbitMQ.
 
-
-### Budget Service (Planned)
-
-The Budget Service will allow users to define budgets for specific months or years, integrating with the Expense and Investment Services to track spending and investment allocations.
-
 ## Investment Service
 
 The Investment Service manages investment records, including creating, updating, and retrieving investment details, with integration into the overall budgeting process.
@@ -437,3 +432,8 @@ spring.jpa.properties.hibernate.format_sql=true
    ```
 
 - Access the API at http://localhost:8080/api/investment.
+
+
+### Budget Service (Planned)
+
+The Budget Service will allow users to define budgets for specific months or years, integrating with the Expense and Investment Services to track spending and investment allocations.
