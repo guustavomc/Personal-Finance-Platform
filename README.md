@@ -77,18 +77,18 @@ k8s/
 ```
 ### API Endpoints
 
-| Method | Endpoint                               | Description                                      | Request Body                  | Response Body                   |
-|--------|----------------------------------------|--------------------------------------------------|-------------------------------|---------------------------------|
-| GET    | `/api/expense`                      | Retrieve all expenses                            | None                          | List of `ExpenseResponse`       |
-| GET    | `/api/expense/{id}`                    | Retrieve expense by ID                           | None                          | List of `ExpenseResponse`               |
-| GET    | `/api/expense/category`                | Retrieve expenses by category                    | Query param: `category`       | List of `ExpenseResponse`       |
-| POST   | `/api/expense`                         | Create a new expense                             | `CreateExpenseRequest`        |List of `ExpenseResponse`              |
-| PUT    | `/api/expense/{id}`                    | Update an existing expense                       | `CreateExpenseRequest`        | List of `ExpenseResponse`                |
-| DELETE | `/api/expense/{id}`                    | Delete an expense by ID                          | None                          | None (204 No Content)           |
-| GET    | `/api/expense/report/summary/monthly`  | Retrieve  Summarized expenses for a specific month | Query params: `year`, `month` | `ExpenseSummaryResponse`        |
-| GET    | `/api/expense/report/summary/annual`   | Retrieve  Summarized expenses for a specific year | Query params: `year`          | `ExpenseSummaryResponse`        |
-| GET    | `/api/expense/report/detailed/monthly` | Retrieve  List of expenses for a specific month  | Query params: `year`, `month` | List of `ExpenseResponse`       |
-| GET    | `/api/expense/report/detailed/annual`  | Retrieve  List of expenses for a specific year  | Query params: `year`          | List of `ExpenseResponse`       |
+| Method | Endpoint                           | Description                                      | Request Body                  | Response Body                   |
+|--------|------------------------------------|--------------------------------------------------|-------------------------------|---------------------------------|
+| GET    | `/api/expense`                  | Retrieve all expenses                            | None                          | List of `ExpenseResponse`       |
+| GET    | `/api/expense/{id}`                | Retrieve expense by ID                           | None                          | List of `ExpenseResponse`               |
+| GET    | `/api/expense/category`            | Retrieve expenses by category                    | Query param: `category`       | List of `ExpenseResponse`       |
+| POST   | `/api/expense`                     | Create a new expense                             | `CreateExpenseRequest`        |List of `ExpenseResponse`              |
+| PUT    | `/api/expense/{id}`                | Update an existing expense                       | `CreateExpenseRequest`        | List of `ExpenseResponse`                |
+| DELETE | `/api/expense/{id}`                | Delete an expense by ID                          | None                          | None (204 No Content)           |
+| GET    | `/api/expense/summary/monthly` | Retrieve  Summarized expenses for a specific month | Query params: `year`, `month` | `ExpenseSummaryResponse`        |
+| GET    | `/api/expense/summary/annual` | Retrieve  Summarized expenses for a specific year | Query params: `year`          | `ExpenseSummaryResponse`        |
+| GET    | `/api/expense/report/monthly` | Retrieve  List of expenses for a specific month  | Query params: `year`, `month` | List of `ExpenseResponse`       |
+| GET    | `/api/expense/report/annual` | Retrieve  List of expenses for a specific year  | Query params: `year`          | List of `ExpenseResponse`       |
 
 ### Example Request/Response
 

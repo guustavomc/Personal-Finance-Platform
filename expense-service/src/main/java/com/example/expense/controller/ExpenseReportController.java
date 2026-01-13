@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/expense/report")
+@RequestMapping("/api/expense")
 @Validated
 public class ExpenseReportController {
 
@@ -42,7 +42,7 @@ public class ExpenseReportController {
     }
 
 
-    @GetMapping("/detailed/monthly")
+    @GetMapping("/report/monthly")
     public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(@RequestParam int year, @RequestParam int month){
         List<ExpenseResponse> expensesFromRequestedMonth = new ArrayList<>();
 
@@ -51,7 +51,7 @@ public class ExpenseReportController {
 
     }
 
-    @GetMapping("/detailed/annual")
+    @GetMapping("/report/annual")
     public ResponseEntity<List<ExpenseResponse>> getAnnualExpenses(@RequestParam int year){
         List<ExpenseResponse> expensesFromRequestedYear = new ArrayList<>();
         expensesFromRequestedYear = expenseReportService.findExpensesByYear(year);
