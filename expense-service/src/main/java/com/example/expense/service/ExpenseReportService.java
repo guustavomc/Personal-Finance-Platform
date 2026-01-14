@@ -36,14 +36,12 @@ public class ExpenseReportService {
 
         String highestSpentCategory= findHighestSpentCategory(totalPerCategory);
 
-        ExpenseSummaryResponse summaryResponse = new ExpenseSummaryResponse(
+        return new ExpenseSummaryResponse(
                 totalSpentInMonth,
                 averageDailyExpenses,
                 highestSpentCategory,
                 totalPerCategory,
                 expensesFromGivenMonth);
-
-        return summaryResponse;
     }
 
     public ExpenseSummaryResponse findExpenseSummaryByYear(int year){
@@ -57,16 +55,15 @@ public class ExpenseReportService {
 
         String highestSpentCategory= findHighestSpentCategory(totalPerCategory);
 
-        ExpenseSummaryResponse summaryResponse = new ExpenseSummaryResponse(
+        return new ExpenseSummaryResponse(
                 totalSpentInYear,
                 averageDailyExpenses,
                 highestSpentCategory,
                 totalPerCategory,
                 expensesFromGivenYear);
-        return summaryResponse;
     }
 
-    private BigDecimal findTotalSpentByMonth(int year, int month){
+    public BigDecimal findTotalSpentByMonth(int year, int month){
         LocalDate startDate = LocalDate.of(year, month,1);
         LocalDate endDate = LocalDate.of(year, month, getDaysInMonth(year, month));
         BigDecimal totalSpent = expenseRepository.sumValueSpentByDateBetween(startDate, endDate);
@@ -78,7 +75,7 @@ public class ExpenseReportService {
         }
     }
 
-    private BigDecimal findTotalSpentByYear(int year){
+    public BigDecimal findTotalSpentByYear(int year){
         LocalDate startDate = LocalDate.of(year, 01,1);
         LocalDate endDate = LocalDate.of(year, 12, getDaysInMonth(year, 12));
         BigDecimal totalSpent = expenseRepository.sumValueSpentByDateBetween(startDate, endDate);
