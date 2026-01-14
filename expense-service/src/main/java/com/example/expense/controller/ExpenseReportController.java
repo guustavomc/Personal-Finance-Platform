@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/expense/report")
+@RequestMapping("/api/expense")
 @Validated
 public class ExpenseReportController {
 
@@ -42,7 +43,7 @@ public class ExpenseReportController {
     }
 
 
-    @GetMapping("/detailed/monthly")
+    @GetMapping("/report/monthly")
     public ResponseEntity<List<ExpenseResponse>> getMonthlyExpenses(@RequestParam int year, @RequestParam int month){
         List<ExpenseResponse> expensesFromRequestedMonth = new ArrayList<>();
 
@@ -51,10 +52,23 @@ public class ExpenseReportController {
 
     }
 
-    @GetMapping("/detailed/annual")
+    @GetMapping("/report/annual")
     public ResponseEntity<List<ExpenseResponse>> getAnnualExpenses(@RequestParam int year){
         List<ExpenseResponse> expensesFromRequestedYear = new ArrayList<>();
         expensesFromRequestedYear = expenseReportService.findExpensesByYear(year);
         return ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedYear);
+    }
+
+    @GetMapping("/total/monthly")
+    public ResponseEntity<BigDecimal> getMonthlyTotalSpent(@RequestParam int year, @RequestParam int month){
+        BigDecimal total = expenseReportService.findTotalSpentByMonth(year, month);
+        return  ResponseEntity.status(HttpStatus.OK).body(total);
+
+    }
+
+    @GetMapping("/total/annual")
+    public ResponseEntity<BigDecimal> getAnnualTotalSpent(@RequestParam int year){
+        BigDecimal total = expenseReportService.findTotalSpentByYear(year);
+        return ResponseEntity.status(HttpStatus.OK).body(total);
     }
 }

@@ -58,8 +58,7 @@ public class ExpenseReportServiceTest {
 
         LocalDate initialDate = LocalDate.of(2025,6,1);
         LocalDate endDate = LocalDate.of(2025,6,30);
-
-        when(expenseRepository.findByDateBetween(initialDate,endDate)).thenReturn(expenses);
+        when(expenseRepository.sumValueSpentByDateBetween(initialDate,endDate)).thenReturn(BigDecimal.valueOf(225.5));
         ExpenseSummaryResponse expenseSummaryResponse = expenseReportService.findExpenseSummaryByMonth(2025,6);
         assertEquals(expenseSummaryResponse.getTotalExpenses(),BigDecimal.valueOf(225.5));
     }
@@ -88,7 +87,7 @@ public class ExpenseReportServiceTest {
         LocalDate initialDate = LocalDate.of(2025, 1, 1);
         LocalDate endDate = LocalDate.of(2025, 12, 31);
 
-        when(expenseRepository.findByDateBetween(initialDate,endDate)).thenReturn(expenses);
+        when(expenseRepository.sumValueSpentByDateBetween(initialDate,endDate)).thenReturn(BigDecimal.valueOf(225.5));
         ExpenseSummaryResponse expenseSummaryResponse = expenseReportService.findExpenseSummaryByYear(2025);
         assertEquals(expenseSummaryResponse.getTotalExpenses(),BigDecimal.valueOf(225.5));
     }
