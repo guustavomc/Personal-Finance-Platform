@@ -121,5 +121,32 @@ public class ExpenseReportControllerTest {
         assertEquals(1, response.getBody().size());
     }
 
+    @Test
+    void getMonthlyTotalSpent_ReturnBigDecimal_WithTotalAmount(){
+        BigDecimal total = BigDecimal.valueOf(100);
+        int year = 2026;
+        int month = 01;
+
+        when(expenseReportService.findTotalSpentByMonth(year, month)).thenReturn(total);
+        ResponseEntity<BigDecimal> response =
+                expenseReportController.getMonthlyTotalSpent(year, month);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(BigDecimal.valueOf(100), response.getBody());
+    }
+
+    @Test
+    void getAnnualTotalSpent_ReturnBigDecimal_WithTotalAmount(){
+        BigDecimal total = BigDecimal.valueOf(100);
+        int year = 2026;
+
+        when(expenseReportService.findTotalSpentByYear(year)).thenReturn(total);
+        ResponseEntity<BigDecimal> response =
+                expenseReportController.getAnnualTotalSpent(year);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(BigDecimal.valueOf(100), response.getBody());
+    }
+
 
 }
