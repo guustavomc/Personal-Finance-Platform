@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,5 +57,18 @@ public class ExpenseReportController {
         List<ExpenseResponse> expensesFromRequestedYear = new ArrayList<>();
         expensesFromRequestedYear = expenseReportService.findExpensesByYear(year);
         return ResponseEntity.status(HttpStatus.OK).body(expensesFromRequestedYear);
+    }
+
+    @GetMapping("/total/monthly")
+    public ResponseEntity<BigDecimal> getMonthlyTotalSpent(@RequestParam int year, @RequestParam int month){
+        BigDecimal total = expenseReportService.findTotalSpentByMonth(year, month);
+        return  ResponseEntity.status(HttpStatus.OK).body(total);
+
+    }
+
+    @GetMapping("/total/annual")
+    public ResponseEntity<BigDecimal> getAnnualTotalSpent(@RequestParam int year){
+        BigDecimal total = expenseReportService.findTotalSpentByYear(year);
+        return ResponseEntity.status(HttpStatus.OK).body(total);
     }
 }
