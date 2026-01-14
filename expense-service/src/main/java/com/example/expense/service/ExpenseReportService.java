@@ -28,7 +28,7 @@ public class ExpenseReportService {
     public ExpenseSummaryResponse findExpenseSummaryByMonth(int year, int month){
         List<ExpenseResponse> expensesFromGivenMonth = findExpensesByMonth(year,month);
 
-        BigDecimal totalSpentInMonth = findTotalSpentFromGivenPeriod(expensesFromGivenMonth);
+        BigDecimal totalSpentInMonth = findTotalSpentByMonth(year, month);
 
         BigDecimal averageDailyExpenses = findAverageDailyExpensesFromMonth(year, month, totalSpentInMonth);
 
@@ -49,7 +49,7 @@ public class ExpenseReportService {
     public ExpenseSummaryResponse findExpenseSummaryByYear(int year){
         List<ExpenseResponse> expensesFromGivenYear = findExpensesByYear(year);
 
-        BigDecimal totalSpentInYear = findTotalSpentFromGivenPeriod(expensesFromGivenYear);
+        BigDecimal totalSpentInYear = findTotalSpentByYear(year);
 
         BigDecimal averageDailyExpenses = findAverageDailyExpensesFromYear(year, totalSpentInYear);
 
@@ -66,12 +66,28 @@ public class ExpenseReportService {
         return summaryResponse;
     }
 
-    private BigDecimal findTotalSpentFromGivenPeriod(List<ExpenseResponse> expensesFromGivenMonth) {
-        BigDecimal totalExpensesFromMonth= expensesFromGivenMonth
-                .stream()
-                .map(expenseResponse -> expenseResponse.getValueSpent())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return totalExpensesFromMonth;
+    private BigDecimal findTotalSpentByMonth(int year, int month){
+        LocalDate startDate = LocalDate.of(year, month,1);
+        LocalDate endDate = LocalDate.of(year, month, getDaysInMonth(year, month));
+        BigDecimal totalSpent = expenseRepository.sumValueSpentByDateBetween(startDate, endDate);
+        if (totalSpent != null){
+            return  totalSpent;
+        }
+        else{
+            return BigDecimal.ZERO;
+        }
+    }
+
+    private BigDecimal findTotalSpentByYear(int year){
+        LocalDate startDate = LocalDate.of(year, 01,1);
+        LocalDate endDate = LocalDate.of(year, 12, getDaysInMonth(year, 12));
+        BigDecimal totalSpent = expenseRepository.sumValueSpentByDateBetween(startDate, endDate);
+        if (totalSpent != null){
+            return  totalSpent;
+        }
+        else{
+            return BigDecimal.ZERO;
+        }
     }
 
     private BigDecimal findAverageDailyExpensesFromMonth(int year, int month, BigDecimal totalExpensesFromMonth) {
