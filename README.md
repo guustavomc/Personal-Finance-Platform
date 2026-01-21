@@ -226,14 +226,6 @@ spring.jpa.properties.hibernate.format_sql=true
 - Access the API at http://localhost:8080/api/expense.
 
 
-### Future Enhancements
-- Add Global Exception Handling
-- Use Lombok for Boilerplate
-- Add Spring Security for authentication and role-based access control.
-- Introduce an API Gateway for routing and load balancing.
-- Add Swagger/OpenAPI documentation for API endpoints.
-- Implement event-driven communication between services using Kafka or RabbitMQ.
-
 ## Investment Service
 
 The Investment Service manages investment records, including creating, updating, and retrieving investment details, with integration into the overall budgeting process.
@@ -439,3 +431,52 @@ spring.jpa.properties.hibernate.format_sql=true
 ### Budget Service (Planned)
 
 The Budget Service will allow users to define budgets for specific months or years, integrating with the Expense and Investment Services to track spending and investment allocations.
+
+
+### Future Enhancements
+
+This project is actively evolving. The following items are prioritized to make it more secure, scalable, testable, and production-ready.
+
+#### 1. Authentication & Authorization (Top Priority)
+- Implement **Spring Security** + **JWT** for secure token-based auth.
+- Secure all endpoints (users can only access their own expenses, budgets, and investments).
+- Add roles (**USER**, **ADMIN**) with role-based access control.
+- Use `@PreAuthorize` annotations or method-level security for fine-grained permissions.
+
+*Why?* Authentication is essential for any real-world finance app and is a common interview/portfolio expectation.
+
+#### 2. Complete Microservices Architecture
+- Finish **Investment Service** (full CRUD + basic portfolio reporting/summaries).
+- Implement **Budget Service** as the orchestrator (coordinates Expense and Investment Services).
+- Add reliable service-to-service communication (e.g., via **RestTemplate**, **Feign Client**, or **WebClient** for now; async later).
+
+#### 3. Testing Improvements
+- Add comprehensive **integration tests** using `@SpringBootTest` + **Testcontainers** for PostgreSQL.
+- Expand unit test coverage (aim for 80%+ on services and controllers).
+
+#### 4. Clean Code & Design Documentation
+- Apply and enforce **SOLID principles** more explicitly:
+   - **Single Responsibility** — already strong with separated concerns.
+   - **Open-Closed** — introduce interfaces/abstract classes (e.g., `ReportStrategy` for extensible reporting).
+   - **Dependency Inversion** — ensure high-level modules depend on abstractions.
+- Implement common **design patterns** (Factory for report generators, Strategy for calculations, Repository via Spring Data).
+- Add a new **"Design Decisions"** section in the README explaining 2–3 key principles/patterns with code references.
+
+#### 5. Concurrency & Performance Basics
+- Introduce `@Async` methods for non-blocking tasks (e.g., background report generation or email notifications).
+- Use `CompletableFuture` for parallel fetches (e.g., combining expense + investment data in Budget Service).
+- Document thread-safety measures and potential race conditions handled.
+
+#### 6. Developer Experience & Quick Wins
+- Add **Swagger/OpenAPI** documentation using springdoc-openapi (auto-generated interactive docs).
+- Implement **caching** on summary/report endpoints with `@Cacheable` (Caffeine or Ehcache).
+- Set up **Docker Compose** for easy local multi-service + PostgreSQL spin-up.
+- Enhance README with:
+   - Architecture diagram (created in draw.io / diagrams.net).
+   - Full deployment instructions (including multi-service).
+   - Exported Postman collection for API testing.
+
+#### 7. Advanced Scalability (Stretch Goals)
+- Replace direct/synchronous service calls with **event-driven communication** using **Kafka** or **RabbitMQ** (e.g., publish expense/investment events for Budget Service to consume).
+- Add **API Gateway** (Spring Cloud Gateway) + service discovery (Eureka/Consul).
+- Introduce distributed tracing (Micrometer + Zipkin) and monitoring basics.
