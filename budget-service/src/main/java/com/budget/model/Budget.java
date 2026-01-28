@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -33,6 +35,8 @@ public class Budget {
     private BigDecimal totalPlannedAmount;
     private BigDecimal totalActualSpent;
     private BigDecimal totalActualInvested;
+
+    private List<BudgetCategory> categories = new ArrayList<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -75,6 +79,10 @@ public class Budget {
 
     public BigDecimal getTotalActualInvested() {
         return totalActualInvested;
+    }
+
+    public List<BudgetCategory> getCategories() {
+        return categories;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -123,6 +131,10 @@ public class Budget {
 
     public void setTotalActualInvested(BigDecimal totalActualInvested) {
         this.totalActualInvested = totalActualInvested;
+    }
+
+    public void setCategories(List<BudgetCategory> categories) {
+        this.categories = categories;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
