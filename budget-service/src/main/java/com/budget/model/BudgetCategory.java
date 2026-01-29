@@ -41,6 +41,10 @@ public class BudgetCategory {
         return categoryName;
     }
 
+    public CategoryType getType() {
+        return type;
+    }
+
     public BigDecimal getPlannedAmount() {
         return plannedAmount;
     }
@@ -71,6 +75,10 @@ public class BudgetCategory {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public void setType(CategoryType type) {
+        this.type = type;
     }
 
     public void setPlannedAmount(BigDecimal plannedAmount) {
