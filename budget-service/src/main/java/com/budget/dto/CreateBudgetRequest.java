@@ -32,7 +32,7 @@ public class CreateBudgetRequest {
     private BigDecimal totalPlannedAmount;
 
     @NotEmpty
-    private List<BudgetCategory> categories = new ArrayList<>();
+    private List<BudgetCategoryRequest> categories = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -54,7 +54,7 @@ public class CreateBudgetRequest {
         return totalPlannedAmount;
     }
 
-    public List<BudgetCategory> getCategories() {
+    public List<BudgetCategoryRequest> getCategories() {
         return categories;
     }
 
@@ -78,7 +78,7 @@ public class CreateBudgetRequest {
         this.totalPlannedAmount = totalPlannedAmount;
     }
 
-    public void setCategories(List<BudgetCategory> categories) {
+    public void setCategories(List<BudgetCategoryRequest> categories) {
         this.categories = categories;
     }
 }
