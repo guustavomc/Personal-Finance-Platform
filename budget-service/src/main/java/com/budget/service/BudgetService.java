@@ -1,8 +1,10 @@
 package com.budget.service;
 
+import com.budget.dto.BudgetCategoryRequest;
 import com.budget.dto.BudgetResponse;
 import com.budget.dto.CreateBudgetRequest;
 import com.budget.model.Budget;
+import com.budget.model.BudgetCategory;
 import com.budget.model.BudgetStatus;
 import com.budget.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,18 @@ public class BudgetService {
 
         budget.setTotalPlannedAmount(createBudgetRequest.getTotalPlannedAmount());
 
-        return mapBudgetToBudgetResponse(budget);
+        for(BudgetCategoryRequest category: createBudgetRequest.getCategories()){
+            BudgetCategory newCategory = new BudgetCategory();
+            newCategory.setCategoryName(category.getCategoryName());
+            newCategory.setType(category.getType());
+            newCategory.setPlannedAmount(category.getPlannedAmount());
+            newCategory.setPercentageOfTotal(category.getPercentageOfTotal());
+            newCategory.setBudget(budget);
+            budget.getCategories().add(newCategory);
+
+        }
+
+        return mapBudgetToBudgetResponse(budgetRepository.save(budget));
     }
 
     private LocalDate adjustBudgetEndDate(CreateBudgetRequest createBudgetRequest) {
