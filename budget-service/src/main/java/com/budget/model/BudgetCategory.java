@@ -17,6 +17,9 @@ public class BudgetCategory {
 
     private String categoryName;
 
+    @Enumerated(EnumType.STRING)
+    private CategoryType type;
+
     private BigDecimal plannedAmount;
     private BigDecimal percentageOfTotal;
 
