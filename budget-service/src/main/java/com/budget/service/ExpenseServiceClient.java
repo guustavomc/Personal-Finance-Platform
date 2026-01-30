@@ -3,9 +3,9 @@ package com.budget.service;
 import com.budget.dto.ExpenseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
-
+import org.springframework.web.client.RestClient;
 import java.util.List;
 
 @Component
@@ -14,17 +14,20 @@ public class ExpenseServiceClient {
     @Value("${expense.service.url}")
     private String expenseServiceURL;
 
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
 
-    @Autowired
-    public ExpenseServiceClient(RestTemplateBuilder builder){
-        this.restTemplate = builder.build();
+    public ExpenseServiceClient(RestClient.Builder builder){
+        this.restClient = builder.baseUrl(expenseServiceURL).build();
     }
 
     public List<ExpenseResponse> getExpensesByMonth(int year, int month){
-        String url = String.format(
-                "%s/api/expense/report/monthly?year=%s&month=%s",
-                expenseServiceURL, year, month);
+        String uri = "/api/expense/report/monthly?year={year}&month={month}";
+
+        return restClient.get()
+                .uri(uri, year, month)
+                .retrieve()
+                .body(new ParameterizedTypeReference<List<ExpenseResponse>>() {
+        });
     }
 
 
