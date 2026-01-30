@@ -1,10 +1,7 @@
 package com.budget.dto;
 
-import com.budget.model.BudgetCategory;
 import com.budget.model.BudgetPeriodType;
-import com.budget.model.BudgetStatus;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

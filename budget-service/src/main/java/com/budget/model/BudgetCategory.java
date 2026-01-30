@@ -13,6 +13,8 @@ public class BudgetCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "budget_id", nullable = false)
     private Budget budget;
 
     private String categoryName;
