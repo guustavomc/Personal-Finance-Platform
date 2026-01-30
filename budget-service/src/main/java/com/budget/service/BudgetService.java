@@ -24,7 +24,7 @@ public class BudgetService {
     @Autowired
     private InvestmentServiceClient investmentServiceClient;
 
-    public BudgetResponse createBudget(CreateBudgetRequest createBudgetRequest){
+    public BudgetResponse saveBudget(CreateBudgetRequest createBudgetRequest){
         Budget budget = new Budget();
         budget.setName(createBudgetRequest.getName());
         budget.setBudgetPeriodType(createBudgetRequest.getBudgetPeriodType());
