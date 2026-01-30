@@ -36,6 +36,7 @@ public class Budget {
     private BigDecimal totalActualSpent;
     private BigDecimal totalActualInvested;
 
+    @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BudgetCategory> categories = new ArrayList<>();
 
     private LocalDateTime createdAt;
@@ -143,5 +144,16 @@ public class Budget {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public void addCategory(BudgetCategory budgetCategory){
+        this.categories.add(budgetCategory);
+        budgetCategory.setBudget(this);
+    }
+
+    public void removeCategory(BudgetCategory budgetCategory){
+        this.categories.remove(budgetCategory);
+        budgetCategory.setBudget(null);
+
     }
 }
