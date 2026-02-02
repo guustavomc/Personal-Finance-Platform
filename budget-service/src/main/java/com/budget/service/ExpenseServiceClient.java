@@ -15,7 +15,7 @@ public class ExpenseServiceClient {
     private String expenseServiceURL;
 
     private final RestClient restClient;
-
+    @Autowired
     public ExpenseServiceClient(RestClient.Builder builder){
         this.restClient = builder.baseUrl(expenseServiceURL).build();
     }
