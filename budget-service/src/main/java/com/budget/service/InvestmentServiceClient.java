@@ -5,6 +5,11 @@ import java.util.List;
 import com.budget.dto.ExpenseResponse;
 
 import main.java.com.budget.dto.InvestmentResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
 
 @Component
 public class InvestmentServiceClient {
@@ -14,11 +19,12 @@ public class InvestmentServiceClient {
 
     private final RestClient restClient;
 
+    @Autowired
     public InvestmentServiceClient(RestClient.Builder builder){
         this.restClient = builder.baseUrl(investmentServiceURL).build();
     }
 
-    public List<ExpenseResponse> getInvestmentsByMonth(int year, int month){
+    public List<InvestmentResponse> getInvestmentsByMonth(int year, int month){
         String uri = "/api/investment/report/monthly?year={year}&month={month}";
 
         return restClient.get()

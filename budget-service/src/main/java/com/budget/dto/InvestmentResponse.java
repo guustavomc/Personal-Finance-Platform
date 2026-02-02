@@ -1,10 +1,13 @@
 package main.java.com.budget.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 public class InvestmentResponse {
 
     private long id;
 
-    private InvestmentType investmentType;
+    private String investmentType;
 
     private String assetSymbol;
 
@@ -26,7 +29,7 @@ public class InvestmentResponse {
         return id;
     }
 
-    public InvestmentType getInvestmentType() {
+    public String getInvestmentType() {
         return investmentType;
     }
 
@@ -66,7 +69,7 @@ public class InvestmentResponse {
         this.id = id;
     }
 
-    public void setInvestmentType(InvestmentType investmentType) {
+    public void setInvestmentType(String investmentType) {
         this.investmentType = investmentType;
     }
 
