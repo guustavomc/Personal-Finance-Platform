@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/budgets")
 public class BudgetController {
 
-    @Autowired
     private BudgetService budgetService;
 
+    @Autowired
     public BudgetController(BudgetService budgetService){
         this.budgetService=budgetService;
     }
