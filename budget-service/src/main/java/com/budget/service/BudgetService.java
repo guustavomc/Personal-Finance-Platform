@@ -42,8 +42,8 @@ public class BudgetService {
             newCategory.setType(category.getType());
             newCategory.setPlannedAmount(category.getPlannedAmount());
             newCategory.setPercentageOfTotal(category.getPercentageOfTotal());
-            newCategory.setBudget(budget);
-            budget.getCategories().add(newCategory);
+
+            budget.addCategory(newCategory);
 
         }
 
