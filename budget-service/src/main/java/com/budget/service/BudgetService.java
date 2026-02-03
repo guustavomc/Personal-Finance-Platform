@@ -1,16 +1,16 @@
 package com.budget.service;
 
-import com.budget.dto.BudgetCategoryRequest;
-import com.budget.dto.BudgetResponse;
-import com.budget.dto.CreateBudgetRequest;
-import com.budget.model.Budget;
-import com.budget.model.BudgetCategory;
-import com.budget.model.BudgetStatus;
+import com.budget.dto.*;
+import com.budget.model.*;
 import com.budget.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class BudgetService {
@@ -48,6 +48,88 @@ public class BudgetService {
         }
 
         return mapBudgetToBudgetResponse(budgetRepository.save(budget));
+    }
+
+    private void updateBudgetCategoryActualValues(BudgetCategory category){
+        List<BudgetItem> items =
+                buildBudgetItemsTimeline(
+                        category.getBudget().getStartDate().getYear(),
+                        category.getBudget().getStartDate().getMonthValue());
+
+        for(BudgetItem item: items){
+            if(category.getCategoryName().equals(item.getBudgetItemCategory())){
+                if (category.getType().equals(CategoryType.EXPENSE)){
+                    category.setActualSpent(category.getActualSpent().add(item.getAmount()));
+                }
+                if (category.getType().equals(CategoryType.INVESTMENT)){
+                    category.setActualInvested(category.getActualInvested().add(item.getAmount()));
+                }
+            }
+        }
+
+    }
+
+    private List<BudgetItem> buildBudgetItemsTimeline(int year, int month){
+        List<BudgetItem> expenses = getExpensesFromMonth(year, month);
+        List<BudgetItem> investments = getInvestmentsFromMonth(year, month);
+
+        return Stream
+                .concat(expenses.stream(), investments.stream())
+                .sorted((a,b) -> a.getDate().compareTo(b.getDate()))
+                .toList();
+
+    }
+
+    private List<BudgetItem> getExpensesFromMonth(int year, int month){
+        List<ExpenseResponse> expenses = expenseServiceClient.getExpensesByMonth(year, month);
+        return  expenses.stream().map(item -> mapExpenseResponseToBudgetItem(item)).toList();
+    }
+
+    private List<BudgetItem> getInvestmentsFromMonth(int year, int month){
+        List<InvestmentResponse> investments = investmentServiceClient.getInvestmentsByMonth(year, month);
+        return investments.stream().map(item -> mapInvestmentResponseToBudgetItem(item)).toList();
+    }
+
+    private BudgetItem mapExpenseResponseToBudgetItem(ExpenseResponse expenseResponse){
+        BudgetItem item = new BudgetItem();
+        item.setType(CategoryType.EXPENSE);
+        item.setDescription(expenseResponse.getDescription());
+        item.setBudgetItemCategory(expenseResponse.getCategory());
+        item.setAmount(expenseResponse.getValueSpent());
+        item.setDate(expenseResponse.getDate());
+        item.setAssetSymbol("");
+        item.setAssetTag("");
+        item.setQuantity(BigDecimal.valueOf(0));
+        item.setCurrency(expenseResponse.getCurrency());
+        item.setAlternateAmount(BigDecimal.valueOf(0));
+        item.setAlternateCurrency("");
+        item.setPaymentMethod(expenseResponse.getPaymentMethod());
+        item.setTotalPurchaseValue(expenseResponse.getTotalPurchaseValue());
+        item.setNumberOfInstallments(expenseResponse.getNumberOfInstallments());
+        item.setCurrentInstallment(expenseResponse.getCurrentInstallment());
+        return item;
+
+    }
+
+    private BudgetItem mapInvestmentResponseToBudgetItem(InvestmentResponse investmentResponse){
+        BudgetItem item = new BudgetItem();
+        item.setType(CategoryType.INVESTMENT);
+        item.setDescription("");
+        item.setBudgetItemCategory(investmentResponse.getInvestmentType());
+        item.setAmount(investmentResponse.getAmountInvested());
+        item.setDate(investmentResponse.getInvestmentDate());
+        item.setAssetSymbol(investmentResponse.getAssetSymbol());
+        item.setAssetTag(investmentResponse.getAssetTag());
+        item.setQuantity(investmentResponse.getQuantity());
+        item.setCurrency(investmentResponse.getCurrency());
+        item.setAlternateAmount(BigDecimal.valueOf(0));
+        item.setAlternateCurrency(investmentResponse.getAlternateCurrency());
+        item.setPaymentMethod("");
+        item.setTotalPurchaseValue(investmentResponse.getAmountInvested());
+        item.setNumberOfInstallments(1);
+        item.setCurrentInstallment(1);
+        return item;
+
     }
 
     private LocalDate adjustBudgetEndDate(CreateBudgetRequest createBudgetRequest) {
