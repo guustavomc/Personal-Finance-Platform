@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.budget.dto.ExpenseResponse;
 
-import main.java.com.budget.dto.InvestmentResponse;
+import com.budget.dto.InvestmentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
