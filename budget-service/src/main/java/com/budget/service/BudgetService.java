@@ -1,6 +1,7 @@
 package com.budget.service;
 
 import com.budget.dto.*;
+import com.budget.exception.BudgetNotFoundException;
 import com.budget.model.*;
 import com.budget.repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,17 @@ public class BudgetService {
 
     @Autowired
     private InvestmentServiceClient investmentServiceClient;
+
+    public BudgetResponse findBudgetWithID(Long id){
+        Budget budget = findVerifiedBudgetWithID(id);
+        return mapBudgetToBudgetResponse(budget);
+    }
+
+    public Budget findVerifiedBudgetWithID(Long id){
+        return budgetRepository.findById(id)
+                .orElseThrow(() -> new BudgetNotFoundException(String.format("Failed to find budget with id %d", id)));
+    }
+
 
     public BudgetResponse saveBudget(CreateBudgetRequest createBudgetRequest){
         Budget budget = new Budget();
