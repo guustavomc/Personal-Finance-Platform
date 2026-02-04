@@ -48,6 +48,7 @@ public class BudgetServiceTest {
         budget.setEndDate(LocalDate.of(2026, 2, 28));
         budget.setTotalPlannedAmount(BigDecimal.valueOf(1000));
 
+
         BudgetCategory category1 = new BudgetCategory();
         category1.setId(2L);
         category1.setBudget(budget);
@@ -84,6 +85,7 @@ public class BudgetServiceTest {
         category1.setCategoryName("Food");
         category1.setType(CategoryType.EXPENSE);
         category1.setPlannedAmount(BigDecimal.valueOf(1000));
+        category1.setPercentageOfTotal(BigDecimal.valueOf(50));
 
         List<BudgetCategory> categories = new ArrayList<>();
         categories.add(category1);
@@ -101,6 +103,7 @@ public class BudgetServiceTest {
         createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
         createCategory1.setType(CategoryType.EXPENSE);
         createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
+        createCategory1.setPercentageOfTotal(BigDecimal.valueOf(50));
 
         List<BudgetCategoryRequest> categoriesRequest = new ArrayList<>();
         categoriesRequest.add(createCategory1);
@@ -113,5 +116,6 @@ public class BudgetServiceTest {
         assertEquals(1L,response.getId());
         assertEquals("February", response.getName());
         assertEquals(BigDecimal.valueOf(1000), response.getTotalPlannedAmount());
+        assertEquals(BigDecimal.valueOf(50), response.getCategories().get(0).getPercentageOfTotal());
     }
 }

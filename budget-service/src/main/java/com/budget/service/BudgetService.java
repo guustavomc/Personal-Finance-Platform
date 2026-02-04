@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -66,6 +67,8 @@ public class BudgetService {
         }
     }
 
+
+
     private void updateBudgetCategoryActualValues(BudgetCategory category){
         List<BudgetItem> items =
                 buildBudgetItemsTimeline(
@@ -91,7 +94,7 @@ public class BudgetService {
 
         return Stream
                 .concat(expenses.stream(), investments.stream())
-                .sorted((a,b) -> a.getDate().compareTo(b.getDate()))
+                .sorted(Comparator.comparing(BudgetItem::getDate))
                 .toList();
 
     }
