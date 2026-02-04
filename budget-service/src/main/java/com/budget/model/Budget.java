@@ -35,8 +35,8 @@ public class Budget {
     private BudgetStatus budgetStatus;
 
     private BigDecimal totalPlannedAmount;
-    private BigDecimal totalActualSpent;
-    private BigDecimal totalActualInvested;
+    private BigDecimal totalActualSpent= BigDecimal.ZERO;
+    private BigDecimal totalActualInvested= BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BudgetCategory> categories = new ArrayList<>();

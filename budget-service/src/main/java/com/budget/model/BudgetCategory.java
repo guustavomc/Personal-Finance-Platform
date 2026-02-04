@@ -25,9 +25,9 @@ public class BudgetCategory {
     private BigDecimal plannedAmount;
     private BigDecimal percentageOfTotal;
 
-    private BigDecimal actualSpent;
+    private BigDecimal actualSpent= BigDecimal.ZERO;
 
-    private BigDecimal actualInvested;
+    private BigDecimal actualInvested= BigDecimal.ZERO;
 
     private LocalDateTime lastSynced;
 
