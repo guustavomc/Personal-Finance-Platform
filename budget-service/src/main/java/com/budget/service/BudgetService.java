@@ -36,18 +36,22 @@ public class BudgetService {
 
         budget.setTotalPlannedAmount(createBudgetRequest.getTotalPlannedAmount());
 
+        mapBudgetCategoryRequestToNewBudget(createBudgetRequest, budget);
+
+        return mapBudgetToBudgetResponse(budgetRepository.save(budget));
+    }
+
+    private static void mapBudgetCategoryRequestToNewBudget(CreateBudgetRequest createBudgetRequest, Budget budget) {
         for(BudgetCategoryRequest category: createBudgetRequest.getCategories()){
             BudgetCategory newCategory = new BudgetCategory();
             newCategory.setCategoryName(category.getCategoryName());
             newCategory.setType(category.getType());
             newCategory.setPlannedAmount(category.getPlannedAmount());
-            newCategory.setPercentageOfTotal(category.getPercentageOfTotal());
+            newCategory.setPercentageOfTotal(category.getPercentageOfTotal() != null ?
+                    category.getPercentageOfTotal() : BigDecimal.ZERO);
 
             budget.addCategory(newCategory);
-
         }
-
-        return mapBudgetToBudgetResponse(budgetRepository.save(budget));
     }
 
     private void updateBudgetCategoryActualValues(BudgetCategory category){
