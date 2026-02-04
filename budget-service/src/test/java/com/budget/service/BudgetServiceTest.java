@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +36,35 @@ public class BudgetServiceTest {
 
     @BeforeEach
     public void setup(){
+    }
+
+    @Test
+    void findBudgetWithID_ReturnBudgetResponseWithID(){
+        Budget budget = new Budget();
+        budget.setId(1L);
+        budget.setName("February");
+        budget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        budget.setStartDate(LocalDate.of(2026, 2, 1));
+        budget.setEndDate(LocalDate.of(2026, 2, 28));
+        budget.setTotalPlannedAmount(BigDecimal.valueOf(1000));
+
+        BudgetCategory category1 = new BudgetCategory();
+        category1.setId(2L);
+        category1.setBudget(budget);
+        category1.setCategoryName("Food");
+        category1.setType(CategoryType.EXPENSE);
+        category1.setPlannedAmount(BigDecimal.valueOf(1000));
+
+        List<BudgetCategory> categories = new ArrayList<>();
+        categories.add(category1);
+        budget.setCategories(categories);
+
+        when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
+
+        BudgetResponse response = budgetService.findBudgetWithID(1L);
+        assertEquals(1L, response.getId());
+        assertEquals("February", response.getName());
+        assertEquals("Food", budget.getCategories().get(0).getCategoryName());
     }
 
 
