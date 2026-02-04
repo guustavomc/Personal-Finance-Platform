@@ -81,5 +81,7 @@ public class BudgetServiceTest {
         BudgetResponse response = budgetService.saveBudget(createBudget);
 
         assertEquals(1L,response.getId());
+        assertEquals("February", response.getName());
+        assertEquals(BigDecimal.valueOf(1000), response.getTotalPlannedAmount());
     }
 }
