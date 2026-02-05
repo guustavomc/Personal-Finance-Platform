@@ -1,5 +1,6 @@
-package com.budget.model;
+package com.budget.dto;
 
+import com.budget.model.CategoryType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
