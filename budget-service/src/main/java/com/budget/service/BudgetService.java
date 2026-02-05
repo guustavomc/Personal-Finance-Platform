@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -50,19 +51,48 @@ public class BudgetService {
         return mapBudgetToBudgetResponse(budgetRepository.save(budget));
     }
 
-    private void updateBudgetCategoryActualValues(BudgetCategory category){
-        List<BudgetItem> items = budgetItemService.getBudgetItemsForSpecificBudget(category.getBudget());
+    private void updateBudgetCategoryActualValues(Long budgetId){
+        Budget budget = findVerifiedBudgetWithID(budgetId);
+
+        budget.setTotalActualSpent(BigDecimal.ZERO);
+        budget.setTotalActualInvested(BigDecimal.ZERO);
+
+        for(BudgetCategory category: budget.getCategories()){
+            category.setActualInvested(BigDecimal.ZERO);
+            category.setActualInvested(BigDecimal.ZERO);
+        }
+
+        List<BudgetItem> items = budgetItemService.getBudgetItemsForSpecificBudget(budget);
 
         for(BudgetItem item: items){
-            if(category.getCategoryName().equals(item.getBudgetItemCategory())){
-                if (category.getType().equals(CategoryType.EXPENSE)){
-                    category.setActualSpent(category.getActualSpent().add(item.getAmount()));
+            BudgetCategory matchingCategory = findMatchingCategory(budget, item);
+            if(matchingCategory != null){
+                if (matchingCategory.getType().equals(CategoryType.EXPENSE)){
+                    BigDecimal newExpense = matchingCategory.getActualSpent().add(item.getAmount());
+                    matchingCategory.setActualSpent(newExpense);
+
+                    budget.setTotalActualSpent(budget.getTotalActualSpent().add(newExpense));
                 }
-                if (category.getType().equals(CategoryType.INVESTMENT)){
-                    category.setActualInvested(category.getActualInvested().add(item.getAmount()));
+                if (matchingCategory.getType().equals(CategoryType.INVESTMENT)){
+                    BigDecimal newInvestment = matchingCategory.getActualSpent().add(item.getAmount());
+                    matchingCategory.setActualInvested(newInvestment);
+
+                    budget.setTotalActualInvested(budget.getTotalActualInvested().add(newInvestment));
                 }
             }
         }
+
+        budget.setUpdatedAt(LocalDateTime.now());
+        budgetRepository.save(budget);
+
+    }
+
+    private BudgetCategory findMatchingCategory(Budget budget, BudgetItem item){
+        return budget.getCategories().stream()
+                .filter(category -> category.getType() == item.getType())
+                .filter(category -> category.getCategoryName().equalsIgnoreCase(item.getBudgetItemCategory()))
+                .findFirst()
+                .orElse(null);
 
     }
 
