@@ -58,7 +58,7 @@ public class BudgetService {
         budget.setTotalActualInvested(BigDecimal.ZERO);
 
         for(BudgetCategory category: budget.getCategories()){
-            category.setActualInvested(BigDecimal.ZERO);
+            category.setActualSpent(BigDecimal.ZERO);
             category.setActualInvested(BigDecimal.ZERO);
         }
 
@@ -71,13 +71,13 @@ public class BudgetService {
                     BigDecimal newExpense = matchingCategory.getActualSpent().add(item.getAmount());
                     matchingCategory.setActualSpent(newExpense);
 
-                    budget.setTotalActualSpent(budget.getTotalActualSpent().add(newExpense));
+                    budget.setTotalActualSpent(budget.getTotalActualSpent().add(item.getAmount()));
                 }
                 if (matchingCategory.getType().equals(CategoryType.INVESTMENT)){
-                    BigDecimal newInvestment = matchingCategory.getActualSpent().add(item.getAmount());
+                    BigDecimal newInvestment = matchingCategory.getActualInvested().add(item.getAmount());
                     matchingCategory.setActualInvested(newInvestment);
 
-                    budget.setTotalActualInvested(budget.getTotalActualInvested().add(newInvestment));
+                    budget.setTotalActualInvested(budget.getTotalActualInvested().add(item.getAmount()));
                 }
             }
         }
@@ -90,7 +90,7 @@ public class BudgetService {
     private BudgetCategory findMatchingCategory(Budget budget, BudgetItem item){
         return budget.getCategories().stream()
                 .filter(category -> category.getType() == item.getType())
-                .filter(category -> category.getCategoryName().equalsIgnoreCase(item.getBudgetItemCategory()))
+                .filter(category -> category.getCategoryName().equals(item.getBudgetItemCategory()))
                 .findFirst()
                 .orElse(null);
 
