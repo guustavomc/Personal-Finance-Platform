@@ -4,6 +4,7 @@ import com.budget.dto.*;
 import com.budget.exception.BudgetNotFoundException;
 import com.budget.model.*;
 import com.budget.repository.BudgetRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +29,10 @@ public class BudgetService {
         return mapBudgetToBudgetResponse(budget);
     }
 
-    public Budget findVerifiedBudgetWithID(Long id){
-        return budgetRepository.findById(id)
-                .orElseThrow(() -> new BudgetNotFoundException(String.format("Failed to find budget with id %d", id)));
+    public BudgetResponse findUpdatedBudgetWithID(Long Id){
+        Budget budget = refreshActualValues(Id);
+        return mapBudgetToBudgetResponse(budget);
     }
-
 
     public BudgetResponse saveBudget(CreateBudgetRequest createBudgetRequest){
         Budget budget = new Budget();
@@ -51,7 +51,8 @@ public class BudgetService {
         return mapBudgetToBudgetResponse(budgetRepository.save(budget));
     }
 
-    private void updateBudgetCategoryActualValues(Long budgetId){
+    @Transactional
+    private Budget refreshActualValues(Long budgetId){
         Budget budget = findVerifiedBudgetWithID(budgetId);
 
         budget.setTotalActualSpent(BigDecimal.ZERO);
@@ -83,8 +84,11 @@ public class BudgetService {
         }
 
         budget.setUpdatedAt(LocalDateTime.now());
-        budgetRepository.save(budget);
-
+        return budgetRepository.save(budget);
+    }
+    private Budget findVerifiedBudgetWithID(Long id){
+        return budgetRepository.findById(id)
+                .orElseThrow(() -> new BudgetNotFoundException(String.format("Failed to find budget with id %d", id)));
     }
 
     private BudgetCategory findMatchingCategory(Budget budget, BudgetItem item){
