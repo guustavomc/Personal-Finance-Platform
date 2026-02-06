@@ -1,6 +1,7 @@
 package com.budget.service;
 
 import com.budget.dto.BudgetCategoryRequest;
+import com.budget.dto.BudgetItem;
 import com.budget.dto.BudgetResponse;
 import com.budget.dto.CreateBudgetRequest;
 import com.budget.model.Budget;
@@ -30,6 +31,9 @@ public class BudgetServiceTest {
 
     @Mock
     private BudgetRepository budgetRepository;
+
+    @Mock
+    private BudgetItemService budgetItemService;
 
     @InjectMocks
     private BudgetService budgetService;
@@ -66,6 +70,56 @@ public class BudgetServiceTest {
         assertEquals(1L, response.getId());
         assertEquals("February", response.getName());
         assertEquals("Food", budget.getCategories().get(0).getCategoryName());
+    }
+
+    @Test
+    void findUpdatedBudgetWithID_ReturnBudgetResponseWithID(){
+        Budget budget = new Budget();
+        budget.setId(1L);
+        budget.setName("February");
+        budget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        budget.setStartDate(LocalDate.of(2026, 2, 1));
+        budget.setEndDate(LocalDate.of(2026, 2, 28));
+        budget.setTotalPlannedAmount(BigDecimal.valueOf(1000));
+        budget.setTotalActualSpent(BigDecimal.ZERO);
+        budget.setTotalActualInvested(BigDecimal.ZERO);
+
+
+        BudgetCategory category1 = new BudgetCategory();
+        category1.setId(2L);
+        category1.setBudget(budget);
+        category1.setCategoryName("Food");
+        category1.setType(CategoryType.EXPENSE);
+        category1.setPlannedAmount(BigDecimal.valueOf(1000));
+        category1.setActualSpent(BigDecimal.ZERO);
+
+        List<BudgetCategory> categories = new ArrayList<>();
+        categories.add(category1);
+        budget.setCategories(categories);
+
+        BudgetItem budgetItem = new BudgetItem();
+        budgetItem.setType(CategoryType.EXPENSE);
+        budgetItem.setDescription("Food");
+        budgetItem.setBudgetItemCategory("Food");
+        budgetItem.setAmount(BigDecimal.valueOf(500));
+        budgetItem.setDate(LocalDate.of(2026, 2, 1));
+        budgetItem.setCurrency("BRL");
+        budgetItem.setPaymentMethod("Credit");
+
+        List<BudgetItem> itemList = new ArrayList<>();
+        itemList.add(budgetItem);
+
+
+        when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
+
+        when(budgetItemService.getBudgetItemsForSpecificBudget(budget)).thenReturn(itemList);
+
+        when(budgetRepository.save(any(Budget.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        BudgetResponse refreshedResponse = budgetService.findUpdatedBudgetWithID(1L);
+        assertEquals(1L, refreshedResponse.getId());
+        assertEquals(BigDecimal.valueOf(500), refreshedResponse.getTotalActualSpent());
+
     }
 
 
