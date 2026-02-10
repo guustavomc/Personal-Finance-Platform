@@ -71,7 +71,7 @@ public class BudgetItemService {
     private BudgetItem mapInvestmentResponseToBudgetItem(InvestmentResponse investmentResponse){
         BudgetItem item = new BudgetItem();
         item.setType(CategoryType.INVESTMENT);
-        item.setDescription("");
+        item.setDescription(investmentResponse.getInvestmentType());
         item.setBudgetItemCategory(investmentResponse.getInvestmentType());
         item.setAmount(investmentResponse.getAmountInvested());
         item.setDate(investmentResponse.getInvestmentDate());
