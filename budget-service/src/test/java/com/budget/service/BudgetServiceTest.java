@@ -92,22 +92,44 @@ public class BudgetServiceTest {
         category1.setType(CategoryType.EXPENSE);
         category1.setPlannedAmount(BigDecimal.valueOf(1000));
         category1.setActualSpent(BigDecimal.ZERO);
+        category1.setActualInvested(BigDecimal.ZERO);
+
+        BudgetCategory category2 = new BudgetCategory();
+        category2.setId(3L);
+        category2.setBudget(budget);
+        category2.setCategoryName("Stock");
+        category2.setType(CategoryType.INVESTMENT);
+        category2.setPlannedAmount(BigDecimal.valueOf(1000));
+        category2.setActualSpent(BigDecimal.ZERO);
+        category2.setActualInvested(BigDecimal.ZERO);
+
 
         List<BudgetCategory> categories = new ArrayList<>();
         categories.add(category1);
+        categories.add(category2);
         budget.setCategories(categories);
 
-        BudgetItem budgetItem = new BudgetItem();
-        budgetItem.setType(CategoryType.EXPENSE);
-        budgetItem.setDescription("Food");
-        budgetItem.setBudgetItemCategory("Food");
-        budgetItem.setAmount(BigDecimal.valueOf(500));
-        budgetItem.setDate(LocalDate.of(2026, 2, 1));
-        budgetItem.setCurrency("BRL");
-        budgetItem.setPaymentMethod("Credit");
+        BudgetItem budgetItem1 = new BudgetItem();
+        budgetItem1.setType(CategoryType.EXPENSE);
+        budgetItem1.setDescription("Food");
+        budgetItem1.setBudgetItemCategory("Food");
+        budgetItem1.setAmount(BigDecimal.valueOf(500));
+        budgetItem1.setDate(LocalDate.of(2026, 2, 1));
+        budgetItem1.setCurrency("BRL");
+        budgetItem1.setPaymentMethod("Credit");
+
+        BudgetItem budgetItem2 = new BudgetItem();
+        budgetItem2.setType(CategoryType.INVESTMENT);
+        budgetItem2.setDescription("Stock");
+        budgetItem2.setBudgetItemCategory("Stock");
+        budgetItem2.setAmount(BigDecimal.valueOf(500));
+        budgetItem2.setDate(LocalDate.of(2026, 2, 1));
+        budgetItem2.setCurrency("BRL");
+        budgetItem2.setPaymentMethod("Credit");
 
         List<BudgetItem> itemList = new ArrayList<>();
-        itemList.add(budgetItem);
+        itemList.add(budgetItem1);
+        itemList.add(budgetItem2);
 
 
         when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
@@ -119,6 +141,8 @@ public class BudgetServiceTest {
         BudgetResponse refreshedResponse = budgetService.findUpdatedBudgetWithID(1L);
         assertEquals(1L, refreshedResponse.getId());
         assertEquals(BigDecimal.valueOf(500), refreshedResponse.getTotalActualSpent());
+        assertEquals(BigDecimal.valueOf(500), refreshedResponse.getTotalActualInvested());
+
 
     }
 
