@@ -483,25 +483,15 @@ k8s/
 
 ### API Endpoints
 
-| Method | Endpoint                           | Description                    | Request Body               | Response Body               |
-|--------|------------------------------------|--------------------------------|----------------------------|-----------------------------|
-| GET    | `/api/investment/invest`                  | Retrieve all investments       | None                       | List of `InvestmentResponse` |
-| GET    | `/api/investment/invest/{id}`             | Retrieve investment by ID      | Query param: `id`          | `InvestmentResponse`    |
-| GET    | `/api/investment/invest/type`             | Retrieve investments by type   | Query param: `investmentType`  | List of `InvestmentResponse`   |
-| POST   | `/api/investment/invest`                  | Create a new investment        | `CreateInvestmentRequest ` | `InvestmentResponse`    |
-| PUT    | `/api/investment/invest/{id}`             | Update an existing investment  | `CreateInvestmentRequest `<br/>Query param: `id`  | `InvestmentResponse`   |
-| DELETE | `/api/investment/invest/{id}`             | Delete an investment by ID     | None                       | None (204 No Content)       |
-| GET    | `/api/investment/withdrawal`       | Retrieve all withdrawals       | None                       | List of `WithdrawalResponse` |
-| GET    | `/api/investment/withdrawal/{id}`  | Retrieve withdrawals by ID     | Query param: `id`          | `WithdrawalResponse`    |
-| GET    | `/api/investment/withdrawal/type`  | Retrieve withdrawals by type   | Query param: `investmentType`  | List of `WithdrawalResponse`   |
-| POST   | `/api/investment/withdrawal`       | Create a new withdrawal        | `CreateWithdrawalRequest ` | `WithdrawalResponse`    |
-| PUT    | `/api/investment/withdrawal/{id}`  | Update an existing withdrawal  | `CreateWithdrawalRequest`<br/>Query param: `id` | `WithdrawalResponse`   |
-| DELETE | `/api/investment/withdrawal/{id}`  | Delete an withdrawal by ID     | None                       | None (204 No Content)       |
-| GET    | `api/investment/portfolio/summary` | Retrieve  Investment Portfolio | None                       | `PortfolioSummaryResponse`    |
+| Method | Endpoint                         | Description                    | Request Body               | Response Body               |
+|--------|----------------------------------|--------------------------------|----------------------------|-----------------------------|
+| GET    | `/api/budget/{id}`               | Retrieve Budget by ID          | Query param: `id`          | `BudgetResponse`    |
+| GET    | `/api/budget/{id}/refresh`       | Retrieve Updated Budget by ID  | Query param: `id`           | `BudgetResponse`     |
+| POST   | `/api/budget`         | Create a new Budget            | `CreateBudgetRequest ` | `BudgetResponse`    |
 
 ### Example Request/Response
 
-**Create Investment (POST `/api/investment/invest`)**
+**Create Budget (POST `/api/budget`)**
 
 Request:
 ```json
@@ -556,6 +546,7 @@ spring.jpa.hibernate.ddl-auto=update
 # Optional: Logging
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
+
 ```
 
 
@@ -592,27 +583,29 @@ spring.jpa.properties.hibernate.format_sql=true
     - For this project we load the local investment-api image into Kind:
 
     ```bash
-    docker build -t investment-api .
-    kind load docker-image investment-api:latest --name <cluster-name>
+    docker build -t budget-api .
+    kind load docker-image budget-api:latest --name <cluster-name>
     ```
     - Make sure the image: field in investment-deployment.yaml matches.
 
 
-- **Important**: If you were getting dockerhub image, replace <your-dockerhub-username>/investment-api:latest with your Docker Hub username in the image field.
+- **Important**: If you were getting dockerhub image, replace:
+  - <your-dockerhub-username>/budget-api:latest with your Docker Hub username in the image field.
 
-- If you used the local image with kind load docker-image, use image: expense-api:latest instead.
+- If you used the local image with kind load docker-image, use image: 
+  - budget-api:latest instead.
 
 6. Apply the Manifests:
    ```bash
-   kubectl apply -f k8s/investment-deployment.yaml
-   kubectl apply -f k8s/investment-service.yaml
+   kubectl apply -f k8s/budget-deployment.yaml
+   kubectl apply -f k8s/budget-service.yaml
    ```
 
 7. Expose via NodePort (or Ingress):
-    - Your investment-service.yaml exposes the app on port 30080:
+    - Your budget-service.yaml exposes the app on port 30080:
 
    ```bash
-   kubectl get svc investment-api-service
+   kubectl get svc budget-api-service
    ```
     - You can now access the app at:http://<node-ip>:30080
 
@@ -625,17 +618,17 @@ spring.jpa.properties.hibernate.format_sql=true
    ```
 
 9. For Kind or other local clusters, check the node’s IP:
+
+   - Use the INTERNAL-IP of a node.
    ```bash
    kubectl get nodes -o wide
    ```
-    - Use the INTERNAL-IP of a node.
-
 10. Port Forwarding:
    ```bash
-   kubectl port-forward service/investment-api-service 8080:80
+   kubectl port-forward service/budget-api-service 8080:80
    ```
 
-- Access the API at http://localhost:8080/api/investment.
+   - Access the API at http://localhost:8080/api/budget.
 ### Future Enhancements
 
 This project is actively evolving. The following items are prioritized to make it more secure, scalable, testable, and production-ready.
