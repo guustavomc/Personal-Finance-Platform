@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/budgets")
+@RequestMapping("/api/budget")
 @Validated
 public class BudgetController {
 
