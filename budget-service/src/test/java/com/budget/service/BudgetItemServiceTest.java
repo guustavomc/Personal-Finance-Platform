@@ -89,13 +89,15 @@ public class BudgetItemServiceTest {
         expenseList.add(expenseResponse);
 
         InvestmentResponse investmentResponse = new InvestmentResponse();
-        investmentResponse.setInvestmentType("Stock");
+        investmentResponse.setInvestmentType("STOCK");
         investmentResponse.setAmountInvested(BigDecimal.valueOf(1000));
         investmentResponse.setInvestmentDate(LocalDate.of(2026, 2, 1));
         investmentResponse.setAssetSymbol("NVDA");
-        investmentResponse.setAssetTag("NVDA");
+        investmentResponse.setAssetTag("STOCK|NVDA");
         investmentResponse.setQuantity(BigDecimal.valueOf(1));
         investmentResponse.setCurrency("USD");
+        investmentResponse.setAlternateCurrency("BRL");
+        investmentResponse.setAlternateAmount(BigDecimal.valueOf(5000));
 
         List<InvestmentResponse> investmentList = new ArrayList<>();
         investmentList.add(investmentResponse);
@@ -109,7 +111,8 @@ public class BudgetItemServiceTest {
 
         assertEquals(2, budgetItems.size());
         assertEquals("Food", budgetItems.get(0).getDescription());
-        assertEquals("Stock", budgetItems.get(1).getDescription());
+        assertEquals("STOCK", budgetItems.get(1).getDescription());
+        assertEquals("STOCK|NVDA", budgetItems.get(1).getAssetTag());
 
     }
 
