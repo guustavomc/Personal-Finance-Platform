@@ -70,6 +70,12 @@ public class BudgetServiceTest {
         assertEquals(1L, response.getId());
         assertEquals("February", response.getName());
         assertEquals("Food", budget.getCategories().get(0).getCategoryName());
+        assertEquals(CategoryType.EXPENSE, budget.getCategories().get(0).getType());
+        assertEquals(BigDecimal.valueOf(1000), budget.getCategories().get(0).getPlannedAmount());
+        assertEquals(2L, budget.getCategories().get(0).getId());
+        assertEquals("February", budget.getCategories().get(0).getBudget().getName());
+
+
     }
 
     @Test
