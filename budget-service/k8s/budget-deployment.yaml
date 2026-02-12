@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: budget-api
+  namespace: default
+  labels:
+    app: budget-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: budget-api
+  template:
+    metadata:
+      labels:
+        app: budget-api
+    spec:
+      containers:
+        - name: budget-api
+          image: budget-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: db-secrets

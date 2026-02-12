@@ -430,9 +430,205 @@ spring.jpa.properties.hibernate.format_sql=true
 
 ### Budget Service (Planned)
 
-The Budget Service will allow users to define budgets for specific months or years, integrating with the Expense and Investment Services to track spending and investment allocations.
+The Budget Service allows users to define budgets for specific months or years, integrating with the Expense and Investment Services to track spending and investment allocations.
+
+### Project Structure
+
+```
+src/
+ └── main/
+ │   ├── java/com/budget
+ │   │   ├── BudgetServiceApplication.java          # Main application entry point
+ │   │   │
+ │   │   ├── configuration/
+ │   │   │   └── AuditingConfig.java
+ │   │   ├── controller/
+ │   │   │   └── BudgetController.java              # REST controller for investment endpoints
+ │   │   ├── dto/
+ │   │   │   ├── BudgetCategoryRequest.java         # DTO for creating/updating budget category
+ │   │   │   ├── BudgetItem.java                    # DTO for creating/updating budget item
+ │   │   │   ├── BudgetResponse.java                # DTO for returning Budget information
+ │   │   │   ├── CreateBudgetRequest.java           # DTO for creating Budget
+ │   │   │   ├── ExpenseResponse.java               # DTO for creating Expense data
+ │   │   │   └── InvestmentResponse.java            # DTO for creating Investment data
+ │   │   ├── exception/
+ │   │   │   ├── BudgetNotFoundException.java       # Custom Exception
+ │   │   │   └── GlobalExceptionHandler.java        # Handle responses for exception
+ │   │   ├── model/
+ │   │   │   ├── Budget.java                        # Entity model for Budget
+ │   │   │   ├── BudgetCategory.java                # Model for category for budgets
+ │   │   │   ├── BudgetPeriodType.java              # Model for setting different time periods
+ │   │   │   ├── BudgetStatus.java                  # Enum for setting different status
+ │   │   │   └── CategoryType.java                  # Enum for Expense or Investment category type
+ │   │   ├── repository/
+ │   │   │   └── BudgetRepository.java              # JPA repository for budget persistence
+ │   │   ├── service/
+ │   │   │   ├── BudgetItemService.java             # Business logic for budget item creation
+ │   │   │   ├── BudgetService.java                 # Business logic for Budget operations
+ │   │   │   ├── ExpenseServiceClient.java          # Business logic for consuming Expense info
+ │   │   │   └── InvestmentServiceClient.java       # Business logic for consuming Investment info
+ │   └── resources/
+ │       ├── application.properties                 # Configuration file
+ │       └── ...
+k8s/
+ └───── postgres-deployment.yaml
+ │  └── postgres-service.yaml
+ │  └── db-secrets.yaml
+ │  └── budget-deployment.yaml
+ │  └── budget-service.yaml
+ │
+ db-docker-compose.yaml
+ Dockerfile
+```
+
+### API Endpoints
+
+| Method | Endpoint                         | Description                    | Request Body               | Response Body               |
+|--------|----------------------------------|--------------------------------|----------------------------|-----------------------------|
+| GET    | `/api/budget/{id}`               | Retrieve Budget by ID          | Query param: `id`          | `BudgetResponse`    |
+| GET    | `/api/budget/{id}/refresh`       | Retrieve Updated Budget by ID  | Query param: `id`           | `BudgetResponse`     |
+| POST   | `/api/budget`         | Create a new Budget            | `CreateBudgetRequest ` | `BudgetResponse`    |
+
+### Example Request/Response
+
+**Create Budget (POST `/api/budget`)**
+
+Request:
+```json
+{
+   "investmentType": "STOCK",
+   "assetSymbol": "GOOGL",
+   "amountInvested": 1500.00,
+   "quantity": 4.0,
+   "investmentDate": "2025-08-10",
+   "currency": "USD"
+}
+```
+
+Response:
+```json
+{
+   "id": 2,
+   "investmentType": "STOCK",
+   "assetSymbol": "GOOGL",
+   "amountInvested": 1500.00,
+   "quantity": 4.0,
+   "investmentDate": "2025-08-10",
+   "currency": "USD",
+   "alternateAmount": 0.0,
+   "alternateCurrency": ""
+}
+```
+### Getting Started
+
+#### Prerequisites
+
+- Java 17 or higher
+- Maven 3.8+
+- IDE (e.g., IntelliJ IDEA, Eclipse)
+- Database (configurable via `application.properties`; uses PostgreSQL)
+
+### Configuration
+
+Edit `src/main/resources/application.properties` to configure the database or other settings. Configuration made for Postgres:
+
+```properties
+# PostgreSQL DB Configuration
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# Hibernate
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+
+# Optional: Logging
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+```
 
 
+### Kubernetes cluster deployment
+
+1. Create or start Kind Cluster
+   ```bash
+   kind create cluster --name <cluster-name>
+   ```
+
+2. Create Kubernetes Secret for DB credentials:
+   ```bash
+   kubectl apply -f k8s/db-secrets.yaml
+   ```
+
+3. Deploy PostgreSQL to the cluster:
+   ```bash
+    kubectl apply -f k8s/postgres-deployment.yaml
+    kubectl apply -f k8s/postgres-service.yaml
+   ```
+
+- Optional: check status
+  ```bash
+  kubectl get pods
+  kubectl get svc
+  ```
+
+4. Build the application:
+   ```bash
+   mvn clean package
+   ```
+
+5. Load the Docker Image:
+    - For this project we load the local investment-api image into Kind:
+
+    ```bash
+    docker build -t budget-api .
+    kind load docker-image budget-api:latest --name <cluster-name>
+    ```
+    - Make sure the image: field in investment-deployment.yaml matches.
+
+
+- **Important**: If you were getting dockerhub image, replace:
+  - <your-dockerhub-username>/budget-api:latest with your Docker Hub username in the image field.
+
+- If you used the local image with kind load docker-image, use image: 
+  - budget-api:latest instead.
+
+6. Apply the Manifests:
+   ```bash
+   kubectl apply -f k8s/budget-deployment.yaml
+   kubectl apply -f k8s/budget-service.yaml
+   ```
+
+7. Expose via NodePort (or Ingress):
+    - Your budget-service.yaml exposes the app on port 30080:
+
+   ```bash
+   kubectl get svc budget-api-service
+   ```
+    - You can now access the app at:http://<node-ip>:30080
+
+
+8. Verify the Deployment:
+   ```bash
+    kubectl get deployments
+    kubectl get pods
+    kubectl get services
+   ```
+
+9. For Kind or other local clusters, check the node’s IP:
+
+   - Use the INTERNAL-IP of a node.
+   ```bash
+   kubectl get nodes -o wide
+   ```
+10. Port Forwarding:
+   ```bash
+   kubectl port-forward service/budget-api-service 8080:80
+   ```
+
+   - Access the API at http://localhost:8080/api/budget.
 ### Future Enhancements
 
 This project is actively evolving. The following items are prioritized to make it more secure, scalable, testable, and production-ready.
