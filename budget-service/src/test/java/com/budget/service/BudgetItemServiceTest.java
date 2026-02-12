@@ -84,6 +84,7 @@ public class BudgetItemServiceTest {
         expenseResponse.setTotalPurchaseValue(BigDecimal.valueOf(1000));
         expenseResponse.setNumberOfInstallments(1);
         expenseResponse.setCurrentInstallment(1);
+        expenseResponse.setCurrency("USD");
 
         List<ExpenseResponse> expenseList = new ArrayList<>();
         expenseList.add(expenseResponse);
@@ -111,6 +112,9 @@ public class BudgetItemServiceTest {
 
         assertEquals(2, budgetItems.size());
         assertEquals("Food", budgetItems.get(0).getDescription());
+        assertEquals("USD", budgetItems.get(0).getCurrency());
+
+
         assertEquals("STOCK", budgetItems.get(1).getDescription());
         assertEquals("STOCK|NVDA", budgetItems.get(1).getAssetTag());
 
