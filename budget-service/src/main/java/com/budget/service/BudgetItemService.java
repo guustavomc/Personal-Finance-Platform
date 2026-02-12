@@ -79,7 +79,7 @@ public class BudgetItemService {
         item.setAssetTag(investmentResponse.getAssetTag());
         item.setQuantity(investmentResponse.getQuantity());
         item.setCurrency(investmentResponse.getCurrency());
-        item.setAlternateAmount(BigDecimal.valueOf(0));
+        item.setAlternateAmount(investmentResponse.getAlternateAmount());
         item.setAlternateCurrency(investmentResponse.getAlternateCurrency());
         item.setPaymentMethod("");
         item.setTotalPurchaseValue(investmentResponse.getAmountInvested());

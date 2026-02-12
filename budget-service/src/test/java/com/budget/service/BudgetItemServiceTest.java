@@ -113,10 +113,18 @@ public class BudgetItemServiceTest {
         assertEquals(2, budgetItems.size());
         assertEquals("Food", budgetItems.get(0).getDescription());
         assertEquals("USD", budgetItems.get(0).getCurrency());
-
+        assertEquals("Cash", budgetItems.get(0).getPaymentMethod());
+        assertEquals(BigDecimal.valueOf(1000), budgetItems.get(0).getTotalPurchaseValue());
+        assertEquals(1, budgetItems.get(0).getCurrentInstallment());
+        assertEquals(1, budgetItems.get(0).getNumberOfInstallments());
 
         assertEquals("STOCK", budgetItems.get(1).getDescription());
         assertEquals("STOCK|NVDA", budgetItems.get(1).getAssetTag());
+        assertEquals("NVDA", budgetItems.get(1).getAssetSymbol());
+        assertEquals("BRL", budgetItems.get(1).getAlternateCurrency());
+        assertEquals(BigDecimal.valueOf(5000), budgetItems.get(1).getAlternateAmount());
+        assertEquals(BigDecimal.valueOf(1), budgetItems.get(1).getQuantity());
+
 
     }
 
