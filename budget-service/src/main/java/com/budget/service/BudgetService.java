@@ -91,6 +91,20 @@ public class BudgetService {
                 .orElseThrow(() -> new BudgetNotFoundException(String.format("Failed to find budget with id %d", id)));
     }
 
+    public void removeBudgetWithID(long id){
+        if(!budgetRepository.existsById(id)){
+            throw new BudgetNotFoundException(String.format("Failed to find investment with id %d", id));
+        }
+        else{
+            removeVerifiedBudget(id);
+        }
+    }
+
+    private void removeVerifiedBudget(long id){
+        budgetRepository.deleteById(id);
+    }
+
+
     private BudgetCategory findMatchingCategory(Budget budget, BudgetItem item){
         return budget.getCategories().stream()
                 .filter(category -> category.getType() == item.getType())
@@ -112,8 +126,6 @@ public class BudgetService {
             budget.addCategory(newCategory);
         }
     }
-
-
 
     private LocalDate adjustBudgetEndDate(CreateBudgetRequest createBudgetRequest) {
         LocalDate endDate;
