@@ -24,7 +24,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BudgetServiceTest {
@@ -201,5 +201,17 @@ public class BudgetServiceTest {
         assertEquals("February", response.getName());
         assertEquals(BigDecimal.valueOf(1000), response.getTotalPlannedAmount());
         assertEquals(BigDecimal.valueOf(50), response.getCategories().get(0).getPercentageOfTotal());
+    }
+
+    @Test
+    void removeBudgetWithID_RemovesBudget(){
+        long id = 1L;
+        when(budgetRepository.existsById(id)).thenReturn(true);
+        doNothing().when(budgetRepository).deleteById(id);
+
+        budgetService.removeBudgetWithID(id);
+        verify(budgetRepository, times(1)).existsById(id);
+        verify(budgetRepository, times(1)).deleteById(id);
+
     }
 }
