@@ -2,6 +2,7 @@ package com.budget.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -158,6 +159,18 @@ public class BudgetControllerTest {
         ResponseEntity<BudgetResponse> response = budgetController.createBudget(createBudget);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(1L, response.getBody().getId());
+
+    }
+
+    @Test
+    void deleteBudget_ReturnResponseEntity_WithBudgetResponse(){
+        long id = 1L;
+
+        BudgetResponse budgetResponse = new BudgetResponse();
+
+        doNothing().when(budgetService).removeBudgetWithID(id);
+        ResponseEntity<String> response = budgetController.deleteBudget(id);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
 
     }
     
