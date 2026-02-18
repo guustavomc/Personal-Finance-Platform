@@ -4,6 +4,7 @@ import com.budget.dto.BudgetCategoryRequest;
 import com.budget.dto.BudgetItem;
 import com.budget.dto.BudgetResponse;
 import com.budget.dto.CreateBudgetRequest;
+import com.budget.exception.BudgetNotFoundException;
 import com.budget.model.Budget;
 import com.budget.model.BudgetCategory;
 import com.budget.model.BudgetPeriodType;
@@ -213,5 +214,143 @@ public class BudgetServiceTest {
         verify(budgetRepository, times(1)).existsById(id);
         verify(budgetRepository, times(1)).deleteById(id);
 
+    }
+
+    @Test
+    void removeBudgetWithID_ThrowBudgetNotFoundException_WhenBudgetNotFound(){
+        long id = 1L;
+        when(budgetRepository.existsById(id)).thenReturn(false);
+
+        BudgetNotFoundException exception = assertThrows(
+                BudgetNotFoundException.class,
+                () -> budgetService.removeBudgetWithID(id));
+
+        assertEquals(
+                "Failed to find investment with id 1",
+                exception.getMessage());
+    }
+
+    @Test
+    void editBudgetByID_EditBudget_ReturnBudgetResponse(){
+        Budget budget = new Budget();
+        budget.setId(1L);
+        budget.setName("February");
+        budget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        budget.setStartDate(LocalDate.of(2026, 2, 1));
+        budget.setEndDate(LocalDate.of(2026, 2, 28));
+        budget.setTotalPlannedAmount(BigDecimal.valueOf(1000));
+
+        BudgetCategory category1 = new BudgetCategory();
+        category1.setId(2L);
+        category1.setBudget(budget);
+        category1.setCategoryName("Food");
+        category1.setType(CategoryType.EXPENSE);
+        category1.setPlannedAmount(BigDecimal.valueOf(1000));
+        category1.setPercentageOfTotal(BigDecimal.valueOf(50));
+
+        List<BudgetCategory> categories = new ArrayList<>();
+        categories.add(category1);
+        budget.setCategories(categories);
+
+        CreateBudgetRequest createBudget = new CreateBudgetRequest();
+        createBudget.setName("February");
+        createBudget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        createBudget.setStartDate(LocalDate.of(2026, 2, 1));
+        createBudget.setEndDate(LocalDate.of(2026, 2, 28));
+        createBudget.setTotalPlannedAmount(BigDecimal.valueOf(2000));
+
+        BudgetCategoryRequest createCategory1 = new BudgetCategoryRequest();
+        createCategory1.setCategoryName("Food");
+        createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
+        createCategory1.setType(CategoryType.EXPENSE);
+        createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
+        createCategory1.setPercentageOfTotal(BigDecimal.valueOf(50));
+
+        Budget budget2 = new Budget();
+        budget2.setId(1L);
+        budget2.setName("February");
+        budget2.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        budget2.setStartDate(LocalDate.of(2026, 2, 1));
+        budget2.setEndDate(LocalDate.of(2026, 2, 28));
+        budget2.setTotalPlannedAmount(BigDecimal.valueOf(2000));
+
+        List<BudgetCategoryRequest> categoriesRequest = new ArrayList<>();
+        categoriesRequest.add(createCategory1);
+        createBudget.setCategories(categoriesRequest);
+
+        budget2.setCategories(categories);
+
+        when(budgetRepository.existsById(1L)).thenReturn(true);
+        when(budgetRepository.findById(1L)).thenReturn(Optional.of(budget));
+
+
+        BudgetResponse response = budgetService.editBudgetByID(1L,createBudget);
+
+        assertEquals(1L,response.getId());
+        assertEquals("February", response.getName());
+        assertEquals(BigDecimal.valueOf(2000), response.getTotalPlannedAmount());
+        assertEquals(BigDecimal.valueOf(50), response.getCategories().get(0).getPercentageOfTotal());
+    }
+
+    @Test
+    void editBudgetByID_ThrowBudgetNotFoundException(){
+        Budget budget = new Budget();
+        budget.setId(1L);
+        budget.setName("February");
+        budget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        budget.setStartDate(LocalDate.of(2026, 2, 1));
+        budget.setEndDate(LocalDate.of(2026, 2, 28));
+        budget.setTotalPlannedAmount(BigDecimal.valueOf(1000));
+
+        BudgetCategory category1 = new BudgetCategory();
+        category1.setId(2L);
+        category1.setBudget(budget);
+        category1.setCategoryName("Food");
+        category1.setType(CategoryType.EXPENSE);
+        category1.setPlannedAmount(BigDecimal.valueOf(1000));
+        category1.setPercentageOfTotal(BigDecimal.valueOf(50));
+
+        List<BudgetCategory> categories = new ArrayList<>();
+        categories.add(category1);
+        budget.setCategories(categories);
+
+        CreateBudgetRequest createBudget = new CreateBudgetRequest();
+        createBudget.setName("February");
+        createBudget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        createBudget.setStartDate(LocalDate.of(2026, 2, 1));
+        createBudget.setEndDate(LocalDate.of(2026, 2, 28));
+        createBudget.setTotalPlannedAmount(BigDecimal.valueOf(2000));
+
+        BudgetCategoryRequest createCategory1 = new BudgetCategoryRequest();
+        createCategory1.setCategoryName("Food");
+        createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
+        createCategory1.setType(CategoryType.EXPENSE);
+        createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
+        createCategory1.setPercentageOfTotal(BigDecimal.valueOf(50));
+
+        Budget budget2 = new Budget();
+        budget2.setId(1L);
+        budget2.setName("February");
+        budget2.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        budget2.setStartDate(LocalDate.of(2026, 2, 1));
+        budget2.setEndDate(LocalDate.of(2026, 2, 28));
+        budget2.setTotalPlannedAmount(BigDecimal.valueOf(2000));
+
+        List<BudgetCategoryRequest> categoriesRequest = new ArrayList<>();
+        categoriesRequest.add(createCategory1);
+        createBudget.setCategories(categoriesRequest);
+
+        budget2.setCategories(categories);
+
+        when(budgetRepository.existsById(1L)).thenReturn(false);
+
+
+        BudgetNotFoundException exception = assertThrows(
+                BudgetNotFoundException.class,
+                () -> budgetService.editBudgetByID(1L, createBudget));
+
+        assertEquals(
+                "Failed to find investment with id 1",
+                exception.getMessage());
     }
 }
