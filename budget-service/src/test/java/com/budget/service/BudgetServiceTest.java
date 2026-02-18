@@ -155,7 +155,7 @@ public class BudgetServiceTest {
 
 
     @Test
-    void saveBudget_ReturnBudgetResponse(){
+    void saveBudget_WithDefinedEndDate_ReturnBudgetResponse(){
         Budget budget = new Budget();
         budget.setId(1L);
         budget.setName("February");
@@ -202,6 +202,61 @@ public class BudgetServiceTest {
         assertEquals("February", response.getName());
         assertEquals(BigDecimal.valueOf(1000), response.getTotalPlannedAmount());
         assertEquals(BigDecimal.valueOf(50), response.getCategories().get(0).getPercentageOfTotal());
+        assertEquals(LocalDate.of(2026, 2, 1), response.getStartDate());
+        assertEquals(LocalDate.of(2026, 2, 28), response.getEndDate());
+
+    }
+
+    @Test
+    void saveBudget_WithoutDefinedEndDate_ReturnBudgetResponse(){
+        Budget budget = new Budget();
+        budget.setId(1L);
+        budget.setName("February");
+        budget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        budget.setStartDate(LocalDate.of(2026, 2, 1));
+        budget.setEndDate(LocalDate.of(2026, 2, 28));
+        budget.setTotalPlannedAmount(BigDecimal.valueOf(1000));
+
+        BudgetCategory category1 = new BudgetCategory();
+        category1.setId(2L);
+        category1.setBudget(budget);
+        category1.setCategoryName("Food");
+        category1.setType(CategoryType.EXPENSE);
+        category1.setPlannedAmount(BigDecimal.valueOf(1000));
+        category1.setPercentageOfTotal(BigDecimal.valueOf(50));
+
+        List<BudgetCategory> categories = new ArrayList<>();
+        categories.add(category1);
+        budget.setCategories(categories);
+
+        CreateBudgetRequest createBudget = new CreateBudgetRequest();
+        createBudget.setName("February");
+        createBudget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        createBudget.setStartDate(LocalDate.of(2026, 2, 1));
+        createBudget.setTotalPlannedAmount(BigDecimal.valueOf(1000));
+
+        BudgetCategoryRequest createCategory1 = new BudgetCategoryRequest();
+        createCategory1.setCategoryName("Food");
+        createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
+        createCategory1.setType(CategoryType.EXPENSE);
+        createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
+        createCategory1.setPercentageOfTotal(BigDecimal.valueOf(50));
+
+        List<BudgetCategoryRequest> categoriesRequest = new ArrayList<>();
+        categoriesRequest.add(createCategory1);
+        createBudget.setCategories(categoriesRequest);
+
+
+        when(budgetRepository.save(any(Budget.class))).thenReturn(budget);
+        BudgetResponse response = budgetService.saveBudget(createBudget);
+
+        assertEquals(1L,response.getId());
+        assertEquals("February", response.getName());
+        assertEquals(BigDecimal.valueOf(1000), response.getTotalPlannedAmount());
+        assertEquals(BigDecimal.valueOf(50), response.getCategories().get(0).getPercentageOfTotal());
+        assertEquals(LocalDate.of(2026, 2, 1), response.getStartDate());
+        assertEquals(LocalDate.of(2026, 2, 28), response.getEndDate());
+
     }
 
     @Test
