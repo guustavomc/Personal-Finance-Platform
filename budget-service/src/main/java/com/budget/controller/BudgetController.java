@@ -22,23 +22,18 @@ public class BudgetController {
     @GetMapping({"/{id}"})
     public ResponseEntity<BudgetResponse> getBudgetById(@PathVariable("id") long id) {
         BudgetResponse response = new BudgetResponse();
-        try {
-            response = budgetService.findBudgetWithID(id);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+        response = budgetService.findBudgetWithID(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
     }
 
     @GetMapping({"/{id}/refresh"})
     public ResponseEntity<BudgetResponse> getRefreshedBudgetById(@PathVariable("id") long id) {
         BudgetResponse response = new BudgetResponse();
-        try {
-            response = budgetService.findUpdatedBudgetWithID(id);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+
+        response = budgetService.findUpdatedBudgetWithID(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
     }
 
     @PostMapping
