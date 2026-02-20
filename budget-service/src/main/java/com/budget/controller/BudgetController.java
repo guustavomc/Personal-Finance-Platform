@@ -38,13 +38,9 @@ public class BudgetController {
 
     @PostMapping
     public ResponseEntity<BudgetResponse> createBudget(@Valid @RequestBody CreateBudgetRequest createBudgetRequest) {
-        BudgetResponse response = new BudgetResponse();
-        try {
-            response = budgetService.saveBudget(createBudgetRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+        BudgetResponse response = budgetService.saveBudget(createBudgetRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
     }
 
     @DeleteMapping({"/{id}"})
