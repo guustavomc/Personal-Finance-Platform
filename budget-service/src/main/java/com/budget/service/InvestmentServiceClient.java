@@ -9,12 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-@Component
+@Service
 public class InvestmentServiceClient {
 
-    @Value("${investment.service.url}")
+    @Value("${investment.service.url:}")
     private String investmentServiceURL;
 
     private final RestClient restClient;
