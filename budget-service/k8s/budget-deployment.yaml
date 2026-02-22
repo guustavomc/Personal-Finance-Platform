@@ -24,3 +24,8 @@ spec:
           envFrom:
             - secretRef:
                 name: db-secrets
+          env:
+            - name: EXPENSE_SERVICE_URL
+              value: "http://expense-api-service:8081"
+            - name: INVESTMENT_SERVICE_URL
+              value: "http://investment-api-service:8082"

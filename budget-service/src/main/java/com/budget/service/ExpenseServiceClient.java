@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class ExpenseServiceClient {
 
-    @Value("${expense.service.url}")
+    @Value("${expense.service.url:}")
     private String expenseServiceURL;
 
     private final RestClient restClient;

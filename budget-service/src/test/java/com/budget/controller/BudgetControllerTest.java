@@ -2,12 +2,14 @@ package com.budget.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.budget.dto.BudgetCategoryRequest;
 import com.budget.dto.BudgetItem;
@@ -158,6 +160,79 @@ public class BudgetControllerTest {
         ResponseEntity<BudgetResponse> response = budgetController.createBudget(createBudget);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(1L, response.getBody().getId());
+
+    }
+
+    @Test
+    void deleteBudget_ReturnResponseEntity_WithBudgetResponse(){
+        long id = 1L;
+
+        BudgetResponse budgetResponse = new BudgetResponse();
+
+        doNothing().when(budgetService).removeBudgetWithID(id);
+        ResponseEntity<String> response = budgetController.deleteBudget(id);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    }
+
+    @Test
+    void updateBudget_ReturnsResponseEntity_WithUpdatedBudgetResponse(){
+        Budget budget = new Budget();
+        budget.setId(1L);
+        budget.setName("February");
+        budget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        budget.setStartDate(LocalDate.of(2026, 2, 1));
+        budget.setEndDate(LocalDate.of(2026, 2, 28));
+        budget.setTotalPlannedAmount(BigDecimal.valueOf(1000));
+
+        BudgetCategory category1 = new BudgetCategory();
+        category1.setId(2L);
+        category1.setBudget(budget);
+        category1.setCategoryName("Food");
+        category1.setType(CategoryType.EXPENSE);
+        category1.setPlannedAmount(BigDecimal.valueOf(1000));
+        category1.setPercentageOfTotal(BigDecimal.valueOf(50));
+
+        List<BudgetCategory> categories = new ArrayList<>();
+        categories.add(category1);
+        budget.setCategories(categories);
+
+        CreateBudgetRequest createBudget = new CreateBudgetRequest();
+        createBudget.setName("February");
+        createBudget.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        createBudget.setStartDate(LocalDate.of(2026, 2, 1));
+        createBudget.setEndDate(LocalDate.of(2026, 2, 28));
+        createBudget.setTotalPlannedAmount(BigDecimal.valueOf(2000));
+
+        BudgetCategoryRequest createCategory1 = new BudgetCategoryRequest();
+        createCategory1.setCategoryName("Food");
+        createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
+        createCategory1.setType(CategoryType.EXPENSE);
+        createCategory1.setPlannedAmount(BigDecimal.valueOf(1000));
+        createCategory1.setPercentageOfTotal(BigDecimal.valueOf(50));
+
+        BudgetResponse budget2 = new BudgetResponse();
+        budget2.setId(1L);
+        budget2.setName("February");
+        budget2.setBudgetPeriodType(BudgetPeriodType.MONTHLY);
+        budget2.setStartDate(LocalDate.of(2026, 2, 1));
+        budget2.setEndDate(LocalDate.of(2026, 2, 28));
+        budget2.setTotalPlannedAmount(BigDecimal.valueOf(2000));
+
+        List<BudgetCategoryRequest> categoriesRequest = new ArrayList<>();
+        categoriesRequest.add(createCategory1);
+        createBudget.setCategories(categoriesRequest);
+
+        budget2.setCategories(categories);
+
+        when(budgetService.editBudgetByID(1L, createBudget)).thenReturn(budget2);
+
+        ResponseEntity<BudgetResponse> response = budgetController.updateBudget(1L,createBudget);
+
+        assertEquals(1L,response.getBody().getId());
+        assertEquals("February", response.getBody().getName());
+        assertEquals(BigDecimal.valueOf(2000), response.getBody().getTotalPlannedAmount());
+        assertEquals(BigDecimal.valueOf(50), response.getBody().getCategories().get(0).getPercentageOfTotal());
 
     }
     

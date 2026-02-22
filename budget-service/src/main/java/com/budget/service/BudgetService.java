@@ -86,10 +86,47 @@ public class BudgetService {
         budget.setUpdatedAt(LocalDateTime.now());
         return budgetRepository.save(budget);
     }
+
+    public void removeBudgetWithID(long id){
+        if(!budgetRepository.existsById(id)){
+            throw new BudgetNotFoundException(String.format("Failed to find investment with id %d", id));
+        }
+        else{
+            removeVerifiedBudget(id);
+        }
+    }
+
+    private void removeVerifiedBudget(long id){
+        budgetRepository.deleteById(id);
+    }
+
+    public BudgetResponse editBudgetByID(long id, CreateBudgetRequest createBudgetRequest){
+        if(!budgetRepository.existsById(id)){
+            throw new BudgetNotFoundException(String.format("Failed to find investment with id %d", id));
+        }
+        else{
+            Budget budget = editVerifiedBudgetByID(id, createBudgetRequest);
+            return mapBudgetToBudgetResponse(budget);
+        }
+    }
+
+    private Budget editVerifiedBudgetByID(long id, CreateBudgetRequest createBudgetRequest){
+        Budget budget = findVerifiedBudgetWithID(id);
+
+        budget.setName(createBudgetRequest.getName());
+        budget.setBudgetPeriodType(createBudgetRequest.getBudgetPeriodType());
+        budget.setStartDate(createBudgetRequest.getStartDate());
+        budget.setEndDate(createBudgetRequest.getEndDate());
+        budget.setTotalPlannedAmount(createBudgetRequest.getTotalPlannedAmount());
+        mapBudgetCategoryRequestToNewBudget(createBudgetRequest, budget);
+        return budget;
+    }
+
     private Budget findVerifiedBudgetWithID(Long id){
         return budgetRepository.findById(id)
                 .orElseThrow(() -> new BudgetNotFoundException(String.format("Failed to find budget with id %d", id)));
     }
+
 
     private BudgetCategory findMatchingCategory(Budget budget, BudgetItem item){
         return budget.getCategories().stream()
@@ -112,8 +149,6 @@ public class BudgetService {
             budget.addCategory(newCategory);
         }
     }
-
-
 
     private LocalDate adjustBudgetEndDate(CreateBudgetRequest createBudgetRequest) {
         LocalDate endDate;
