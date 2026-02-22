@@ -428,7 +428,7 @@ spring.jpa.properties.hibernate.format_sql=true
 - Access the API at http://localhost:8080/api/investment.
 
 
-### Budget Service (Planned)
+### Budget Service
 
 The Budget Service allows users to define budgets for specific months or years, integrating with the Expense and Investment Services to track spending and investment allocations.
 
@@ -483,11 +483,14 @@ k8s/
 
 ### API Endpoints
 
-| Method | Endpoint                         | Description                    | Request Body               | Response Body               |
-|--------|----------------------------------|--------------------------------|----------------------------|-----------------------------|
-| GET    | `/api/budget/{id}`               | Retrieve Budget by ID          | Query param: `id`          | `BudgetResponse`    |
-| GET    | `/api/budget/{id}/refresh`       | Retrieve Updated Budget by ID  | Query param: `id`           | `BudgetResponse`     |
-| POST   | `/api/budget`         | Create a new Budget            | `CreateBudgetRequest ` | `BudgetResponse`    |
+| Method | Endpoint                   | Description                   | Request Body               | Response Body               |
+|--------|----------------------------|-------------------------------|----------------------------|-----------------------------|
+| GET    | `/api/budget/{id}`         | Retrieve Budget by ID         | Query param: `id`          | `BudgetResponse`    |
+| GET    | `/api/budget/{id}/refresh` | Retrieve Updated Budget by ID | Query param: `id`           | `BudgetResponse`     |
+| POST   | `/api/budget`              | Create a new Budget           | `CreateBudgetRequest ` | `BudgetResponse`    |
+| DELETE | `/api/budget/{id}`         | Delete Budget by ID           | Query param: `id` | None (204 No Content)|
+| PUT | `/api/budget/{id}`         | Update Budget by ID           | `CreateBudgetRequest `Query param: `id` | `BudgetResponse`|
+
 
 ### Example Request/Response
 
@@ -496,27 +499,47 @@ k8s/
 Request:
 ```json
 {
-   "investmentType": "STOCK",
-   "assetSymbol": "GOOGL",
-   "amountInvested": 1500.00,
-   "quantity": 4.0,
-   "investmentDate": "2025-08-10",
-   "currency": "USD"
+  "name": "Budget Test",
+  "budgetPeriodType": "MONTHLY",
+  "startDate": "2026-04-01",
+  "totalPlannedAmount": 3000.00,
+  "categories": [
+    {
+      "categoryName": "Rent",
+      "plannedAmount": 1200.00,
+      "type": "EXPENSE"
+    }
+  ]
 }
 ```
 
 Response:
 ```json
 {
-   "id": 2,
-   "investmentType": "STOCK",
-   "assetSymbol": "GOOGL",
-   "amountInvested": 1500.00,
-   "quantity": 4.0,
-   "investmentDate": "2025-08-10",
-   "currency": "USD",
-   "alternateAmount": 0.0,
-   "alternateCurrency": ""
+  "budgetPeriodType": "MONTHLY",
+  "budgetStatus": "ACTIVE",
+  "categories": [
+    {
+      "actualInvested": 0,
+      "actualSpent": 0,
+      "categoryName": "Rent",
+      "id": 24,
+      "lastSynced": null,
+      "percentageOfTotal": 0,
+      "plannedAmount": 1200.00,
+      "type": "EXPENSE"
+    }
+  ],
+  "createdAt": null,
+  "endDate": "2026-04-30",
+  "id": 9,
+  "name": "Budget Test",
+  "startDate": "2026-04-01",
+  "totalActualInvested": 0,
+  "totalActualSpent": 0,
+  "totalPlannedAmount": 3000.00,
+  "updatedAt": null,
+  "userId": null
 }
 ```
 ### Getting Started
