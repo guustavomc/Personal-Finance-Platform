@@ -1,16 +1,15 @@
 ﻿# Personal-Finance-Platform
 
-A RESTful API platform for managing personal finances, built with Spring Boot. This project enables users to create and manage monthly/yearly budgets, track expenses, and handle investments through a microservices architecture. The platform is designed to be scalable, testable, and extensible, with plans to incorporate Spring Security for authentication and authorization in future iterations.
+A RESTful API platform for managing personal finances, built with Spring Boot. This project enables users to create and manage monthly/yearly budgets, track expenses, and handle investments through a microservices architecture. The platform is designed to be scalable, testable, and extensible, with JWT-based authentication and authorization handled by a dedicated Auth Service.
 
 ## Project Overview
 
-The Personal-Finance-Platform consists of three microservices:
+The Personal-Finance-Platform consists of four microservices:
 
+- **Auth Service**: Handles user registration and login, issuing JWT tokens used to authenticate requests across the platform.
 - **Budget Service**: Responsible for creating and managing budgets for specific months or years. It orchestrates interactions with the Expense and Investment Services.
 - **Expense Service**: Manages expense records, including creating, retrieving, updating, and deleting expenses. This service is called directly by the Budget Service.
 - **Investment Service**: Handles investment tracking and management, also called directly by the Budget Service.
-
-Currently, only the **Expense Service** is implemented. The Budget and Investment Services are planned for future development.
 
 ## Tech Stack
 
@@ -23,6 +22,130 @@ Currently, only the **Expense Service** is implemented. The Budget and Investmen
 - **Future Plans**: Spring Security, Docker, API Gateway, Service Discovery
 
 # Detailed Description of Each Service
+
+## Auth Service
+
+The Auth Service is responsible for user registration and authentication. It issues signed JWT tokens upon successful login or registration, which must be included in the `Authorization` header of requests to protected endpoints across the platform.
+
+### Features
+
+- Register a new user with username, email, and password.
+- Authenticate an existing user and receive a signed JWT token.
+- Passwords are hashed using BCrypt — plain-text passwords are never stored.
+- Token validation is handled via a per-request filter, keeping other services stateless.
+- Role-based access control support with `USER` and `ADMIN` roles.
+
+### Project Structure
+
+```
+src/
+ └── main/
+ │   ├── java/com/auth
+ │   │   ├── AuthServiceApplication.java          # Main application entry point
+ │   │   │
+ │   │   ├── config/
+ │   │   │   └── SecurityConfig.java              # Spring Security and filter chain configuration
+ │   │   ├── controller/
+ │   │   │   └── AuthController.java              # REST controller for auth endpoints
+ │   │   ├── dto/
+ │   │   │   ├── RegisterRequest.java             # DTO for registration input
+ │   │   │   ├── LoginRequest.java                # DTO for login input
+ │   │   │   └── AuthResponse.java                # DTO for token response
+ │   │   ├── entity/
+ │   │   │   ├── User.java                        # Entity model for users
+ │   │   │   └── Role.java                        # Enum for user roles (USER, ADMIN)
+ │   │   ├── repository/
+ │   │   │   └── UserRepository.java              # JPA repository for user persistence
+ │   │   ├── security/
+ │   │   │   ├── JwtFilter.java                   # Per-request JWT validation filter
+ │   │   │   └── JwtUtil.java                     # JWT generation and parsing utilities
+ │   │   ├── service/
+ │   │   │   └── AuthService.java                 # Business logic for register and login
+ │   └── resources/
+ │       ├── application.properties               # Configuration file
+ │       └── ...
+```
+
+### API Endpoints
+
+| Method | Endpoint         | Description                              | Request Body      | Response Body  |
+|--------|------------------|------------------------------------------|-------------------|----------------|
+| POST   | `/auth/register` | Register a new user                      | `RegisterRequest` | `AuthResponse` |
+| POST   | `/auth/login`    | Authenticate a user and receive a token  | `LoginRequest`    | `AuthResponse` |
+
+### Example Request/Response
+
+**Register (POST `/auth/register`)**
+
+Request:
+```json
+{
+  "username": "john",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+Response:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "username": "john",
+  "role": "USER"
+}
+```
+
+**Login (POST `/auth/login`)**
+
+Request:
+```json
+{
+  "username": "john",
+  "password": "password123"
+}
+```
+
+Response:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "username": "john",
+  "role": "USER"
+}
+```
+
+### Getting Started
+
+#### Prerequisites
+
+- Java 17 or higher
+- Maven 3.8+
+- IDE (e.g., IntelliJ IDEA, Eclipse)
+- Database (configurable via `application.properties`; uses PostgreSQL)
+
+### Configuration
+
+Edit `src/main/resources/application.properties` to configure the database and JWT settings:
+
+```properties
+# PostgreSQL DB Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/finance_db
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# Hibernate
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+
+# JWT
+jwt.secret=your-secret-key-at-least-32-characters-long
+jwt.expiration=3600000
+```
+
+> The JWT secret must be at least 32 characters for HMAC-SHA256. In production, inject it via an environment variable rather than hardcoding it.
+
+---
 
 ## Expense Service
 
@@ -656,13 +779,10 @@ spring.jpa.properties.hibernate.format_sql=true
 
 This project is actively evolving. The following items are prioritized to make it more secure, scalable, testable, and production-ready.
 
-#### 1. Authentication & Authorization (Top Priority)
-- Implement **Spring Security** + **JWT** for secure token-based auth.
-- Secure all endpoints (users can only access their own expenses, budgets, and investments).
-- Add roles (**USER**, **ADMIN**) with role-based access control.
-- Use `@PreAuthorize` annotations or method-level security for fine-grained permissions.
-
-*Why?* Authentication is essential for any real-world finance app and is a common interview/portfolio expectation.
+#### 1. Inter-Service Authentication (Top Priority)
+- Propagate the JWT token from the Auth Service to Expense, Investment, and Budget Service requests.
+- Secure all endpoints so users can only access their own data (filter by `userId` extracted from the token).
+- Use `@PreAuthorize` annotations or method-level security for fine-grained role-based access control.
 
 #### 2. Complete Microservices Architecture
 - Finish **Investment Service** (full CRUD + basic portfolio reporting/summaries).
