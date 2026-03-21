@@ -23,130 +23,6 @@ The Personal-Finance-Platform consists of four microservices:
 
 # Detailed Description of Each Service
 
-## Auth Service
-
-The Auth Service is responsible for user registration and authentication. It issues signed JWT tokens upon successful login or registration, which must be included in the `Authorization` header of requests to protected endpoints across the platform.
-
-### Features
-
-- Register a new user with username, email, and password.
-- Authenticate an existing user and receive a signed JWT token.
-- Passwords are hashed using BCrypt — plain-text passwords are never stored.
-- Token validation is handled via a per-request filter, keeping other services stateless.
-- Role-based access control support with `USER` and `ADMIN` roles.
-
-### Project Structure
-
-```
-src/
- └── main/
- │   ├── java/com/auth
- │   │   ├── AuthServiceApplication.java          # Main application entry point
- │   │   │
- │   │   ├── config/
- │   │   │   └── SecurityConfig.java              # Spring Security and filter chain configuration
- │   │   ├── controller/
- │   │   │   └── AuthController.java              # REST controller for auth endpoints
- │   │   ├── dto/
- │   │   │   ├── RegisterRequest.java             # DTO for registration input
- │   │   │   ├── LoginRequest.java                # DTO for login input
- │   │   │   └── AuthResponse.java                # DTO for token response
- │   │   ├── entity/
- │   │   │   ├── User.java                        # Entity model for users
- │   │   │   └── Role.java                        # Enum for user roles (USER, ADMIN)
- │   │   ├── repository/
- │   │   │   └── UserRepository.java              # JPA repository for user persistence
- │   │   ├── security/
- │   │   │   ├── JwtFilter.java                   # Per-request JWT validation filter
- │   │   │   └── JwtUtil.java                     # JWT generation and parsing utilities
- │   │   ├── service/
- │   │   │   └── AuthService.java                 # Business logic for register and login
- │   └── resources/
- │       ├── application.properties               # Configuration file
- │       └── ...
-```
-
-### API Endpoints
-
-| Method | Endpoint         | Description                              | Request Body      | Response Body  |
-|--------|------------------|------------------------------------------|-------------------|----------------|
-| POST   | `/auth/register` | Register a new user                      | `RegisterRequest` | `AuthResponse` |
-| POST   | `/auth/login`    | Authenticate a user and receive a token  | `LoginRequest`    | `AuthResponse` |
-
-### Example Request/Response
-
-**Register (POST `/auth/register`)**
-
-Request:
-```json
-{
-  "username": "john",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-Response:
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "username": "john",
-  "role": "USER"
-}
-```
-
-**Login (POST `/auth/login`)**
-
-Request:
-```json
-{
-  "username": "john",
-  "password": "password123"
-}
-```
-
-Response:
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "username": "john",
-  "role": "USER"
-}
-```
-
-### Getting Started
-
-#### Prerequisites
-
-- Java 17 or higher
-- Maven 3.8+
-- IDE (e.g., IntelliJ IDEA, Eclipse)
-- Database (configurable via `application.properties`; uses PostgreSQL)
-
-### Configuration
-
-Edit `src/main/resources/application.properties` to configure the database and JWT settings:
-
-```properties
-# PostgreSQL DB Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/finance_db
-spring.datasource.username=your_username
-spring.datasource.password=your_password
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# Hibernate
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
-spring.jpa.hibernate.ddl-auto=update
-
-# JWT
-jwt.secret=your-secret-key-at-least-32-characters-long
-jwt.expiration=3600000
-```
-
-> The JWT secret must be at least 32 characters for HMAC-SHA256. In production, inject it via an environment variable rather than hardcoding it.
-
----
-
 ## Expense Service
 
 The Expense Service is a fully implemented microservice responsible for managing expense records. It provides endpoints for creating, retrieving, updating, and deleting expenses, as well as filtering expenses by category or month.
@@ -775,25 +651,144 @@ spring.jpa.properties.hibernate.format_sql=true
    ```
 
    - Access the API at http://localhost:8080/api/budget.
+
+## Auth Service
+
+The Auth Service is responsible for user registration and authentication. It issues signed JWT tokens upon successful login or registration, which must be included in the `Authorization` header of requests to protected endpoints across the platform.
+
+### Features
+
+- Register a new user with username, email, and password.
+- Authenticate an existing user and receive a signed JWT token.
+- Passwords are hashed using BCrypt — plain-text passwords are never stored.
+- Token validation is handled via a per-request filter, keeping other services stateless.
+- Role-based access control support with `USER` and `ADMIN` roles.
+
+### Project Structure
+
+```
+src/
+ └── main/
+ │   ├── java/com/auth
+ │   │   ├── AuthServiceApplication.java          # Main application entry point
+ │   │   │
+ │   │   ├── config/
+ │   │   │   └── SecurityConfig.java              # Spring Security and filter chain configuration
+ │   │   ├── controller/
+ │   │   │   └── AuthController.java              # REST controller for auth endpoints
+ │   │   ├── dto/
+ │   │   │   ├── RegisterRequest.java             # DTO for registration input
+ │   │   │   ├── LoginRequest.java                # DTO for login input
+ │   │   │   └── AuthResponse.java                # DTO for token response
+ │   │   ├── entity/
+ │   │   │   ├── User.java                        # Entity model for users
+ │   │   │   └── Role.java                        # Enum for user roles (USER, ADMIN)
+ │   │   ├── repository/
+ │   │   │   └── UserRepository.java              # JPA repository for user persistence
+ │   │   ├── security/
+ │   │   │   ├── JwtFilter.java                   # Per-request JWT validation filter
+ │   │   │   └── JwtUtil.java                     # JWT generation and parsing utilities
+ │   │   ├── service/
+ │   │   │   └── AuthService.java                 # Business logic for register and login
+ │   └── resources/
+ │       ├── application.properties               # Configuration file
+ │       └── ...
+```
+
+### API Endpoints
+
+| Method | Endpoint         | Description                              | Request Body      | Response Body  |
+|--------|------------------|------------------------------------------|-------------------|----------------|
+| POST   | `/auth/register` | Register a new user                      | `RegisterRequest` | `AuthResponse` |
+| POST   | `/auth/login`    | Authenticate a user and receive a token  | `LoginRequest`    | `AuthResponse` |
+
+### Example Request/Response
+
+**Register (POST `/auth/register`)**
+
+Request:
+```json
+{
+  "username": "john",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+Response:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "username": "john",
+  "role": "USER"
+}
+```
+
+**Login (POST `/auth/login`)**
+
+Request:
+```json
+{
+  "username": "john",
+  "password": "password123"
+}
+```
+
+Response:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "username": "john",
+  "role": "USER"
+}
+```
+
+### Getting Started
+
+#### Prerequisites
+
+- Java 17 or higher
+- Maven 3.8+
+- IDE (e.g., IntelliJ IDEA, Eclipse)
+- Database (configurable via `application.properties`; uses PostgreSQL)
+
+### Configuration
+
+Edit `src/main/resources/application.properties` to configure the database and JWT settings:
+
+```properties
+# PostgreSQL DB Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/finance_db
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# Hibernate
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+
+# JWT
+jwt.secret=your-secret-key-at-least-32-characters-long
+jwt.expiration=3600000
+```
+
+> The JWT secret must be at least 32 characters for HMAC-SHA256. In production, inject it via an environment variable rather than hardcoding it.
+
+---
 ### Future Enhancements
 
 This project is actively evolving. The following items are prioritized to make it more secure, scalable, testable, and production-ready.
 
-#### 1. Inter-Service Authentication (Top Priority)
-- Propagate the JWT token from the Auth Service to Expense, Investment, and Budget Service requests.
-- Secure all endpoints so users can only access their own data (filter by `userId` extracted from the token).
-- Use `@PreAuthorize` annotations or method-level security for fine-grained role-based access control.
-
-#### 2. Complete Microservices Architecture
+#### 1. Complete Microservices Architecture
 - Finish **Investment Service** (full CRUD + basic portfolio reporting/summaries).
 - Implement **Budget Service** as the orchestrator (coordinates Expense and Investment Services).
 - Add reliable service-to-service communication (e.g., via **RestTemplate**, **Feign Client**, or **WebClient** for now; async later).
 
-#### 3. Testing Improvements
+#### 2. Testing Improvements
 - Add comprehensive **integration tests** using `@SpringBootTest` + **Testcontainers** for PostgreSQL.
 - Expand unit test coverage (aim for 80%+ on services and controllers).
 
-#### 4. Clean Code & Design Documentation
+#### 3. Clean Code & Design Documentation
 - Apply and enforce **SOLID principles** more explicitly:
    - **Single Responsibility** — already strong with separated concerns.
    - **Open-Closed** — introduce interfaces/abstract classes (e.g., `ReportStrategy` for extensible reporting).
@@ -801,12 +796,12 @@ This project is actively evolving. The following items are prioritized to make i
 - Implement common **design patterns** (Factory for report generators, Strategy for calculations, Repository via Spring Data).
 - Add a new **"Design Decisions"** section in the README explaining 2–3 key principles/patterns with code references.
 
-#### 5. Concurrency & Performance Basics
+#### 4. Concurrency & Performance Basics
 - Introduce `@Async` methods for non-blocking tasks (e.g., background report generation or email notifications).
 - Use `CompletableFuture` for parallel fetches (e.g., combining expense + investment data in Budget Service).
 - Document thread-safety measures and potential race conditions handled.
 
-#### 6. Developer Experience & Quick Wins
+#### 5. Developer Experience & Quick Wins
 - Add **Swagger/OpenAPI** documentation using springdoc-openapi (auto-generated interactive docs).
 - Implement **caching** on summary/report endpoints with `@Cacheable` (Caffeine or Ehcache).
 - Set up **Docker Compose** for easy local multi-service + PostgreSQL spin-up.
@@ -815,7 +810,7 @@ This project is actively evolving. The following items are prioritized to make i
    - Full deployment instructions (including multi-service).
    - Exported Postman collection for API testing.
 
-#### 7. Advanced Scalability (Stretch Goals)
+#### 6. Advanced Scalability (Stretch Goals)
 - Replace direct/synchronous service calls with **event-driven communication** using **Kafka** or **RabbitMQ** (e.g., publish expense/investment events for Budget Service to consume).
 - Add **API Gateway** (Spring Cloud Gateway) + service discovery (Eureka/Consul).
 - Introduce distributed tracing (Micrometer + Zipkin) and monitoring basics.
