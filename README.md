@@ -799,59 +799,47 @@ jwt.expiration=3600000
   kubectl get svc
   ```
 
-4. Build the application:
-   ```bash
-   mvn clean package
-   ```
-
-5. Load the Docker Image:
-   - For this project we load the local expense-api image into Kind:
+4. Load the Docker Image:
+   - Build and load the local auth-api image into Kind:
 
     ```bash
-    docker build -t auth-api .
+    docker build -t auth-api:latest ./auth-service
     kind load docker-image auth-api:latest --name <cluster-name>
     ```
-   - Make sure the image: field in auth-deployment.yaml matches.
-   
+   - Make sure the `image:` field in `auth-deployment.yaml` matches (`auth-api:latest`).
 
-   - **Important**: If you were getting dockerhub image, replace <your-dockerhub-username>/expense-api:latest with your Docker Hub username in the image field. 
-   
-   - If you used the local image with kind load docker-image, use image: expense-api:latest instead.
-
-6. Apply the Manifests:
+5. Apply the Manifests:
    ```bash
    kubectl apply -f k8s/auth-deployment.yaml
    kubectl apply -f k8s/auth-service.yaml
    ```
 
-7. Expose via NodePort (or Ingress):
+6. Expose via NodePort (or Ingress):
    - Your auth-service.yaml exposes the app on port 30080:
 
    ```bash
    kubectl get svc auth-api-service
    ```
-   - You can now access the app at:http://<node-ip>:30080
-   
+   - You can now access the app at: http://<node-ip>:30080
 
-8. Verify the Deployment:
+7. Verify the Deployment:
    ```bash
-    kubectl get deployments
-    kubectl get pods
-    kubectl get services
+   kubectl get deployments
+   kubectl get pods
+   kubectl get services
    ```
 
-9. For Kind or other local clusters, check the node’s IP:
+8. For Kind or other local clusters, check the node’s IP:
    ```bash
    kubectl get nodes -o wide
    ```
    - Use the INTERNAL-IP of a node.
 
-
-10. Port Forwarding:
+9. Port Forwarding:
    ```bash
    kubectl port-forward service/auth-api-service 8081:80
    ```
-- Access the API at http://localhost:8081/api/auth.
+- Access the API at http://localhost:8081/auth (e.g. `POST /auth/register`, `POST /auth/login`).
 ---
 ### Future Enhancements
 
