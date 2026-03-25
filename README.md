@@ -774,6 +774,84 @@ jwt.expiration=3600000
 
 > The JWT secret must be at least 32 characters for HMAC-SHA256. In production, inject it via an environment variable rather than hardcoding it.
 
+
+### Kubernetes cluster deployment
+
+1. Create or start Kind Cluster
+   ```bash
+   kind create cluster --name <cluster-name>
+   ```
+
+2. Create Kubernetes Secret for DB credentials:
+   ```bash
+   kubectl apply -f k8s/db-secrets.yaml
+   ```
+
+3. Deploy PostgreSQL to the cluster:
+   ```bash
+    kubectl apply -f k8s/postgres-deployment.yaml
+    kubectl apply -f k8s/postgres-service.yaml
+   ```
+   
+- Optional: check status
+  ```bash
+  kubectl get pods
+  kubectl get svc
+  ```
+
+4. Build the application:
+   ```bash
+   mvn clean package
+   ```
+
+5. Load the Docker Image:
+   - For this project we load the local expense-api image into Kind:
+
+    ```bash
+    docker build -t auth-api .
+    kind load docker-image auth-api:latest --name <cluster-name>
+    ```
+   - Make sure the image: field in auth-deployment.yaml matches.
+   
+
+   - **Important**: If you were getting dockerhub image, replace <your-dockerhub-username>/expense-api:latest with your Docker Hub username in the image field. 
+   
+   - If you used the local image with kind load docker-image, use image: expense-api:latest instead.
+
+6. Apply the Manifests:
+   ```bash
+   kubectl apply -f k8s/auth-deployment.yaml
+   kubectl apply -f k8s/auth-service.yaml
+   ```
+
+7. Expose via NodePort (or Ingress):
+   - Your auth-service.yaml exposes the app on port 30080:
+
+   ```bash
+   kubectl get svc auth-api-service
+   ```
+   - You can now access the app at:http://<node-ip>:30080
+   
+
+8. Verify the Deployment:
+   ```bash
+    kubectl get deployments
+    kubectl get pods
+    kubectl get services
+   ```
+
+9. For Kind or other local clusters, check the node’s IP:
+   ```bash
+   kubectl get nodes -o wide
+   ```
+   - Use the INTERNAL-IP of a node.
+
+
+10. Port Forwarding:
+   ```bash
+   kubectl port-forward service/auth-api-service 8081:80
+   ```
+- Access the API at http://localhost:8081/api/auth.
 ---
 ### Future Enhancements
 
