@@ -803,7 +803,8 @@ jwt.expiration=3600000
    - Build and load the local auth-api image into Kind:
 
     ```bash
-    docker build -t auth-api:latest ./auth-service
+    docker build -t auth-api .
+
     kind load docker-image auth-api:latest --name <cluster-name>
     ```
    - Make sure the `image:` field in `auth-deployment.yaml` matches (`auth-api:latest`).
