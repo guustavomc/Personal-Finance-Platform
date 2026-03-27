@@ -196,12 +196,12 @@ spring.jpa.properties.hibernate.format_sql=true
    ```
 
 7. Expose via NodePort (or Ingress):
-   - Your expense-service.yaml exposes the app on port 30080:
+   - Your expense-service.yaml exposes the app on port 30081:
 
    ```bash
    kubectl get svc expense-api-service
    ```
-   - You can now access the app at:http://<node-ip>:30080
+   - You can now access the app at:http://<node-ip>:30081
    
 
 8. Verify the Deployment:
@@ -220,9 +220,9 @@ spring.jpa.properties.hibernate.format_sql=true
 
 10. Port Forwarding:
    ```bash
-   kubectl port-forward service/expense-api-service 8080:80
+   kubectl port-forward service/expense-api-service 8081:80
    ```
-- Access the API at http://localhost:8080/api/expense.
+- Access the API at http://localhost:8081/api/expense.
 
 
 ## Investment Service
@@ -398,12 +398,12 @@ spring.jpa.properties.hibernate.format_sql=true
    ```
 
 7. Expose via NodePort (or Ingress):
-   - Your investment-service.yaml exposes the app on port 30080:
+   - Your investment-service.yaml exposes the app on port 30084:
 
    ```bash
    kubectl get svc investment-api-service
    ```
-   - You can now access the app at:http://<node-ip>:30080
+   - You can now access the app at:http://<node-ip>:30084
 
 
 8. Verify the Deployment:
@@ -421,10 +421,10 @@ spring.jpa.properties.hibernate.format_sql=true
 
 10. Port Forwarding:
    ```bash
-   kubectl port-forward service/investment-api-service 8080:80
+   kubectl port-forward service/investment-api-service 8084:80
    ```
 
-- Access the API at http://localhost:8080/api/investment.
+- Access the API at http://localhost:8084/api/investment.
 
 
 ### Budget Service
@@ -624,12 +624,12 @@ spring.jpa.properties.hibernate.format_sql=true
    ```
 
 7. Expose via NodePort (or Ingress):
-    - Your budget-service.yaml exposes the app on port 30080:
+    - Your budget-service.yaml exposes the app on port 30082:
 
    ```bash
    kubectl get svc budget-api-service
    ```
-    - You can now access the app at:http://<node-ip>:30080
+    - You can now access the app at:http://<node-ip>:30082
 
 
 8. Verify the Deployment:
@@ -647,10 +647,10 @@ spring.jpa.properties.hibernate.format_sql=true
    ```
 10. Port Forwarding:
    ```bash
-   kubectl port-forward service/budget-api-service 8080:80
+   kubectl port-forward service/budget-api-service 8082:80
    ```
 
-   - Access the API at http://localhost:8080/api/budget.
+   - Access the API at http://localhost:8082/api/budget.
 
 ## Auth Service
 
@@ -816,12 +816,12 @@ jwt.expiration=3600000
    ```
 
 6. Expose via NodePort (or Ingress):
-   - Your auth-service.yaml exposes the app on port 30080:
+   - Your auth-service.yaml exposes the app on port 30083:
 
    ```bash
    kubectl get svc auth-api-service
    ```
-   - You can now access the app at: http://<node-ip>:30080
+   - You can now access the app at: http://<node-ip>:30083
 
 7. Verify the Deployment:
    ```bash
