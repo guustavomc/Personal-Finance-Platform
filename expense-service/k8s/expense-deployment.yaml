@@ -20,7 +20,7 @@ spec:
           image: expense-api:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           envFrom:
             - secretRef:
                 name: db-secrets

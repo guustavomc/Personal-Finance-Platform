@@ -20,7 +20,7 @@ spec:
           image: auth-api:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 8081
+            - containerPort: 8083
           envFrom:
             - secretRef:
                 name: db-secrets
