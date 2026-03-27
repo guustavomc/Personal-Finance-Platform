@@ -20,12 +20,12 @@ spec:
           image: budget-api:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 8082
           envFrom:
             - secretRef:
                 name: db-secrets
           env:
             - name: EXPENSE_SERVICE_URL
-              value: "http://expense-api-service:8081"
+              value: "http://expense-api-service:80"
             - name: INVESTMENT_SERVICE_URL
-              value: "http://investment-api-service:8082"
+              value: "http://investment-api-service:80"

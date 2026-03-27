@@ -20,7 +20,7 @@ spec:
           image: investment-api:latest
           imagePullPolicy: Never
           ports:
-            - containerPort: 8080
+            - containerPort: 8084
           envFrom:
             - secretRef:
                 name: db-secrets
