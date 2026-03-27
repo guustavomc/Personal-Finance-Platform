@@ -838,9 +838,9 @@ jwt.expiration=3600000
 
 9. Port Forwarding:
    ```bash
-   kubectl port-forward service/auth-api-service 8081:80
+   kubectl port-forward service/auth-api-service 8083:80
    ```
-- Access the API at http://localhost:8081/auth (e.g. `POST /auth/register`, `POST /auth/login`).
+- Access the API at http://localhost:8083/auth (e.g. `POST /auth/register`, `POST /auth/login`).
 ---
 ### Future Enhancements
 
