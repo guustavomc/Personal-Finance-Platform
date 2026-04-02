@@ -842,6 +842,46 @@ jwt.expiration=3600000
    ```
 - Access the API at http://localhost:8083/auth (e.g. `POST /auth/register`, `POST /auth/login`).
 ---
+## Tests with Auth Service
+In Postman, go to the Authorization tab of your request and set it up like this:
+
+Auth Type: Bearer Token
+Token: paste the JWT you got from POST /auth/login on auth-service
+Postman will automatically add the Authorization: Bearer <token> header to the request.
+
+Full flow to test:
+
+1. Get a token — call auth-service first:
+
+- POST http://localhost:8083/auth/register
+- Content-Type: application/json
+```bash
+{
+  "username": "user1234",
+  "email": "user1234@example.com",
+  "password": "password123"
+}
+```
+2. Copy the token from the response, then call budget-service:
+
+- POST http://localhost:8082/api/budget
+Authorization: Bearer <paste token here>
+
+```bash
+{
+  "name": "Budget Test",
+  "budgetPeriodType": "MONTHLY",
+  "startDate": "2026-04-01",
+  "totalPlannedAmount": 3000.00,
+  "categories": [
+    {
+      "categoryName": "Rent",
+      "plannedAmount": 1200.00,
+      "type": "EXPENSE"
+    }
+  ]
+}
+```
 ### Future Enhancements
 
 This project is actively evolving. The following items are prioritized to make it more secure, scalable, testable, and production-ready.
