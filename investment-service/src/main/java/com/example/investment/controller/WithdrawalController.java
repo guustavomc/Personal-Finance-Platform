@@ -53,7 +53,7 @@ public class WithdrawalController {
         return ResponseEntity.status(HttpStatus.CREATED).body(withdrawal);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteWithdrawal(@PathVariable("id") long id){
         withdrawalService.removeWithdrawalWithID(id);
         return ResponseEntity.status(HttpStatus.OK).build();

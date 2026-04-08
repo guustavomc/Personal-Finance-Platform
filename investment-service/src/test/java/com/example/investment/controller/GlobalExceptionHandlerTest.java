@@ -2,6 +2,7 @@ package com.example.investment.controller;
 
 import com.example.investment.exception.InvestmentNotFoundException;
 import com.example.investment.exception.WithdrawalNotFoundException;
+import com.example.investment.security.JwtUtil;
 import com.example.investment.service.InvestmentService;
 import com.example.investment.service.WithdrawalService;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,17 +10,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest({InvestmentController.class, WithdrawalController.class})
+@WithMockUser
 public class GlobalExceptionHandlerTest {
 
     @Autowired
@@ -30,6 +34,9 @@ public class GlobalExceptionHandlerTest {
 
     @MockitoBean
     private WithdrawalService withdrawalService;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
 
     @BeforeEach
     public void setup(){
@@ -51,7 +58,7 @@ public class GlobalExceptionHandlerTest {
     void DataIntegrityViolationException_Return400_WhenFailedToDeleteInvestment() throws Exception{
         doThrow(new DataIntegrityViolationException("")).when(investmentService).removeInvestment(1L);
 
-        mockMvc.perform(delete("/api/investment/invest/1"))
+        mockMvc.perform(delete("/api/investment/invest/1").with(csrf()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message").value("Failed to delete investment, the register is in use: "));
