@@ -21,6 +21,21 @@ The Personal-Finance-Platform consists of four microservices:
 - **Validation**: Spring Validation
 - **Future Plans**: Spring Security, Docker, API Gateway, Service Discovery
 
+# Auto Deploy of All Services
+Usage:
+
+```
+./deploy.sh <cluster-name>   # defaults to "finance-cluster" if omitted
+```
+
+What it automates (in order):
+
+Creates the Kind cluster if it doesn't exist yet (skips if already running)
+Runs mvn clean package for all 4 services
+Builds Docker images and loads them into Kind
+Applies DB secrets + Postgres manifests per service
+Deploys the apps — auth, expense, investment first, then budget last (since it depends on the other two)
+Prints a full status report and the port-forward commands at the end
 # Detailed Description of Each Service
 
 ## Expense Service
